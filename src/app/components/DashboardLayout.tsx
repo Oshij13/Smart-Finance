@@ -1,12 +1,12 @@
 import { Outlet, Link, useLocation } from "react-router";
-import { 
-  LayoutDashboard, 
-  Target, 
-  Sparkles, 
-  PiggyBank, 
-  TrendingUp, 
-  Lightbulb, 
-  Wallet, 
+import {
+  LayoutDashboard,
+  Target,
+  Sparkles,
+  PiggyBank,
+  TrendingUp,
+  Lightbulb,
+  Wallet,
   Leaf,
   BookOpen,
   Menu,
@@ -73,8 +73,8 @@ export function DashboardLayout() {
               </div>
             </div>
             <div>
-              <h1 className="font-bold text-slate-900 text-sm">Smart Finance</h1>
-              <p className="text-xs text-slate-500">AI Advisor</p>
+              <h1 className="font-bold text-slate-900 text-sm">FinSight</h1>
+              <p className="text-xs text-slate-500">Your Financial AI Advisor</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
