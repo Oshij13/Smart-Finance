@@ -2,5 +2,5 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "./theme.css";
 @import "./fonts.css";
+@import "./theme.css";
