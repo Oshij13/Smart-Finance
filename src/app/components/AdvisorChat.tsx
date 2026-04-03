@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import html2canvas from "html2canvas";
 import { useLocation } from "react-router";
 import { getUserData } from "../store/userStore";
 import { generateFinancePDF } from "../../utils/generatePDF";
@@ -44,18 +45,32 @@ export default function AdvisorChat() {
         }
     }, [location.state]);
 
-    // ✅ FIXED PDF FUNCTION
-    const handleDownloadPDF = () => {
-        const latestMessage = messages[messages.length - 1];
+    // 📊 CAPTURE CHARTS & DOWNLOAD PDF
+    const handleDownloadPDF = async () => {
+        const chartImages: { [key: number]: string } = {};
+        
+        // Find all chart containers
+        const chartElements = document.querySelectorAll("[data-chart-id]");
+        
+        for (const el of Array.from(chartElements)) {
+            const id = parseInt(el.getAttribute("data-chart-id") || "0");
+            try {
+                const canvas = await html2canvas(el as HTMLElement, {
+                    scale: 2, // Higher quality
+                    logging: false,
+                    useCORS: true
+                });
+                chartImages[id] = canvas.toDataURL("image/png");
+            } catch (err) {
+                console.error("Failed to capture chart:", err);
+            }
+        }
 
         generateFinancePDF({
             userName: getUserData()?.name || "User",
             data: {
                 ...getUserData(),
-                insights: latestMessage?.data?.insights || [],
-                table: latestMessage?.data?.table || null,
-                recommendation: latestMessage?.data?.recommendation || "",
-                chartCanvas: chartRef.current || null,
+                chartImages: chartImages // Pass captured images
             },
             messages: messages,
         });
@@ -167,7 +182,9 @@ export default function AdvisorChat() {
 
                                         {/* Chart */}
                                         {msg.data?.chartConfig && (
-                                            <SmartChart config={msg.data.chartConfig} />
+                                            <div data-chart-id={i}>
+                                                <SmartChart config={msg.data.chartConfig} />
+                                            </div>
                                         )}
 
                                         {/* Table */}

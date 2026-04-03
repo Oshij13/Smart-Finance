@@ -4,7 +4,13 @@ import autoTable from "jspdf-autotable";
 // 🧹 CLEAN TEXT HELPER (Fixes scrambled characters/emojis for jsPDF)
 const cleanText = (text: any): string => {
     if (typeof text !== "string") return String(text || "");
-    return text
+    
+    // Remove JSON-like structures that GPT sometimes leaks into the message
+    let cleaned = text.replace(/\{[\s\S]*?"type":\s*"(pie|line|bar)"[\s\S]*?\}/g, "");
+
+    return cleaned
+        .replace(/\*\*/g, "") // Remove bolding
+        .replace(/###/g, "") // Remove headers
         .replace(/₹/g, "Rs.")
         .replace(/[^\x00-\x7F\n\r]/g, "") // Remove non-ASCII except newlines
         .trim();
@@ -47,7 +53,7 @@ export const generateFinancePDF = ({
     y += 10;
 
     doc.setFontSize(10);
-    messages.forEach((msg) => {
+    messages.forEach((msg, index) => {
         const role = msg.role === "user" ? "You" : "Smart Finance AI";
         const content = msg.message || msg.content || "";
 
@@ -61,24 +67,41 @@ export const generateFinancePDF = ({
         // Message Content
         doc.setFont("helvetica", "normal");
         const cleanedContent = cleanText(content);
+        if (!cleanedContent) return; // Skip if message became empty after cleaning (e.g. was just JSON)
+
         const lines = doc.splitTextToSize(cleanedContent, pageWidth - 2 * margin);
         
         // Page break check for text
-        if (y + lines.length * 5 > 280) {
+        if (y + lines.length * 5 + 10 > 280) {
             doc.addPage();
             y = 20;
         }
 
         doc.text(lines, margin, y);
-        y += lines.length * 5 + 5;
+        y += lines.length * 5 + 2;
 
-        // Extra space between messages
-        y += 2;
+        // Render Chart Image if available for this message index
+        if (data.chartImages && data.chartImages[index]) {
+            const chartImg = data.chartImages[index];
+            if (y + 60 > 280) { doc.addPage(); y = 20; }
+            doc.addImage(chartImg, "PNG", margin, y, pageWidth - 2 * margin, 60);
+            y += 65;
+        }
+
+        y += 3;
     });
 
-    // 📑 SECTION: FINANCIAL SUMMARY & INSIGHTS (FINAL PAGE)
-    doc.addPage();
-    y = 20;
+    // 📑 SECTION: FINANCIAL SUMMARY & INSIGHTS
+    // Only add a new page if we are low on space
+    if (y + 60 > 280) {
+        doc.addPage();
+        y = 20;
+    } else {
+        y += 10;
+        doc.setDrawColor(200);
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 10;
+    }
 
     // Sub-header for the final page
     doc.setFontSize(16);
@@ -109,15 +132,17 @@ export const generateFinancePDF = ({
     y = (doc as any).lastAutoTable.finalY + 12;
 
     // 💡 INSIGHTS
-    if (data?.insights) {
+    const insights = data.insights || (messages[messages.length - 1]?.data?.insights);
+    if (insights) {
         let insightsArray: string[] = [];
-        if (Array.isArray(data.insights)) {
-            insightsArray = data.insights;
-        } else if (typeof data.insights === "string") {
-            insightsArray = data.insights.split('\n').filter((l: string) => l.trim().length > 5);
+        if (Array.isArray(insights)) {
+            insightsArray = insights;
+        } else if (typeof insights === "string") {
+            insightsArray = insights.split('\n').filter((l: string) => l.trim().length > 5);
         }
 
         if (insightsArray.length > 0) {
+            if (y + 30 > 280) { doc.addPage(); y = 20; }
             doc.setFontSize(14);
             doc.text("Insights & Observations", margin, y);
             y += 8;
@@ -142,14 +167,15 @@ export const generateFinancePDF = ({
     }
 
     // 📊 TABLE
-    if (data?.table?.headers && data?.table?.rows) {
+    const tableData = data.table || (messages[messages.length - 1]?.data?.table);
+    if (tableData?.headers && tableData?.rows) {
         if (y + 30 > 280) { doc.addPage(); y = 20; }
         doc.setFontSize(14);
         doc.text("Detailed Breakdown", margin, y);
         y += 6;
 
-        const cleanedHeaders = data.table.headers.map((h: string) => cleanText(h));
-        const cleanedRows = data.table.rows.map((row: any[]) => row.map(cell => cleanText(cell)));
+        const cleanedHeaders = tableData.headers.map((h: string) => cleanText(h));
+        const cleanedRows = tableData.rows.map((row: any[]) => row.map(cell => cleanText(cell)));
 
         autoTable(doc, {
             startY: y,
@@ -163,8 +189,9 @@ export const generateFinancePDF = ({
     }
 
     // ⚡ RECOMMENDATION
-    if (data?.recommendation || (typeof data.insights === "string" && data.insights.includes("ACTION:"))) {
-        let rec = data.recommendation;
+    const recData = data.recommendation || (messages[messages.length - 1]?.data?.recommendation);
+    if (recData || (typeof data.insights === "string" && data.insights.includes("ACTION:"))) {
+        let rec = recData;
         if (!rec && typeof data.insights === "string") {
             rec = data.insights.split("ACTION:")[1]?.trim();
         }
