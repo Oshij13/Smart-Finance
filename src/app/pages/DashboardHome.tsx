@@ -133,7 +133,7 @@ export default function DashboardHome() {
   const progress = target > 0 ? (savings / target) * 100 : 0;
 
   // 💡 SMART INSIGHTS
-  const insights = [];
+  const insights: string[] = [];
 
   // Savings insight
   if (savingsRate >= 25) {
@@ -169,10 +169,25 @@ export default function DashboardHome() {
     insights.push("Your expenses are well managed — good financial control.");
   }
 
+  // ✅ AI INSIGHTS
+  if (Array.isArray(analysis?.insights)) {
+    analysis.insights.forEach((insight: string) => {
+      if (!insights.includes(insight)) {
+        insights.push(insight);
+      }
+    });
+  }
+
   let action = "";
-  if (analysis?.insights) {
-    const text = analysis.insights;
-    const parts = text.split("ACTION:");
+
+  // ✅ If backend sends direct recommendation
+  if (analysis?.recommendation) {
+    action = analysis.recommendation;
+  }
+
+  // ✅ fallback (if insights is string)
+  else if (typeof analysis?.insights === "string") {
+    const parts = analysis.insights.split("ACTION:");
     const actionPart = parts[1] || "";
     action = actionPart.replace("-", "").trim();
   }
