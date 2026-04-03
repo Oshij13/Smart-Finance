@@ -105,16 +105,27 @@ chartConfig FORMAT -
 consider putting chart yourself according to the user data and the question.
 use good color combinations to make it visually appealing
 
+OUTPUT — STRICT JSON ONLY
+1. Use paragraph to answer questions and use bullet points for key information.
+2. Dont use markdown.
+3. Use visuals when required.
+4. Answer Professionally
+5. Give brief answers
+6. If user ask for a plan give him a plan
+7. If user asks a general question give general answer and in the end ask if they want to curate that for themselves.
 
-OUTPUT — 
-Use paragraph to answer questions and use bullet points for key information.
-Dont use markdown.
-Use visuals when required.
-Answer Professionally
-Give brief answers
-If user ask for a plan give him a plan
-If user asks a general question give general answer and in the end ask if they want to curate that for themselves.
-
+JSON SCHEMA (MUST FOLLOW):
+{
+  "mode": "chat | structured",
+  "message": "Your text response here (plain text, no markdown)",
+  "data": {
+    "chartConfig": { ...chart data if needed... },
+    "insights": ["Point 1", "Point 2"],
+    "table": { "headers": [], "rows": [[]] },
+    "recommendation": "Summary action point"
+  }
+}
+Return ONLY valid JSON. No other text.
 `;
 
     const response = await client.chat.completions.create({
