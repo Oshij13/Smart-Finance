@@ -1,5 +1,14 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+ 
+// 🧹 CLEAN TEXT HELPER (Fixes scrambled characters/emojis for jsPDF)
+const cleanText = (text: any): string => {
+    if (typeof text !== "string") return String(text || "");
+    return text
+        .replace(/₹/g, "Rs.")
+        .replace(/[^\x00-\x7F\n\r]/g, "") // Remove non-ASCII except newlines
+        .trim();
+};
 
 export const generateFinancePDF = ({
     userName,
@@ -26,7 +35,7 @@ export const generateFinancePDF = ({
     doc.text("Smart Finance Report", margin, 18);
 
     doc.setFontSize(10);
-    doc.text(`User: ${userName}`, pageWidth - 60, 15);
+    doc.text(`User: ${cleanText(userName)}`, pageWidth - 60, 15);
     doc.text(`Date: ${date}`, pageWidth - 60, 22);
 
     doc.setTextColor(0, 0, 0);
@@ -51,7 +60,8 @@ export const generateFinancePDF = ({
 
         // Message Content
         doc.setFont("helvetica", "normal");
-        const lines = doc.splitTextToSize(content, pageWidth - 2 * margin);
+        const cleanedContent = cleanText(content);
+        const lines = doc.splitTextToSize(cleanedContent, pageWidth - 2 * margin);
         
         // Page break check for text
         if (y + lines.length * 5 > 280) {
@@ -81,10 +91,10 @@ export const generateFinancePDF = ({
     y += 8;
 
     const summary = [
-        ["Income", `₹${data?.income || 0}`],
-        ["Expenses", `₹${data?.expenses || 0}`],
-        ["Savings", `₹${data?.savings || 0}`],
-        ["Investments", `₹${data?.investments || 0}`],
+        ["Income", `Rs. ${data?.income || 0}`],
+        ["Expenses", `Rs. ${data?.expenses || 0}`],
+        ["Savings", `Rs. ${data?.savings || 0}`],
+        ["Investments", `Rs. ${data?.investments || 0}`],
     ];
 
     autoTable(doc, {
@@ -117,7 +127,7 @@ export const generateFinancePDF = ({
 
             insightsArray.forEach((insight: string) => {
                 const cleaned = insight.replace(/^[-*•\d.]+\s*/, "").replace(/\*\*/g, "").trim();
-                const splitText = doc.splitTextToSize(`• ${cleaned}`, pageWidth - 2 * margin);
+                const splitText = doc.splitTextToSize(`- ${cleanText(cleaned)}`, pageWidth - 2 * margin);
 
                 if (y + splitText.length * 6 > 280) {
                     doc.addPage();
@@ -138,10 +148,13 @@ export const generateFinancePDF = ({
         doc.text("Detailed Breakdown", margin, y);
         y += 6;
 
+        const cleanedHeaders = data.table.headers.map((h: string) => cleanText(h));
+        const cleanedRows = data.table.rows.map((row: any[]) => row.map(cell => cleanText(cell)));
+
         autoTable(doc, {
             startY: y,
-            head: [data.table.headers],
-            body: data.table.rows,
+            head: [cleanedHeaders],
+            body: cleanedRows,
             theme: "striped",
             headStyles: { fillColor: [99, 102, 241] }, // Indigo
         });
@@ -163,7 +176,7 @@ export const generateFinancePDF = ({
             y += 8;
 
             doc.setFontSize(11);
-            const splitText = doc.splitTextToSize(rec, pageWidth - 2 * margin);
+            const splitText = doc.splitTextToSize(cleanText(rec), pageWidth - 2 * margin);
             doc.text(splitText, margin, y);
         }
     }
