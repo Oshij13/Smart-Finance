@@ -8,9 +8,7 @@ console.log("🔥 SERVER FILE LOADED");
 dotenv.config();
 
 const app = express();
-app.use(cors({
-  origin: "*"
-}));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 const client = new OpenAI({
@@ -23,9 +21,9 @@ app.get("/", (req, res) => {
 });
 
 /* ===========================
-   ADVISOR CHAT
+   SHARED ADVISOR FUNCTION
 =========================== */
-app.post("/advisor", async (req, res) => {
+const handleAdvisor = async (req, res) => {
   try {
     const { message, userData } = req.body;
 
@@ -134,7 +132,7 @@ Note: Omit keys in "data" that are not relevant to the query. Always include cha
     const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" }, // ✅ Forces valid JSON — no more parse failures
+      response_format: { type: "json_object" },
     });
 
     let reply;
@@ -143,22 +141,32 @@ Note: Omit keys in "data" that are not relevant to the query. Always include cha
     } catch {
       reply = {
         mode: "chat",
-        message: "Sorry, I couldn't process that. Please try again.",
+        message: "Sorry, something went wrong.",
       };
     }
 
     res.json({ reply });
 
   } catch (error) {
-    console.error(error);
+    console.error("❌ ERROR:", error);
     res.status(500).json({ reply: "Error" });
   }
-});
+};
+
+/* ===========================
+   ROUTES
+=========================== */
+
+// Original route
+app.post("/advisor", handleAdvisor);
+
+// ✅ NEW ROUTE (IMPORTANT FIX)
+app.post("/api/chat", handleAdvisor);
 
 /* ===========================
    ANALYZE FINANCE
 =========================== */
-app.post("/analyze-finance", async (req, res) => {
+app.post("/api/analyze-finance", async (req, res) => {
   console.log("🚨 ANALYZE ROUTE WORKING");
 
   try {
@@ -176,30 +184,17 @@ app.post("/analyze-finance", async (req, res) => {
     const investmentRatio = inc > 0 ? Math.round((inv / inc) * 100) : 0;
 
     const prompt = `
-You are a smart financial advisor for Indian users.
+You are a smart financial advisor.
 
-User Profile:
-- Monthly Income: ₹${inc}
-- Monthly Expenses: ₹${exp}
-- Total Savings: ₹${sav}
-- Total Investments: ₹${inv}
-- Occupation: ${occupation}
+User:
+Income: ₹${inc}
+Expenses: ₹${exp}
+Savings: ₹${sav}
+Investments: ₹${inv}
 
-Key Metrics:
-- Savings Rate: ${savingsRate}%
-- Remaining Income: ₹${remainingIncome}
-- Emergency Fund: ${emergencyFundMonths} months
-- Investment Ratio: ${investmentRatio}%
-
-Give output STRICTLY:
-
-INSIGHTS:
-- Insight 1
-- Insight 2
-- Insight 3
-
-ACTION:
-- One clear action
+Give:
+- 3 insights
+- 1 action
 `;
 
     const response = await client.chat.completions.create({

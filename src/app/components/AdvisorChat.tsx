@@ -55,7 +55,7 @@ export default function AdvisorChat() {
                 insights: latestMessage?.data?.insights || [],
                 table: latestMessage?.data?.table || null,
                 recommendation: latestMessage?.data?.recommendation || "",
-                chartCanvas: chartRef.current || null, // ✅ SAFE
+                chartCanvas: chartRef.current || null,
             },
         });
     };
