@@ -1,544 +1,471 @@
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { 
-  Download, 
-  Sparkles, 
-  TrendingUp, 
-  TrendingDown, 
-  ArrowRight,
-  Target,
-  Zap,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  Calendar,
-  Shield,
-  Wallet,
-  DollarSign,
-  Activity,
-  PiggyBank
-} from "lucide-react";
-import { Progress } from "../components/ui/progress";
-import { Badge } from "../components/ui/badge";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router";
+import { getUserData, setUserData } from "../store/userStore";
 
-export function DashboardHome() {
-  const [currentMonth] = useState("April 2026");
-  const userName = localStorage.getItem("userName") || "User";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
-  // User's personalized data
-  const userData = {
-    monthlyIncome: 75000,
-    totalSavings: 145000,
-    monthlyExpenses: 52500,
-    investments: 85000,
-    emergencyFundTarget: 226398,
-    emergencyFundCurrent: 45000,
-    savingsTarget: 15093,
-    savingsCurrent: 12000,
-    currentPhase: "Phase 1 — Building Habit",
-    riskProfile: "Moderate"
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Legend,
+} from "recharts";
+
+export default function DashboardHome() {
+  const navigate = useNavigate();
+
+  const onboardingData = getUserData();
+
+  const [analysis, setAnalysis] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditingGoal, setIsEditingGoal] = useState(false);
+  const [goalInput, setGoalInput] = useState(onboardingData?.goal || "");
+
+  useEffect(() => {
+    if (!onboardingData) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchAnalysis = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/analyze-finance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(onboardingData),
+        });
+
+        const data = await response.json();
+        setAnalysis(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalysis();
+  }, []);
+
+  // ✅ PDF DOWNLOAD FUNCTION
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById("dashboard-content");
+    if (!element) return;
+
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const imgWidth = 210;
+    const pageHeight = 295;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save("SmartFinanceDashboard.pdf");
   };
 
-  // Metrics with trends
-  const metrics = [
-    { 
-      label: "Monthly Income", 
-      value: userData.monthlyIncome, 
-      trend: "+8%", 
-      trendUp: true, 
-      subtext: "vs last month",
-      icon: DollarSign,
+  if (loading) return <div className="p-6">Loading your dashboard...</div>;
+
+  const income = Number(onboardingData?.income || 0);
+  const expenses = Number(onboardingData?.expenses || 0);
+  const savings = Number(onboardingData?.savings || 0);
+  const investments = Number(onboardingData?.investments || 0);
+
+  const emergencyTarget = expenses * 6;
+  const emergencyProgress =
+    emergencyTarget > 0 ? (savings / emergencyTarget) * 100 : 0;
+
+  const savingsRate = income > 0 ? (savings / income) * 100 : 0;
+  const emergencyMonths = expenses > 0 ? savings / expenses : 0;
+  const investmentRate = income > 0 ? (investments / income) * 100 : 0;
+
+  // Scoring logic (out of 100)
+  let score = 0;
+
+  // Savings (40 points)
+  if (savingsRate >= 20) score += 40;
+  else score += (savingsRate / 20) * 40;
+
+  // Emergency fund (30 points)
+  if (emergencyMonths >= 6) score += 30;
+  else score += (emergencyMonths / 6) * 30;
+
+  // Investment (30 points)
+  if (investmentRate >= 20) score += 30;
+  else score += (investmentRate / 20) * 30;
+
+  score = Math.round(score);
+
+  // 🎯 GOAL LOGIC
+  const goal = onboardingData?.goal || "Wealth Building";
+
+  let target = 0;
+  if (goal.toLowerCase().includes("emergency")) {
+    target = expenses * 6;
+  } else if (goal.toLowerCase().includes("car")) {
+    target = 500000;
+  } else if (goal.toLowerCase().includes("house")) {
+    target = 2000000;
+  } else {
+    target = 100000;
+  }
+
+  const progress = target > 0 ? (savings / target) * 100 : 0;
+
+  // 💡 SMART INSIGHTS
+  const insights = [];
+
+  // Savings insight
+  if (savingsRate >= 25) {
+    insights.push("Your savings rate is excellent — you are building strong financial discipline.");
+  } else if (savingsRate >= 15) {
+    insights.push("Your savings rate is decent, but increasing it slightly can improve long-term security.");
+  } else {
+    insights.push("Your savings rate is low — try to save at least 20% of your income.");
+  }
+
+  // Emergency fund insight
+  if (emergencyMonths >= 6) {
+    insights.push("You have a strong emergency fund — you are well protected against unexpected situations.");
+  } else if (emergencyMonths >= 3) {
+    insights.push("Your emergency fund is moderate — aim for 6 months for better security.");
+  } else {
+    insights.push("Your emergency fund is low — prioritize building it to avoid financial stress.");
+  }
+
+  // Investment insight
+  if (investmentRate >= 20) {
+    insights.push("You are investing well — this will significantly help in long-term wealth creation.");
+  } else if (investmentRate >= 10) {
+    insights.push("Your investment level is okay, but increasing it can accelerate your financial growth.");
+  } else {
+    insights.push("You are under-investing — consider starting SIPs or other investment options.");
+  }
+
+  // Expense insight
+  if (expenses > income * 0.7) {
+    insights.push("Your expenses are high relative to income — reducing spending can improve savings.");
+  } else {
+    insights.push("Your expenses are well managed — good financial control.");
+  }
+
+  let action = "";
+  if (analysis?.insights) {
+    const text = analysis.insights;
+    const parts = text.split("ACTION:");
+    const actionPart = parts[1] || "";
+    action = actionPart.replace("-", "").trim();
+  }
+
+  // ⚡ NEXT ACTIONS LOGIC
+  const actions: { text: string; action: string }[] = [];
+
+  if (savingsRate < 20) {
+    actions.push({ text: "Increase your savings rate", action: "How can I save more money?" });
+  }
+  if (emergencyMonths < 6) {
+    actions.push({ text: "Build your emergency fund", action: "How to build emergency fund?" });
+  }
+  if (investmentRate < 15) {
+    actions.push({ text: "Start investing more", action: "Best investment options for me?" });
+  }
+  if (expenses > income * 0.7) {
+    actions.push({ text: "Reduce unnecessary expenses", action: "How to reduce expenses?" });
+  }
+  if (actions.length === 0) {
+    actions.push({ text: "Optimize your financial plan", action: "How to optimize my finances?" });
+  }
+
+  const cards = [
+    {
+      title: "Income",
+      value: income,
+      color: "text-green-600",
+      bg: "bg-green-50",
+      icon: "💰",
+      insight: "Stable income flow",
+    },
+    {
+      title: "Expenses",
+      value: expenses,
+      color: "text-red-500",
+      bg: "bg-red-50",
+      icon: "💸",
+      insight: expenses > income * 0.6 ? "High spending ⚠️" : "Controlled spending ✅",
+    },
+    {
+      title: "Savings",
+      value: savings,
       color: "text-blue-600",
-      bgColor: "bg-blue-50"
+      bg: "bg-blue-50",
+      icon: "📈",
+      insight: savingsRate > 20 ? "Strong savings 💪" : "Needs improvement ⚠️",
     },
-    { 
-      label: "Total Savings", 
-      value: userData.totalSavings, 
-      trend: "+12%", 
-      trendUp: true, 
-      subtext: "growing well",
-      icon: PiggyBank,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50"
-    },
-    { 
-      label: "Monthly Expenses", 
-      value: userData.monthlyExpenses, 
-      trend: "-3%", 
-      trendUp: false, 
-      subtext: "reduced nicely",
-      icon: Wallet,
+    {
+      title: "Investments",
+      value: investments,
       color: "text-purple-600",
-      bgColor: "bg-purple-50"
+      bg: "bg-purple-50",
+      icon: "📊",
+      insight: investmentRate > 15 ? "Good investing 🚀" : "Start investing more",
     },
-    { 
-      label: "Investments", 
-      value: userData.investments, 
-      trend: "+15%", 
-      trendUp: true, 
-      subtext: "on track",
-      icon: TrendingUp,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50"
-    },
-  ];
-
-  // Income vs Expenses trend
-  const incomeExpenseData = [
-    { month: "Nov", income: 70000, expenses: 58000 },
-    { month: "Dec", income: 72000, expenses: 56000 },
-    { month: "Jan", income: 73000, expenses: 55000 },
-    { month: "Feb", income: 75000, expenses: 54000 },
-    { month: "Mar", income: 75000, expenses: 53000 },
-    { month: "Apr", income: 75000, expenses: 52500 },
-  ];
-
-  // Expense breakdown
-  const expenseData = [
-    { name: "Essentials", value: 26250, color: "#3b82f6", status: "good" },
-    { name: "Discretionary", value: 15750, color: "#8b5cf6", status: "high" },
-    { name: "Savings", value: 12000, color: "#10b981", status: "good" },
-    { name: "Dining", value: 8000, color: "#f59e0b", status: "overspending" },
-    { name: "Transport", value: 5500, color: "#ec4899", status: "good" },
-  ];
-
-  const totalExpense = expenseData.reduce((sum, item) => sum + item.value, 0);
-  const savingsPercentage = ((userData.savingsCurrent / userData.monthlyIncome) * 100).toFixed(0);
-
-  // AI Insights
-  const aiInsights = [
-    { type: "warning", icon: AlertTriangle, message: "You overspent ₹2,000 on dining this month", color: "text-amber-600" },
-    { type: "success", icon: CheckCircle2, message: "Great! You saved ₹3,000 more than last month", color: "text-emerald-600" },
-    { type: "tip", icon: Sparkles, message: "You can save ₹1,500 by reducing subscriptions", color: "text-blue-600" },
-  ];
-
-  // Recent Activity
-  const recentActivity = [
-    { action: "AI suggested increase SIP by ₹2,000", time: "2 hours ago", status: "pending" },
-    { action: "New investment opportunity detected", time: "5 hours ago", status: "new" },
-    { action: "Tax calculated for FY 2025-26", time: "1 day ago", status: "completed" },
-    { action: "Budget exceeded in Dining category", time: "2 days ago", status: "alert" },
-  ];
-
-  // Financial Goals
-  const goals = [
-    { 
-      name: "Emergency Fund", 
-      current: userData.emergencyFundCurrent, 
-      target: userData.emergencyFundTarget, 
-      timeline: "8 months left",
-      icon: Shield,
-      color: "bg-blue-500"
-    },
-    { 
-      name: "Vacation Fund", 
-      current: 35000, 
-      target: 80000, 
-      timeline: "6 months left",
-      icon: Calendar,
-      color: "bg-purple-500"
-    },
-  ];
-
-  // Journey phases
-  const phases = [
-    { name: "Building Habit", status: "current", completed: true },
-    { name: "Growing Wealth", status: "next", completed: false },
-    { name: "Financial Freedom", status: "future", completed: false },
-  ];
-
-  // Modules progress
-  const modules = [
-    { name: "Savings Planner", progress: 75, status: "Active" },
-    { name: "Investments", progress: 45, status: "In Progress" },
-    { name: "Tax Planner", progress: 90, status: "Completed" },
-    { name: "Goal Tracker", progress: 60, status: "Active" },
-    { name: "Retirement", progress: 30, status: "Started" },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Hero Section - Personalized Greeting */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-8 text-white shadow-2xl">
-        <div className="relative z-10">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-                Good morning, {userName} 👋
-              </h1>
-              <p className="text-lg text-blue-100 mb-6">
-                Your financial snapshot for {currentMonth}
+    <div id="dashboard-content" className="p-6">
+      <div className="space-y-6">
+
+        {/* TOP */}
+        {/* HEADER */}
+        <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
+          <div>
+            <h1 className="text-2xl font-bold">
+              Hey {onboardingData?.name || "User"} 👋
+            </h1>
+            <p className="text-sm opacity-90">Your financial dashboard</p>
+          </div>
+
+          {/* ✅ BUTTON GROUP */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate("/ai-advisor")}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg"
+            >
+              ✨ AI Advisor
+            </button>
+
+            <button
+              onClick={handleDownloadPDF}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg"
+            >
+              📄 Download PDF
+            </button>
+          </div>
+        </div>
+
+        {/* 👤 PROFILE CARD */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+              {(onboardingData?.name || "U")[0]}
+            </div>
+
+            <div>
+              <h2 className="text-lg font-semibold">{onboardingData?.name || "User"}</h2>
+              <p className="text-sm text-gray-500">Monthly Income: ₹{onboardingData?.income || 0}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {onboardingData?.income > 50000 ? "Growing Investor" : "Beginner Investor"}
               </p>
-              <div className="flex flex-wrap gap-3">
-                <Button className="bg-white text-blue-700 hover:bg-blue-50 shadow-lg">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export Report
-                </Button>
-                <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Ask AI Advisor
-                </Button>
+            </div>
+          </div>
+
+          <div className="text-right">
+            {!isEditingGoal ? (
+              <>
+                <p className="text-sm text-gray-500">Primary Goal</p>
+                <p className="font-semibold text-blue-600">{onboardingData?.goal || "Wealth Building"}</p>
+                <button onClick={() => setIsEditingGoal(true)} className="text-xs text-blue-500 mt-1 hover:underline">Edit</button>
+              </>
+            ) : (
+              <div className="flex flex-col items-end gap-2">
+                <input value={goalInput} onChange={(e) => setGoalInput(e.target.value)} className="border px-2 py-1 rounded text-sm" placeholder="Enter goal" />
+                <div className="flex gap-2">
+                  <button onClick={() => { const updated = { ...onboardingData, goal: goalInput }; setUserData(updated); setIsEditingGoal(false); }} className="text-xs px-2 py-1 bg-green-500 text-white rounded">Save</button>
+                  <button onClick={() => setIsEditingGoal(false)} className="text-xs px-2 py-1 bg-gray-200 rounded">Cancel</button>
+                </div>
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* CORE STATUS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 💯 FINANCIAL HEALTH SCORE */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">💯 Financial Health</h3>
+              <span className="text-2xl font-bold text-blue-600">{score}/100</span>
+            </div>
+            <div className="w-full bg-gray-200 h-3 rounded-full mb-4">
+              <div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} />
+            </div>
+            <p className="text-sm mb-3">
+              {score > 75 ? "✅ Excellent financial health" : score > 50 ? "⚠️ Good, but can improve" : "🚨 Needs attention"}
+            </p>
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <div><p className="text-gray-500">Savings</p><p className="font-semibold">{savingsRate.toFixed(1)}%</p></div>
+              <div><p className="text-gray-500">Emergency</p><p className="font-semibold">{emergencyMonths.toFixed(1)} months</p></div>
+              <div><p className="text-gray-500">Investments</p><p className="font-semibold">{investmentRate.toFixed(1)}%</p></div>
+            </div>
+          </div>
+
+          {/* 🎯 GOAL PROGRESS TRACKER */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3>
+              <span className="text-sm text-gray-500">{progress.toFixed(0)}%</span>
+            </div>
+            <p className="text-sm text-gray-600 mb-2">{goal}</p>
+            <div className="w-full bg-gray-200 h-3 rounded-full mb-3">
+              <div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>₹{savings.toLocaleString()}</span>
+              <span>Target: ₹{target.toLocaleString()}</span>
             </div>
           </div>
         </div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/2 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl"></div>
-      </div>
 
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((metric, index) => {
-          const Icon = metric.icon;
-          return (
-            <Card key={index} className="border-0 shadow-lg bg-white/80 backdrop-blur hover:shadow-xl transition-all">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <div className={`w-11 h-11 rounded-xl ${metric.bgColor} flex items-center justify-center`}>
-                    <Icon className={`w-6 h-6 ${metric.color}`} />
-                  </div>
-                  <div className={`flex items-center gap-1 text-sm font-semibold ${
-                    metric.trendUp ? 'text-emerald-600' : 'text-rose-600'
-                  }`}>
-                    {metric.trendUp ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                    {metric.trend}
-                  </div>
-                </div>
-                <p className="text-sm text-slate-600 mb-1">{metric.label}</p>
-                <p className="text-2xl font-bold text-slate-900">₹{metric.value.toLocaleString()}</p>
-                <p className="text-xs text-slate-500 mt-1">{metric.subtext}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Personalized Progress Layer */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Emergency Fund Progress */}
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 lg:col-span-2">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-blue-900">
-              <Shield className="w-5 h-5" />
-              Emergency Fund Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex justify-between items-baseline mb-2">
-                <span className="text-2xl font-bold text-slate-900">
-                  ₹{userData.emergencyFundCurrent.toLocaleString()}
-                </span>
-                <span className="text-sm text-slate-600">
-                  / ₹{userData.emergencyFundTarget.toLocaleString()}
-                </span>
+        {/* FINANCIAL SNAPSHOT */}
+        {/* CARDS */}
+        <div className="grid grid-cols-4 gap-4">
+          {cards.map((card, i) => (
+            <div key={i} className={`p-6 rounded-2xl shadow-sm hover:shadow-md transition ${card.bg}`}>
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-xl">{card.icon}</span>
+                <span className="text-xs text-gray-400">Monthly</span>
               </div>
-              <Progress 
-                value={(userData.emergencyFundCurrent / userData.emergencyFundTarget) * 100} 
-                className="h-3"
-              />
-              <p className="text-sm text-slate-600 mt-2">
-                {((userData.emergencyFundCurrent / userData.emergencyFundTarget) * 100).toFixed(0)}% complete • 
-                About 8 months to reach your goal
-              </p>
+              <p className="text-sm text-gray-500">{card.title}</p>
+              <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString()}</h2>
+              <p className={`text-xs mt-2 font-medium ${card.insight.includes("⚠️") ? "text-red-500" : "text-green-600"}`}>{card.insight}</p>
             </div>
+          ))}
+        </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <div className="p-3 rounded-xl bg-white/60 backdrop-blur">
-                <p className="text-xs text-slate-600 mb-1">Savings Rate</p>
-                <p className="text-xl font-bold text-slate-900">
-                  ₹{userData.savingsCurrent.toLocaleString()}
-                </p>
-                <p className="text-xs text-slate-500">Target: ₹{userData.savingsTarget.toLocaleString()}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-white/60 backdrop-blur">
-                <p className="text-xs text-slate-600 mb-1">Current Phase</p>
-                <Badge className="bg-blue-600 text-white border-0 mt-1">
-                  {userData.currentPhase}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Next Best Action */}
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-teal-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-emerald-900">
-              <Zap className="w-5 h-5" />
-              Your Next Best Action
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="p-4 rounded-xl bg-white/60 backdrop-blur border border-emerald-200">
-              <p className="font-semibold text-slate-900 mb-2">Increase savings by ₹1,000</p>
-              <p className="text-sm text-slate-600 mb-3">
-                Boost your emergency fund faster
-              </p>
-              <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700">
-                Increase Savings
-              </Button>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white/40 backdrop-blur">
-              <p className="text-xs text-slate-600 mb-1">Next Milestone</p>
-              <p className="text-sm font-semibold text-slate-900">
-                Emergency fund complete in 8 months
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Income vs Expenses */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Income vs Expenses</CardTitle>
-              <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                Trending Down
-              </Badge>
-            </div>
-            <CardDescription>Your spending is decreasing month over month</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={280}>
-              <LineChart data={incomeExpenseData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="month" stroke="#64748b" />
-                <YAxis stroke="#64748b" />
-                <Tooltip 
-                  formatter={(value: number) => `₹${value.toLocaleString()}`}
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                    border: 'none', 
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Line type="monotone" dataKey="income" stroke="#3b82f6" strokeWidth={3} dot={{ r: 5 }} />
-                <Line type="monotone" dataKey="expenses" stroke="#f59e0b" strokeWidth={3} dot={{ r: 5 }} />
-              </LineChart>
+        {/* VISUAL */}
+        {/* CHARTS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 50/30/20 RULE GRAPH */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚖️ 50/30/20 Rule Analysis</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={[{ name: "Needs(50%)", Target: income * 0.50, Actual: expenses * 0.625 }, { name: "Wants(30%)", Target: income * 0.30, Actual: expenses * 0.375 }, { name: "Savings(20%)", Target: income * 0.20, Actual: savings + investments }]} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
+                <XAxis dataKey="name" fontSize={12} tickMargin={8} />
+                <YAxis fontSize={11} tickFormatter={(val) => `₹${val >= 1000 ? val / 1000 + 'k' : val}`} />
+                <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString()}`} cursor={{ fill: '#f1f5f9' }} />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar dataKey="Actual" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={40} />
+              </BarChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Expense Breakdown */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-          <CardHeader>
-            <CardTitle>Expense Breakdown</CardTitle>
-            <CardDescription>
-              <span className="text-rose-600 font-semibold">Overspending on Dining</span> • 
-              <span className="text-emerald-600 ml-1">On track for essentials</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="relative">
-              <ResponsiveContainer width="100%" height={280}>
-                <PieChart>
-                  <Pie
-                    data={expenseData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={110}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {expenseData.map((entry, index) => (
-                      <Cell key={`pie-cell-${entry.name}-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value: number) => `₹${value.toLocaleString()}`}
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                      border: 'none', 
-                      borderRadius: '12px',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-slate-900">{savingsPercentage}%</p>
-                  <p className="text-xs text-slate-600">saved</p>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              {expenseData.map((item, index) => (
-                <div key={`legend-${item.name}-${index}`} className="flex items-center gap-2 text-sm">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                  <span className="text-slate-700">{item.name}</span>
+          {/* BAR */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Monthly Overview</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* ACTION */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* ⚡ WHAT SHOULD I DO NEXT */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚡ What Should You Do Next?</h3>
+            <div className="space-y-3">
+              {actions.map((item, i) => (
+                <div key={i} onClick={() => navigate("/ai-advisor", { state: { query: item.action } })} className="p-4 rounded-xl border hover:bg-gray-50 hover:shadow cursor-pointer transition">
+                  <p className="text-sm font-medium">{item.text}</p>
+                  <p className="text-xs text-gray-500 mt-1">Click to explore →</p>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* NEXT BEST ACTION (AI) */}
+          <div className="bg-green-50 p-6 rounded-2xl shadow-sm hover:shadow-md transition border border-green-100">
+            <p className="font-semibold text-green-700 flex items-center gap-2">
+              ✨ AI Recommendation
+            </p>
+            <p className="text-sm mt-3 leading-relaxed text-green-800">
+              {action || "AI will suggest actions here based on your data."}
+            </p>
+          </div>
+        </div>
+
+        {/* INSIGHTS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 🛡️ EMERGENCY FUND */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">🛡️ Emergency Fund</h3>
+
+            <p className="text-sm text-gray-500 mb-3">
+              {emergencyMonths.toFixed(1)} months covered
+            </p>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 h-3 rounded-full mb-3">
+              <div
+                className="bg-blue-500 h-3 rounded-full"
+                style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }}
+              />
+            </div>
+
+            <p className="text-xs text-gray-500 mb-4">
+              Target: ₹{(expenses * 6).toLocaleString()}
+            </p>
+
+            {/* 💡 WHY IT MATTERS */}
+            <div className="bg-blue-50 p-4 rounded-xl text-sm text-gray-700 space-y-2">
+              <p>
+                💡 <strong>Why is an emergency fund important?</strong>
+              </p>
+              <p>
+                It protects you from unexpected situations like job loss, medical emergencies,
+                or urgent expenses — so you don’t rely on loans or credit cards.
+              </p>
+              <p>
+                📊 <strong>Why 3–6 months?</strong>
+              </p>
+              <p>
+                Having at least 3–6 months of expenses saved gives you enough time to recover
+                financially without stress if your income stops.
+              </p>
+            </div>
+          </div>
+
+          {/* 💡 SMART INSIGHTS */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 Smart Insights</h3>
+            <div className="space-y-3">
+              {insights.map((insight, i) => (
+                <div key={i} className="bg-blue-50 p-3 rounded-xl text-sm text-gray-700">
+                  {insight}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
-
-      {/* AI Insights + Activity Feed */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Smart Insights */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-indigo-600" />
-              Smart Insights
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {aiInsights.map((insight, index) => {
-              const Icon = insight.icon;
-              return (
-                <div key={index} className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                  <Icon className={`w-5 h-5 ${insight.color} flex-shrink-0 mt-0.5`} />
-                  <p className="text-sm text-slate-700 flex-1">{insight.message}</p>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="w-5 h-5" />
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {recentActivity.map((activity, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                  activity.status === 'completed' ? 'bg-emerald-500' :
-                  activity.status === 'alert' ? 'bg-rose-500' :
-                  activity.status === 'new' ? 'bg-blue-500' :
-                  'bg-amber-500'
-                }`}></div>
-                <div className="flex-1">
-                  <p className="text-sm text-slate-700">{activity.action}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Financial Goals */}
-      <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            Financial Goals
-          </CardTitle>
-          <CardDescription>Track your progress towards major milestones</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {goals.map((goal, index) => {
-              const Icon = goal.icon;
-              const progress = (goal.current / goal.target) * 100;
-              return (
-                <div key={index} className="p-5 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl ${goal.color} flex items-center justify-center`}>
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-900">{goal.name}</p>
-                        <p className="text-xs text-slate-500">{goal.timeline}</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {progress.toFixed(0)}%
-                    </Badge>
-                  </div>
-                  <Progress value={progress} className="h-2 mb-2" />
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">₹{goal.current.toLocaleString()}</span>
-                    <span className="text-slate-500">₹{goal.target.toLocaleString()}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Journey Tracker */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-indigo-50">
-        <CardHeader>
-          <CardTitle>Your Financial Journey</CardTitle>
-          <CardDescription>Building towards financial freedom</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between gap-4">
-            {phases.map((phase, index) => (
-              <div key={index} className="flex-1">
-                <div className={`p-4 rounded-xl text-center transition-all ${
-                  phase.status === 'current' 
-                    ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white shadow-lg' 
-                    : phase.completed
-                    ? 'bg-white/60 text-slate-700'
-                    : 'bg-white/40 text-slate-500'
-                }`}>
-                  <p className="font-semibold text-sm mb-1">{phase.name}</p>
-                  {phase.status === 'current' && (
-                    <Badge className="bg-white/20 text-white border-0 text-xs">Current</Badge>
-                  )}
-                  {phase.completed && phase.status !== 'current' && (
-                    <CheckCircle2 className="w-5 h-5 mx-auto text-emerald-600" />
-                  )}
-                  {!phase.completed && phase.status !== 'current' && (
-                    <Clock className="w-5 h-5 mx-auto opacity-50" />
-                  )}
-                </div>
-                {index < phases.length - 1 && (
-                  <div className="h-1 bg-slate-200 my-2"></div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* AI Modules Progress */}
-      <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-        <CardHeader>
-          <CardTitle>Module Progress</CardTitle>
-          <CardDescription>Complete modules to unlock better insights</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {modules.map((module, index) => (
-              <div key={index} className="p-4 rounded-xl border border-slate-200 hover:border-blue-300 transition-all">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="font-semibold text-slate-900 text-sm">{module.name}</p>
-                  <Badge variant={
-                    module.status === 'Completed' ? 'default' :
-                    module.status === 'Active' ? 'secondary' :
-                    'outline'
-                  } className="text-xs">
-                    {module.status}
-                  </Badge>
-                </div>
-                <Progress value={module.progress} className="h-2 mb-2" />
-                <p className="text-xs text-slate-600">{module.progress}% complete</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
