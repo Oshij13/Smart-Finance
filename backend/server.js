@@ -95,37 +95,31 @@ RESPONSE RULES (FOLLOW STRICTLY):
 5. Use "insights" array and "table" object when helpful.
 6. For tax questions, include the full tax comparison schema.
 
-CHART RULES — MANDATORY:
-- Budget / 50-30-20 breakdown → PIE CHART
-- Investment growth / SIP / future value → LINE CHART (year-by-year, minimum 5 years)
-- Comparisons (options, instruments, regimes) → BAR CHART, LINE CHART whatever helps.
-- Always include a "chartConfig" whenever you mention numbers, percentages, or projections.
+CHART SCHEMAS (STRICTLY FOLLOW FOR VISUALS):
+1. PIE CHART (Budget/Breakdown):
+   { "type": "pie", "data": [{ "name": "Category", "value": 100 }], "series": [{ "color": "#6366F1" }, { "color": "#10B981" }], "title": "Chart Title" }
+2. LINE/BAR CHART (SIP/Projections):
+   { "type": "line", "data": [{ "year": "2025", "total": 5000 }], "xKey": "year", "series": [{ "key": "total", "name": "Wealth", "color": "#8B5CF6" }], "title": "Title" }
 
-chartConfig FORMAT -
-consider putting chart yourself according to the user data and the question.
-use good color combinations to make it visually appealing
+COLOR PALETTE (Use for "fun" look):
+- Vibrant Purple: #8B5CF6, Emerald Green: #10B981, Sky Blue: #0EA5E9, Soft Rose: #F43F5E, Amber Orange: #F59E0B.
 
-OUTPUT — STRICT JSON OUTPUT — STRICT JSON ONLY
-1. Use paragraph to answer questions and use bullet points for key information.
-2. STRICTLY NO MARKDOWN: Never use **bold**, ### headers, or | tables |. Use plain text only. If the response contains markdown symbols like **, it will fail.
-3. Use visuals when required.
-4. Answer Professionally and briefly.
-5. If user ask for a plan, give him a plan.
-6. Always end with a follow-up question.
-7. If user asks a general question, give a general answer and then ask if they want to curate it for themselves.
-
-JSON SCHEMA (MUST FOLLOW):
-{
-  "mode": "chat | structured",
-  "message": "Your text response here (plain text, no markdown)",
-  "data": {
-    "chartConfig": { ...chart data if needed... },
-    "insights": ["Point 1", "Point 2"],
-    "table": { "headers": [], "rows": [[]] },
-    "recommendation": "Summary action point"
-  }
-}
-Return ONLY valid JSON. No other text.
+OUTPUT — STRICT JSON ONLY
+1. Use paragraph for text answers. 
+2. STRICTLY NO MARKDOWN.
+3. Use visuals (charts/tables) liberally to make it fun.
+4. If plan requested, give a 12-month roadmap table.
+5. JSON SCHEMA (MUST FOLLOW):
+   {
+     "mode": "chat | structured",
+     "message": "Plain text response",
+     "data": {
+       "chartConfig": { ...one of the schemas above... },
+       "insights": ["Point 1"],
+       "table": { "headers": ["Col 1", "Col 2"], "rows": [["Val1", "Val2"]] },
+       "recommendation": "One sentence summary"
+     }
+   }
 `;
 
     const response = await client.chat.completions.create({
