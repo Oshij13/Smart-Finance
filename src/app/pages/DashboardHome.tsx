@@ -36,7 +36,7 @@ export default function DashboardHome() {
 
     const fetchAnalysis = async () => {
       try {
-        const response = await fetch("http://localhost:5000/analyze-finance", {
+        const response = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/analyze-finance", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(onboardingData),
