@@ -136,9 +136,14 @@ export default function AdvisorChat() {
 
                                 {(msg.message ?? msg.content) && (
                                     <div className="bg-white border shadow px-5 py-4 rounded-xl">
-                                        {(msg.message ?? msg.content).split('\n').map((p: string, i: number) =>
-                                            p.trim() ? <p key={i}>{p}</p> : null
-                                        )}
+                                        { (msg.message ?? msg.content)
+                                            .replace(/\*\*/g, "") // Strip bolding
+                                            .replace(/###/g, "") // Strip headers
+                                            .split("\n")
+                                            .map((p: string, i: number) =>
+                                                p.trim() ? <p key={i}>{p}</p> : null
+                                            )
+                                        }
                                     </div>
                                 )}
 
