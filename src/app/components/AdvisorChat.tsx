@@ -67,7 +67,10 @@ export default function AdvisorChat() {
         setLoading(true);
 
         try {
-            const res = await fetch("http://localhost:5000/advisor", {
+            // Wake up backend (Render sleep fix)
+            await fetch("https://smart-finance-backend-w4ou.onrender.com");
+
+            const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -75,6 +78,10 @@ export default function AdvisorChat() {
                     userData: getUserData(),
                 }),
             });
+
+            if (!res.ok) {
+                throw new Error("Backend error");
+            }
 
             const data = await res.json();
 
