@@ -476,7 +476,7 @@ export default function DashboardHome() {
           <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 Smart Insights</h3>
             <div className="space-y-3">
-              {insights.map((insight, i) => (
+              {(insights || []).map((insight, i) => (
                 <div key={i} className="bg-blue-50 p-3 rounded-xl text-sm text-gray-700">
                   {insight}
                 </div>

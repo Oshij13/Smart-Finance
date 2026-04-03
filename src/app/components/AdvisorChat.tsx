@@ -148,7 +148,7 @@ export default function AdvisorChat() {
                                     <div className="space-y-4">
 
                                         {/* Insights */}
-                                        {msg.data.insights && (
+                                        {msg.data.insights && Array.isArray(msg.data.insights) && (
                                             <div className="bg-purple-50 p-4 rounded-xl">
                                                 <p className="font-semibold mb-2">💡 Insights</p>
                                                 <ul className="list-disc ml-4 text-sm">
@@ -170,15 +170,15 @@ export default function AdvisorChat() {
                                                 <table className="w-full text-sm">
                                                     <thead className="bg-gray-100">
                                                         <tr>
-                                                            {msg.data.table.headers.map((h: string, i: number) => (
+                                                            {(msg.data.table.headers || []).map((h: string, i: number) => (
                                                                 <th key={i} className="p-2">{h}</th>
                                                             ))}
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {msg.data.table.rows.map((row: string[], i: number) => (
+                                                        {(msg.data.table.rows || []).map((row: any[], i: number) => (
                                                             <tr key={i}>
-                                                                {row.map((cell, j) => (
+                                                                {(row || []).map((cell, j) => (
                                                                     <td key={j} className="p-2">{cell}</td>
                                                                 ))}
                                                             </tr>
