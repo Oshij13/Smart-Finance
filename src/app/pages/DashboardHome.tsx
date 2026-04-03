@@ -150,11 +150,20 @@ export default function DashboardHome() {
         }
       });
     } else if (typeof analysis.insights === "string") {
-      // If it's a string, split by newlines and clean it up
-      const lines = (analysis.insights as string).split('\n');
-      lines.forEach((line: string) => {
+      // Split by newlines OR bullet markers to ensure separate points
+      const rawLines = (analysis.insights as string)
+        .split(/\n|(?=\s[-*•\d.]+\s)/); // Split by newline OR lookahead for bullet
+
+      rawLines.forEach((line: string) => {
         const trimmed = line.trim();
-        if (!trimmed || trimmed.includes("ACTION:") || trimmed.includes("Priority Action Step")) return;
+        // Skip headers, action labels, or empty lines
+        if (
+          !trimmed || 
+          trimmed.includes("ACTION:") || 
+          trimmed.includes("Action Step") ||
+          trimmed.includes("Insights") ||
+          trimmed.includes("Financial Analysis")
+        ) return;
 
         // Clean up markdown and bullets
         const cleaned = trimmed

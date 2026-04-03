@@ -180,10 +180,12 @@ Expenses: ₹${exp}
 Savings: ₹${sav}
 Investments: ₹${inv}
 
-Instructions:
-1. Provide exactly 3 specific, personalized insights about their finances. No bolding or headers.
-2. Provide a single, detailed paragraph (at least 3-4 sentences) as a priority recommendation to fill the recommendation card. 
-3. Directives: NO markdown, NO bold (**), and START the recommendation paragraph with "ACTION: ".
+Instructions (STRICT):
+1. Provide exactly 4 concise, single-sentence insights about their finances.
+2. NO markdown, NO bold (**), and NO headers (###).
+3. NO extra text before or after the insights.
+4. Each insight must be on its own line starting with a dash (-).
+5. Finally, provide a DETAILED paragraph (3-4 sentences) as a recommendation. START this paragraph with "ACTION: ".
 `;
 
     const response = await client.chat.completions.create({
