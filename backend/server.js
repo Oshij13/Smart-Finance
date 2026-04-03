@@ -180,9 +180,10 @@ Expenses: ₹${exp}
 Savings: ₹${sav}
 Investments: ₹${inv}
 
-Give EXACTLY:
-- 3 personalized insights about their finances
-- 1 priority action step starting with "ACTION: "
+Instructions:
+1. Provide exactly 3 specific, personalized insights about their finances. No bolding or headers.
+2. Provide a single, detailed paragraph (at least 3-4 sentences) as a priority recommendation to fill the recommendation card. 
+3. Directives: NO markdown, NO bold (**), and START the recommendation paragraph with "ACTION: ".
 `;
 
     const response = await client.chat.completions.create({

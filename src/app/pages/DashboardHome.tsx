@@ -135,61 +135,39 @@ export default function DashboardHome() {
   // 💡 SMART INSIGHTS
   const insights: string[] = [];
 
-  // Savings insight
-  if (savingsRate >= 25) {
-    insights.push("Your savings rate is excellent — you are building strong financial discipline.");
-  } else if (savingsRate >= 15) {
-    insights.push("Your savings rate is decent, but increasing it slightly can improve long-term security.");
-  } else {
-    insights.push("Your savings rate is low — try to save at least 20% of your income.");
-  }
-
-  // Emergency fund insight
-  if (emergencyMonths >= 6) {
-    insights.push("You have a strong emergency fund — you are well protected against unexpected situations.");
-  } else if (emergencyMonths >= 3) {
-    insights.push("Your emergency fund is moderate — aim for 6 months for better security.");
-  } else {
-    insights.push("Your emergency fund is low — prioritize building it to avoid financial stress.");
-  }
-
-  // Investment insight
-  if (investmentRate >= 20) {
-    insights.push("You are investing well — this will significantly help in long-term wealth creation.");
-  } else if (investmentRate >= 10) {
-    insights.push("Your investment level is okay, but increasing it can accelerate your financial growth.");
-  } else {
-    insights.push("You are under-investing — consider starting SIPs or other investment options.");
-  }
-
-  // Expense insight
-  if (expenses > income * 0.7) {
-    insights.push("Your expenses are high relative to income — reducing spending can improve savings.");
-  } else {
-    insights.push("Your expenses are well managed — good financial control.");
-  }
-
   // ✅ AI INSIGHTS
-  if (Array.isArray(analysis?.insights)) {
-    analysis.insights.forEach((insight: string) => {
-      if (!insights.includes(insight)) {
-        insights.push(insight);
-      }
-    });
-  } else if (typeof analysis?.insights === "string") {
-    // If it's a string, split by newlines and clean it up
-    const aiPoints = (analysis.insights as string)
-      .split('\n')
-      .map((p: string) => p.trim())
-      .filter((p: string) => p.length > 10 && !p.includes("ACTION:")); // Extract meaningful points, ignore action
+  if (analysis?.insights) {
+    if (Array.isArray(analysis.insights)) {
+      analysis.insights.forEach((insight: string) => {
+        // Clean up markdown
+        const cleaned = insight
+          .replace(/\*\*/g, "")
+          .replace(/###/g, "")
+          .replace(/^[-*•\d.]+\s*/, "")
+          .trim();
+        if (cleaned && !insights.includes(cleaned)) {
+          insights.push(cleaned);
+        }
+      });
+    } else if (typeof analysis.insights === "string") {
+      // If it's a string, split by newlines and clean it up
+      const lines = (analysis.insights as string).split('\n');
+      lines.forEach((line: string) => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.includes("ACTION:") || trimmed.includes("Priority Action Step")) return;
 
-    aiPoints.forEach((p: string) => {
-      // Clean up common bullet prefixes like "- ", "1. ", etc.
-      const cleaned = p.replace(/^[-*•\d.]+\s*/, "").trim();
-      if (!insights.includes(cleaned)) {
-        insights.push(cleaned);
-      }
-    });
+        // Clean up markdown and bullets
+        const cleaned = trimmed
+          .replace(/\*\*/g, "")
+          .replace(/###/g, "")
+          .replace(/^[-*•\d.]+\s*/, "")
+          .trim();
+
+        if (cleaned && cleaned.length > 10 && !insights.includes(cleaned)) {
+          insights.push(cleaned);
+        }
+      });
+    }
   }
 
   let action = "";
@@ -203,7 +181,11 @@ export default function DashboardHome() {
   else if (typeof analysis?.insights === "string") {
     const parts = analysis.insights.split("ACTION:");
     const actionPart = parts[1] || "";
-    action = actionPart.replace("-", "").trim();
+    action = actionPart
+      .replace(/\*\*/g, "") // Strip bolding
+      .replace(/###/g, "") // Strip headers
+      .replace(/^-+\s*/, "") // Strip leading dashes
+      .trim();
   }
 
   // ⚡ NEXT ACTIONS LOGIC
