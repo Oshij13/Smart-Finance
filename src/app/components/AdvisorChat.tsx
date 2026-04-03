@@ -57,6 +57,7 @@ export default function AdvisorChat() {
                 recommendation: latestMessage?.data?.recommendation || "",
                 chartCanvas: chartRef.current || null,
             },
+            messages: messages,
         });
     };
 

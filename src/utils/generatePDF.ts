@@ -4,12 +4,13 @@ import autoTable from "jspdf-autotable";
 export const generateFinancePDF = ({
     userName,
     data,
+    messages = [],
 }: {
     userName: string;
     data: any;
+    messages?: any[];
 }) => {
     const doc = new jsPDF();
-
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 14;
     const date = new Date().toLocaleDateString();
@@ -29,15 +30,55 @@ export const generateFinancePDF = ({
     doc.text(`Date: ${date}`, pageWidth - 60, 22);
 
     doc.setTextColor(0, 0, 0);
-
     y = 40;
 
-    // 🧾 SECTION: SUMMARY
+    // 💬 SECTION: CONVERSATION HISTORY
+    doc.setFontSize(14);
+    doc.text("Conversation History", margin, y);
+    y += 10;
+
+    doc.setFontSize(10);
+    messages.forEach((msg) => {
+        const role = msg.role === "user" ? "You" : "Smart Finance AI";
+        const content = msg.message || msg.content || "";
+
+        if (!content) return;
+
+        // Label
+        doc.setFont("helvetica", "bold");
+        doc.text(`${role}:`, margin, y);
+        y += 5;
+
+        // Message Content
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(content, pageWidth - 2 * margin);
+        
+        // Page break check for text
+        if (y + lines.length * 5 > 280) {
+            doc.addPage();
+            y = 20;
+        }
+
+        doc.text(lines, margin, y);
+        y += lines.length * 5 + 5;
+
+        // Extra space between messages
+        y += 2;
+    });
+
+    // 📑 SECTION: FINANCIAL SUMMARY & INSIGHTS (FINAL PAGE)
+    doc.addPage();
+    y = 20;
+
+    // Sub-header for the final page
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Financial Analysis & Insights", margin, y);
+    y += 10;
+
     doc.setFontSize(14);
     doc.text("Financial Summary", margin, y);
     y += 8;
-
-    doc.setFontSize(11);
 
     const summary = [
         ["Income", `₹${data?.income || 0}`],
@@ -51,114 +92,89 @@ export const generateFinancePDF = ({
         head: [["Category", "Amount"]],
         body: summary,
         theme: "grid",
+        styles: { fontSize: 11 },
+        headStyles: { fillColor: [16, 185, 129] }, // Emerald Green
     });
 
-    y = (doc as any).lastAutoTable.finalY + 10;
+    y = (doc as any).lastAutoTable.finalY + 12;
 
     // 💡 INSIGHTS
-    if (data?.insights?.length) {
-        doc.setFontSize(14);
-        doc.text("Insights", margin, y);
-        y += 6;
+    if (data?.insights) {
+        let insightsArray: string[] = [];
+        if (Array.isArray(data.insights)) {
+            insightsArray = data.insights;
+        } else if (typeof data.insights === "string") {
+            insightsArray = data.insights.split('\n').filter((l: string) => l.trim().length > 5);
+        }
 
-        doc.setFontSize(11);
+        if (insightsArray.length > 0) {
+            doc.setFontSize(14);
+            doc.text("Insights & Observations", margin, y);
+            y += 8;
 
-        data.insights.forEach((insight: string) => {
-            const splitText = doc.splitTextToSize(`• ${insight}`, pageWidth - 2 * margin);
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "normal");
 
-            // Page break check
-            if (y + splitText.length * 6 > 280) {
-                doc.addPage();
-                y = 20;
-            }
+            insightsArray.forEach((insight: string) => {
+                const cleaned = insight.replace(/^[-*•\d.]+\s*/, "").replace(/\*\*/g, "").trim();
+                const splitText = doc.splitTextToSize(`• ${cleaned}`, pageWidth - 2 * margin);
 
-            doc.text(splitText, margin, y);
-            y += splitText.length * 6;
-        });
+                if (y + splitText.length * 6 > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
 
-        y += 5;
+                doc.text(splitText, margin, y);
+                y += splitText.length * 6 + 2;
+            });
+            y += 5;
+        }
     }
 
     // 📊 TABLE
     if (data?.table?.headers && data?.table?.rows) {
+        if (y + 30 > 280) { doc.addPage(); y = 20; }
         doc.setFontSize(14);
-        doc.text("Comparison Table", margin, y);
-        y += 5;
+        doc.text("Detailed Breakdown", margin, y);
+        y += 6;
 
         autoTable(doc, {
             startY: y,
             head: [data.table.headers],
             body: data.table.rows,
             theme: "striped",
+            headStyles: { fillColor: [99, 102, 241] }, // Indigo
         });
 
-        y = (doc as any).lastAutoTable.finalY + 10;
-    }
-
-    // 📈 CHART (SAFE VERSION)
-    if (data?.chartCanvas) {
-        try {
-            let canvas = data.chartCanvas;
-
-            // Handle Recharts container case
-            if (canvas?.container) {
-                canvas = canvas.container.querySelector("canvas");
-            }
-
-            if (canvas && canvas.toDataURL) {
-                const img = canvas.toDataURL("image/png");
-
-                // Page break check
-                if (y + 90 > 280) {
-                    doc.addPage();
-                    y = 20;
-                }
-
-                doc.setFontSize(14);
-                doc.text("Growth Chart", margin, y);
-                y += 5;
-
-                doc.addImage(img, "PNG", margin, y, 180, 80);
-                y += 90;
-            }
-        } catch (e) {
-            console.log("Chart export failed");
-        }
+        y = (doc as any).lastAutoTable.finalY + 12;
     }
 
     // ⚡ RECOMMENDATION
-    if (data?.recommendation) {
-        if (y + 20 > 280) {
-            doc.addPage();
-            y = 20;
+    if (data?.recommendation || (typeof data.insights === "string" && data.insights.includes("ACTION:"))) {
+        let rec = data.recommendation;
+        if (!rec && typeof data.insights === "string") {
+            rec = data.insights.split("ACTION:")[1]?.trim();
         }
 
-        doc.setFontSize(14);
-        doc.text("Recommendation", margin, y);
-        y += 6;
+        if (rec) {
+            if (y + 30 > 280) { doc.addPage(); y = 20; }
+            doc.setFontSize(14);
+            doc.text("Priority Recommendation", margin, y);
+            y += 8;
 
-        doc.setFontSize(11);
-
-        const splitText = doc.splitTextToSize(
-            data.recommendation,
-            pageWidth - 2 * margin
-        );
-
-        doc.text(splitText, margin, y);
+            doc.setFontSize(11);
+            const splitText = doc.splitTextToSize(rec, pageWidth - 2 * margin);
+            doc.text(splitText, margin, y);
+        }
     }
 
     // ✅ FOOTER
     const pageCount = (doc as any).internal.getNumberOfPages();
-
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(9);
         doc.setTextColor(150);
-        doc.text(
-            `Page ${i} of ${pageCount}`,
-            pageWidth - 40,
-            290
-        );
+        doc.text(`Page ${i} of ${pageCount}`, pageWidth - 40, 290);
     }
 
     // 💾 SAVE
