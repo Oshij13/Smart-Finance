@@ -176,6 +176,20 @@ export default function DashboardHome() {
         insights.push(insight);
       }
     });
+  } else if (typeof analysis?.insights === "string") {
+    // If it's a string, split by newlines and clean it up
+    const aiPoints = (analysis.insights as string)
+      .split('\n')
+      .map((p: string) => p.trim())
+      .filter((p: string) => p.length > 10 && !p.includes("ACTION:")); // Extract meaningful points, ignore action
+
+    aiPoints.forEach((p: string) => {
+      // Clean up common bullet prefixes like "- ", "1. ", etc.
+      const cleaned = p.replace(/^[-*•\d.]+\s*/, "").trim();
+      if (!insights.includes(cleaned)) {
+        insights.push(cleaned);
+      }
+    });
   }
 
   let action = "";

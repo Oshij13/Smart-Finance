@@ -174,15 +174,15 @@ app.post("/api/analyze-finance", async (req, res) => {
     const prompt = `
 You are a smart financial advisor.
 
-User:
+User Data:
 Income: ₹${inc}
 Expenses: ₹${exp}
 Savings: ₹${sav}
 Investments: ₹${inv}
 
-Give:
-- 3 insights
-- 1 action
+Give EXACTLY:
+- 3 personalized insights about their finances
+- 1 priority action step starting with "ACTION: "
 `;
 
     const response = await client.chat.completions.create({
