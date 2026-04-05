@@ -156,7 +156,9 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
     const quickOptions =
         step === 1
             ? ["Student", "Salaried", "Freelancer"]
-            : [];
+            : step === 5
+                ? ["Zerodha", "INDmoney", "Groww"]
+                : [];
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/20">
@@ -201,13 +203,26 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
                 {/* QUICK BUTTONS */}
                 {quickOptions.length > 0 && (
-                    <div className="p-3 flex gap-2 flex-wrap">
+                    <div className="px-4 pb-3 flex gap-2 flex-wrap">
                         {quickOptions.map((opt) => (
                             <button
                                 key={opt}
-                                onClick={() => handleNext(opt)}
-                                className="px-3 py-1 bg-gray-100 rounded-lg text-sm hover:bg-gray-200"
+                                onClick={() => {
+                                    if (step === 5) {
+                                        // 🔮 Showcase connectivity simulation
+                                        setMessages(prev => [...prev, { role: "assistant", content: `Connecting to ${opt}...` }]);
+                                        setTimeout(() => {
+                                            const mockValue = "250000";
+                                            setMessages(prev => [...prev, { role: "user", content: `Connected via ${opt} (Auto-filled ₹${mockValue})` }]);
+                                            handleNext(mockValue);
+                                        }, 1200);
+                                    } else {
+                                        handleNext(opt);
+                                    }
+                                }}
+                                className="px-3 py-1.5 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-xs font-medium hover:bg-gray-100 hover:border-gray-300 transition-all focus:ring-2 focus:ring-purple-500/50 outline-none"
                             >
+                                {opt === "Zerodha" ? "🔵 " : opt === "INDmoney" ? "🟢 " : opt === "Groww" ? "💹 " : ""}
                                 {opt}
                             </button>
                         ))}
