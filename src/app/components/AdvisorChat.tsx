@@ -142,31 +142,10 @@ export default function AdvisorChat() {
         setLoading(false);
     };
 
-    const handleClearChat = () => {
-        localStorage.removeItem("chatHistory");
-        
-        setMessages([
-            {
-                role: "assistant",
-                content:
-                    "👋 Hi! I'm your Smart Finance AI.\n\nAsk me anything about your money — budgeting, savings, taxes, or planning.",
-                options: quickOptions,
-            },
-        ]);
-    };
-
     return (
         <div id="dashboard-content" className="flex flex-col h-[92vh] p-6 bg-gray-50">
 
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl font-semibold">✨ AI Advisor</h1>
-                <button
-                    onClick={handleClearChat}
-                    className="px-3 py-1 bg-red-100 text-red-600 rounded-xl text-xs font-medium hover:bg-red-200 transition"
-                >
-                    🗑️ Clear Chat
-                </button>
-            </div>
+            <h1 className="text-xl font-semibold mb-4">✨ AI Advisor</h1>
 
             <div className="flex-1 overflow-y-auto space-y-6 bg-white p-6 rounded-2xl shadow">
 
