@@ -24,16 +24,29 @@ export default function AdvisorChat() {
         "🏖️ Retirement Planning",
     ];
 
+    // 🔄 LOAD history on page load
     useEffect(() => {
-        setMessages([
-            {
-                role: "assistant",
-                content:
-                    "👋 Hi! I'm your Smart Finance AI.\n\nAsk me anything about your money — budgeting, savings, taxes, or planning.",
-                options: quickOptions,
-            },
-        ]);
+        const saved = localStorage.getItem("chatHistory");
+        if (saved) {
+            setMessages(JSON.parse(saved));
+        } else {
+            setMessages([
+                {
+                    role: "assistant",
+                    content:
+                        "👋 Hi! I'm your Smart Finance AI.\n\nAsk me anything about your money — budgeting, savings, taxes, or planning.",
+                    options: quickOptions,
+                },
+            ]);
+        }
     }, []);
+
+    // 💾 SAVE chat whenever it updates
+    useEffect(() => {
+        if (messages.length > 0) {
+            localStorage.setItem("chatHistory", JSON.stringify(messages));
+        }
+    }, [messages]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -92,6 +105,7 @@ export default function AdvisorChat() {
                 body: JSON.stringify({
                     message: text,
                     userData: getUserData(),
+                    history: messages.slice(-6)
                 }),
             });
 
@@ -112,6 +126,7 @@ export default function AdvisorChat() {
                 {
                     role: "assistant",
                     message: data.reply?.message || "No response",
+                    content: data.reply?.message || "No response",
                     data: data.reply?.data || data.reply,
                     mode: data.reply?.mode,
                     showActions: shouldShowActions,

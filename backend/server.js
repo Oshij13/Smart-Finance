@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 =========================== */
 const handleAdvisor = async (req, res) => {
   try {
-    const { message, userData } = req.body;
+    const { message, userData, history } = req.body;
 
     const {
       income = 0,
@@ -126,7 +126,10 @@ OUTPUT — STRICT JSON ONLY
 
     const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        ...(history || []),
+        { role: "user", content: prompt }
+      ],
       response_format: { type: "json_object" },
     });
 
