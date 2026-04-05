@@ -10,6 +10,7 @@ export default function AdvisorChat() {
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState("");
     const [sessionId, setSessionId] = useState<string>("");
+    const [isCustomMode, setIsCustomMode] = useState(false);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const chartRef = useRef<any>(null);
@@ -23,12 +24,19 @@ export default function AdvisorChat() {
         "🧾 Tax Help",
         "✂️ Reduce Spending",
         "🏖️ Retirement Planning",
+        "❓ Others",
     ];
 
-    // 🔄 NEW SESSION initialization
+    // 🔄 SESSION initialization
     useEffect(() => {
-        const newSessionId = crypto.randomUUID();
-        setSessionId(newSessionId);
+        let existingSession = sessionStorage.getItem("sessionId");
+
+        if (!existingSession) {
+            existingSession = crypto.randomUUID();
+            sessionStorage.setItem("sessionId", existingSession);
+        }
+
+        setSessionId(existingSession);
 
         setMessages([
             {
@@ -248,12 +256,19 @@ export default function AdvisorChat() {
                                 )}
 
                                 {/* QUICK OPTIONS */}
-                                {msg.options && (
+                                {!isCustomMode && msg.options && (
                                     <div className="flex flex-wrap gap-2 mt-2">
                                         {msg.options.map((opt: string, idx: number) => (
                                             <button
                                                 key={idx}
-                                                onClick={() => sendMessage(opt)}
+                                                onClick={() => {
+                                                    if (opt === "❓ Others") {
+                                                        setIsCustomMode(true);
+                                                    } else {
+                                                        sendMessage(opt);
+                                                        setIsCustomMode(true); // enable input AFTER response
+                                                    }
+                                                }}
                                                 className="text-sm px-3 py-1.5 rounded-full bg-purple-100 hover:bg-purple-200 transition"
                                             >
                                                 {opt}
@@ -271,29 +286,31 @@ export default function AdvisorChat() {
             </div>
 
             {/* INPUT */}
-            <div className="mt-4 flex gap-2">
-                <input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
+            {isCustomMode && (
+                <div className="mt-4 flex gap-2">
+                    <input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                sendMessage(input);
+                                setInput("");
+                            }
+                        }}
+                        className="flex-1 border px-4 py-2 rounded-xl focus:ring-2 focus:ring-purple-500/50 outline-none"
+                    />
+
+                    <button
+                        onClick={() => {
                             sendMessage(input);
                             setInput("");
-                        }
-                    }}
-                    className="flex-1 border px-4 py-2 rounded-xl"
-                />
-
-                <button
-                    onClick={() => {
-                        sendMessage(input);
-                        setInput("");
-                    }}
-                    className="bg-blue-500 text-white px-5 rounded-xl"
-                >
-                    Send
-                </button>
-            </div>
+                        }}
+                        className="bg-blue-500 text-white px-5 rounded-xl font-medium hover:bg-blue-600 transition-colors"
+                    >
+                        Send
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
