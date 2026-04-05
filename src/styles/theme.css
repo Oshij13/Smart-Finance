@@ -120,10 +120,6 @@
 }
 
 @layer base {
-  * {
-    @apply ring-2 ring-blue-500/50;
-  }
-
   body {
     @apply bg-background text-foreground;
   }

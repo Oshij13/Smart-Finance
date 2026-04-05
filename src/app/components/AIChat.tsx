@@ -12,12 +12,12 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
     const [formData, setFormData] = useState<any>({
         name: "",
+        occupation: "",
+        city: "",
         income: "",
         expenses: "",
-        savings: "",
         investments: "",
-        occupation: "",
-        jobType: ""
+        emergencyFund: ""
     });
 
     const chatRef = useRef<HTMLDivElement>(null);
@@ -39,8 +39,11 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
     const validate = (value: string) => {
         if (step === 0 && !value.trim()) return "Name required";
+        if (step === 1 && !value.trim()) return "Occupation required";
+        if (step === 2 && !value.trim()) return "City required";
 
-        if ([1, 2, 3, 4].includes(step) && isNaN(Number(value))) {
+        // Income, Expenses, Investments, Emergency Fund should be numbers
+        if ([3, 4, 5, 6].includes(step) && isNaN(Number(value))) {
             return "Only numbers allowed";
         }
 
@@ -56,12 +59,12 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         const updated = { ...formData };
 
         if (step === 0) updated.name = value;
-        if (step === 1) updated.income = value;
-        if (step === 2) updated.expenses = value;
-        if (step === 3) updated.savings = value;
-        if (step === 4) updated.investments = value;
-        if (step === 5) updated.occupation = value;
-        if (step === 6) updated.jobType = value;
+        if (step === 1) updated.occupation = value;
+        if (step === 2) updated.city = value;
+        if (step === 3) updated.income = value;
+        if (step === 4) updated.expenses = value;
+        if (step === 5) updated.investments = value;
+        if (step === 6) updated.emergencyFund = value;
 
         setFormData(updated);
 
@@ -69,34 +72,27 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         setInput("");
 
         if (step === 0) {
-            setMessages(prev => [...prev, { role: "assistant", content: `Nice to meet you, ${value}! What's your monthly income?` }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Nice to meet you, ${value}! What's your occupation?` }]);
         }
 
         if (step === 1) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Got it 👍 What are your monthly expenses?" }]);
+            setMessages(prev => [...prev, { role: "assistant", content: "Great! Which city are you currently residing in?" }]);
         }
 
         if (step === 2) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Nice. How much savings do you currently have?" }]);
+            setMessages(prev => [...prev, { role: "assistant", content: "Got it. What's your monthly income?" }]);
         }
 
         if (step === 3) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Great. How much have you invested?" }]);
+            setMessages(prev => [...prev, { role: "assistant", content: "Nice. What are your average monthly expenses?" }]);
         }
 
         if (step === 4) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Great. What's your occupation?" }]);
+            setMessages(prev => [...prev, { role: "assistant", content: "Good. How much have you invested in total?" }]);
         }
 
         if (step === 5) {
-            if (value === "Salaried") {
-                setMessages(prev => [...prev, { role: "assistant", content: "Are you in Private or Government job?" }]);
-                setStep(6);
-                return;
-            } else {
-                finish(updated);
-                return;
-            }
+            setMessages(prev => [...prev, { role: "assistant", content: "Final question: What's your current emergency fund balance?" }]);
         }
 
         if (step === 6) {
@@ -130,11 +126,9 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
     };
 
     const quickOptions =
-        step === 5
+        step === 1
             ? ["Student", "Salaried", "Freelancer"]
-            : step === 6
-                ? ["Private", "Government"]
-                : [];
+            : [];
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/20">
