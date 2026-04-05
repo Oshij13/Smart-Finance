@@ -9,6 +9,7 @@ export default function AdvisorChat() {
     const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState("");
+    const [sessionId, setSessionId] = useState<string>("");
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const chartRef = useRef<any>(null);
@@ -24,29 +25,20 @@ export default function AdvisorChat() {
         "🏖️ Retirement Planning",
     ];
 
-    // 🔄 LOAD history on page load
+    // 🔄 NEW SESSION initialization
     useEffect(() => {
-        const saved = localStorage.getItem("chatHistory");
-        if (saved) {
-            setMessages(JSON.parse(saved));
-        } else {
-            setMessages([
-                {
-                    role: "assistant",
-                    content:
-                        "👋 Hi! I'm your Smart Finance AI.\n\nAsk me anything about your money — budgeting, savings, taxes, or planning.",
-                    options: quickOptions,
-                },
-            ]);
-        }
-    }, []);
+        const newSessionId = crypto.randomUUID();
+        setSessionId(newSessionId);
 
-    // 💾 SAVE chat whenever it updates
-    useEffect(() => {
-        if (messages.length > 0) {
-            localStorage.setItem("chatHistory", JSON.stringify(messages));
-        }
-    }, [messages]);
+        setMessages([
+            {
+                role: "assistant",
+                content:
+                    "👋 Hi! I'm your Smart Finance AI.\n\nAsk me anything about your money — budgeting, savings, taxes, or planning.",
+                options: quickOptions,
+            },
+        ]);
+    }, []);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -61,10 +53,10 @@ export default function AdvisorChat() {
     // 📊 CAPTURE CHARTS & DOWNLOAD PDF
     const handleDownloadPDF = async () => {
         const chartImages: { [key: number]: string } = {};
-        
+
         // Find all chart containers
         const chartElements = document.querySelectorAll("[data-chart-id]");
-        
+
         for (const el of Array.from(chartElements)) {
             const id = parseInt(el.getAttribute("data-chart-id") || "0");
             try {
@@ -105,7 +97,8 @@ export default function AdvisorChat() {
                 body: JSON.stringify({
                     message: text,
                     userData: getUserData(),
-                    history: messages.slice(-6)
+                    history: messages.slice(-6),
+                    sessionId: sessionId
                 }),
             });
 
@@ -167,7 +160,7 @@ export default function AdvisorChat() {
 
                                 {(msg.message ?? msg.content) && (
                                     <div className="bg-white border shadow px-5 py-4 rounded-xl">
-                                        { (msg.message ?? msg.content)
+                                        {(msg.message ?? msg.content)
                                             .replace(/\*\*/g, "") // Strip bolding
                                             .replace(/###/g, "") // Strip headers
                                             .split("\n")
