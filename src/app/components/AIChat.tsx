@@ -21,6 +21,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
     });
 
     const chatRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (messages.length === 0) {
@@ -116,6 +117,33 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         }, 800);
     };
 
+    // 📂 CSV Upload (Expenses)
+    const handleFileUpload = (e: any) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = (event: any) => {
+            const text = event.target.result;
+            const rows = text.split("\n");
+
+            let debit = 0;
+            rows.forEach((row: string) => {
+                const cols = row.split(",");
+                debit += parseFloat(cols[3]) || 0;
+            });
+
+            const expenses = debit.toFixed(0);
+
+            // Inform user and proceed
+            setMessages(prev => [...prev, { role: "user", content: `Uploaded statement (Calculated Expenses: ₹${expenses})` }]);
+            handleNext(expenses);
+        };
+
+        reader.readAsText(file);
+    };
+
     const sendMessage = () => {
         if (!input.trim()) return;
         handleNext(input);
@@ -187,17 +215,37 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                 )}
 
                 {/* Input */}
-                <div className="p-3 border-t flex gap-2">
+                <div className="p-3 border-t flex gap-2 items-center">
+                    {/* HIDDEN FILE INPUT */}
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept=".csv"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                    />
+
+                    {/* SHOW UPLOAD BUTTON ONLY FOR EXPENSES STEP (Step 4) */}
+                    {step === 4 && (
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="bg-purple-100 text-purple-600 p-2 rounded-lg hover:bg-purple-200 transition-colors"
+                            title="Upload Statement"
+                        >
+                            📂
+                        </button>
+                    )}
+
                     <input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Type your answer..."
-                        className="flex-1 border rounded-lg px-3 py-2 text-sm"
+                        className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500/50 outline-none"
                     />
                     <button
                         onClick={sendMessage}
-                        className="bg-blue-500 text-white px-3 rounded-lg"
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
                     >
                         Send
                     </button>
