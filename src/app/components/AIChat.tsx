@@ -244,8 +244,22 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                     </div>
                 )}
 
-                {/* Input */}
-                <div className="p-3 border-t flex gap-2 items-center">
+              {/* HELP TEXT & PRIVACY NOTE */}
+              <div className="px-4 py-1 flex flex-col gap-0.5">
+                  {(step === 4 || step === 5) && (
+                      <p className="text-[10px] text-blue-600 font-medium animate-pulse leading-tight">
+                          {step === 4 
+                              ? "💡 Tip: Upload bank statement or input expenses manually" 
+                              : "💡 Tip: Connect investment apps or input manually"}
+                      </p>
+                  )}
+                  <p className="text-[9px] text-gray-400 italic leading-tight">
+                      🔒 We ask for statement/connectivity solely for calculation purposes.
+                  </p>
+              </div>
+
+              {/* Input */}
+              <div className="p-3 border-t flex gap-2 items-center">
                     {/* HIDDEN FILE INPUT */}
                     <input
                         type="file"
