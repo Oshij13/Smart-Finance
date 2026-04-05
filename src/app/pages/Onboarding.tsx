@@ -10,20 +10,23 @@ export default function Onboarding() {
         { key: "occupation", question: "What do you do?" },
         { key: "city", question: "Which city are you currently residing in?" },
         { key: "income", question: "What's your monthly income?" },
-        { key: "savings", question: "How much do you save monthly?" },
-        { key: "investments", question: "How much have you invested?" }
+        { key: "expenses", question: "What are your average monthly expenses?" },
+        { key: "investments", question: "How much have you invested?" },
+        { key: "emergencyFund", question: "What's your current emergency fund balance?" }
     ];
 
     const [step, setStep] = useState(0);
     const [input, setInput] = useState("");
+    const [mode, setMode] = useState<"manual" | "upload" | null>(null);
 
     const [formData, setFormData] = useState<any>({
         name: "",
         occupation: "",
         city: "",
         income: "",
-        savings: "",
-        investments: ""
+        expenses: "",
+        investments: "",
+        emergencyFund: ""
     });
 
     const handleNext = () => {
@@ -39,6 +42,7 @@ export default function Onboarding() {
 
         if (step < questions.length - 1) {
             setStep(step + 1);
+            setMode(null); // Reset mode for next step
         } else {
             setUserData(updatedData);
             navigate("/"); // go to dashboard
@@ -65,12 +69,13 @@ export default function Onboarding() {
                 debit += parseFloat(cols[3]) || 0;
             });
 
-            const savings = credit - debit;
+            const expenses = debit; // In our simplified CSV parsing, debit is the expense total
 
             setFormData((prev: any) => ({
                 ...prev,
-                savings: savings.toFixed(0)
+                expenses: expenses.toFixed(0)
             }));
+            setInput(expenses.toFixed(0)); // Also update input so Next button works
         };
 
         reader.readAsText(file);
@@ -85,35 +90,84 @@ export default function Onboarding() {
                     {questions[step].question}
                 </h2>
 
-                <input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    className="w-full border px-3 py-2 rounded mb-3"
-                    placeholder="Type here..."
-                />
+                {questions[step].key !== "expenses" && (
+                    <input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        className="w-full border px-3 py-2 rounded mb-3 focus:ring-2 focus:ring-purple-500/50 outline-none"
+                        placeholder="Type here..."
+                    />
+                )}
 
-                {/* CSV Upload only for savings */}
-                {questions[step].key === "savings" && (
-                    <div className="mb-3">
-                        <p className="text-sm text-gray-500">
-                            Upload bank CSV (optional)
-                        </p>
-                        <input type="file" accept=".csv" onChange={handleFileUpload} />
+                {/* EXPENSES OPTION SELECTOR (previously for savings) */}
+                {questions[step].key === "expenses" && (
+                    <div className="mb-4">
+                        {!mode ? (
+                            <div className="mt-3 space-y-3">
+                                <p className="text-sm text-gray-500">
+                                    Choose how you want to proceed:
+                                </p>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setMode("manual")}
+                                        className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl font-medium border border-blue-100 hover:bg-blue-100 transition-all focus:ring-2 focus:ring-purple-500/50 outline-none"
+                                    >
+                                        ✍️ Enter Manually
+                                    </button>
+                                    <button
+                                        onClick={() => setMode("upload")}
+                                        className="flex-1 px-3 py-2 bg-purple-50 text-purple-600 rounded-xl font-medium border border-purple-100 hover:bg-purple-100 transition-all focus:ring-2 focus:ring-purple-500/50 outline-none"
+                                    >
+                                        📂 Upload Statement
+                                    </button>
+                                </div>
+                            </div>
+                        ) : mode === "manual" ? (
+                            <div className="space-y-2">
+                                <button onClick={() => setMode(null)} className="text-xs text-gray-400 hover:text-gray-600 transition">← Back to options</button>
+                                <input
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    placeholder="Enter your expenses"
+                                    className="w-full border px-3 py-2 rounded-xl focus:ring-2 focus:ring-purple-500/50 outline-none"
+                                />
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <button onClick={() => setMode(null)} className="text-xs text-gray-400 hover:text-gray-600 transition">← Back to options</button>
+                                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                    <p className="text-xs text-blue-700 font-medium mb-2">📂 Upload bank statement (CSV)</p>
+                                    <input
+                                        type="file"
+                                        accept=".csv"
+                                        onChange={handleFileUpload}
+                                        className="text-xs w-full mb-1"
+                                    />
+                                    <p className="text-[10px] text-blue-500">CSV format recommended for accuracy</p>
+                                </div>
+
+                                {formData.expenses && input === formData.expenses && (
+                                    <p className="text-green-600 text-xs font-medium flex items-center gap-1 animate-pulse">
+                                        ✅ Expenses calculated automatically: ₹{formData.expenses}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
 
                 {/* Investment Apps UI */}
                 {questions[step].key === "investments" && (
                     <div className="flex gap-2 mb-3">
-                        <button className="px-3 py-1 bg-blue-100 rounded">Zerodha</button>
-                        <button className="px-3 py-1 bg-purple-100 rounded">INDmoney</button>
-                        <button className="px-3 py-1 bg-green-100 rounded">Groww</button>
+                        <button className="px-3 py-1 bg-blue-100 rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Zerodha</button>
+                        <button className="px-3 py-1 bg-purple-100 rounded focus:ring-2 focus:ring-purple-500/50 outline-none">INDmoney</button>
+                        <button className="px-3 py-1 bg-green-100 rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Groww</button>
                     </div>
                 )}
 
                 <button
                     onClick={handleNext}
-                    className="w-full bg-blue-600 text-white py-2 rounded"
+                    className="w-full bg-blue-600 text-white py-2 rounded focus:ring-2 focus:ring-purple-500/50 outline-none"
                 >
                     Next
                 </button>

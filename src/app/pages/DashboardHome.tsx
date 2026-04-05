@@ -101,15 +101,18 @@ export default function DashboardHome() {
 
   const income = Number(onboardingData?.income || 0);
   const expenses = Number(onboardingData?.expenses || 0);
-  const savings = Number(onboardingData?.savings || 0);
   const investments = Number(onboardingData?.investments || 0);
+  const emergencyFund = Number(onboardingData?.emergencyFund || 0);
+
+  // ✅ DERIVED SAVINGS
+  const savings = income - (expenses + investments);
 
   const emergencyTarget = expenses * 6;
   const emergencyProgress =
-    emergencyTarget > 0 ? (savings / emergencyTarget) * 100 : 0;
+    emergencyTarget > 0 ? (emergencyFund / emergencyTarget) * 100 : 0;
 
   const savingsRate = income > 0 ? (savings / income) * 100 : 0;
-  const emergencyMonths = expenses > 0 ? savings / expenses : 0;
+  const emergencyMonths = expenses > 0 ? emergencyFund / expenses : 0;
   const investmentRate = income > 0 ? (investments / income) * 100 : 0;
 
   // Scoring logic (out of 100)
@@ -252,7 +255,7 @@ export default function DashboardHome() {
       color: "text-blue-600",
       bg: "bg-blue-50",
       icon: "📈",
-      insight: savingsRate > 20 ? "Strong savings 💪" : "Needs improvement ⚠️",
+      insight: savingsRate >= 20 ? "Strong savings 💪" : savingsRate > 0 ? "Building phase ⚠️" : "No savings 🚨",
     },
     {
       title: "Investments",
@@ -365,14 +368,14 @@ export default function DashboardHome() {
           <div className="flex gap-3">
             <button
               onClick={() => navigate("/ai-advisor")}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg focus:ring-2 focus:ring-purple-500/50 outline-none"
             >
               ✨ AI Advisor
             </button>
 
             <button
               onClick={handleDownloadPDF}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg focus:ring-2 focus:ring-purple-500/50 outline-none"
             >
               📄 Download PDF
             </button>
@@ -400,14 +403,14 @@ export default function DashboardHome() {
               <>
                 <p className="text-sm text-gray-500">Primary Goal</p>
                 <p className="font-semibold text-blue-600">{onboardingData?.goal || "Wealth Building"}</p>
-                <button onClick={() => setIsEditingGoal(true)} className="text-xs text-blue-500 mt-1 hover:underline">Edit</button>
+                <button onClick={() => setIsEditingGoal(true)} className="text-xs text-blue-500 mt-1 hover:underline focus:ring-2 focus:ring-purple-500/50 outline-none">Edit</button>
               </>
             ) : (
               <div className="flex flex-col items-end gap-2">
-                <input value={goalInput} onChange={(e) => setGoalInput(e.target.value)} className="border px-2 py-1 rounded text-sm" placeholder="Enter goal" />
+                <input value={goalInput} onChange={(e) => setGoalInput(e.target.value)} className="border px-2 py-1 rounded text-sm focus:ring-2 focus:ring-purple-500/50 outline-none" placeholder="Enter goal" />
                 <div className="flex gap-2">
-                  <button onClick={() => { const updated = { ...onboardingData, goal: goalInput }; setUserData(updated); setIsEditingGoal(false); }} className="text-xs px-2 py-1 bg-green-500 text-white rounded">Save</button>
-                  <button onClick={() => setIsEditingGoal(false)} className="text-xs px-2 py-1 bg-gray-200 rounded">Cancel</button>
+                  <button onClick={() => { const updated = { ...onboardingData, goal: goalInput }; setUserData(updated); setIsEditingGoal(false); }} className="text-xs px-2 py-1 bg-green-500 text-white rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Save</button>
+                  <button onClick={() => setIsEditingGoal(false)} className="text-xs px-2 py-1 bg-gray-200 rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Cancel</button>
                 </div>
               </div>
             )}
