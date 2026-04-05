@@ -262,8 +262,8 @@ export default function DashboardHome() {
       value: investments,
       color: "text-purple-600",
       bg: "bg-purple-50",
-      icon: "📊",
-      insight: investmentRate > 15 ? "Good investing 🚀" : "Start investing more",
+      icon: "💎",
+      insight: investmentRate > 15 ? "Investing expert 🚀" : "Start investing more 📈",
     },
   ];
 
@@ -391,7 +391,7 @@ export default function DashboardHome() {
 
             <div>
               <h2 className="text-lg font-semibold">{onboardingData?.name || "User"}</h2>
-              <p className="text-sm text-gray-500">Monthly Income: ₹{onboardingData?.income || 0}</p>
+              <p className="text-sm text-gray-500">Monthly Income: ₹{Number(onboardingData?.income || 0).toLocaleString('en-IN')}</p>
               <p className="text-xs text-gray-400 mt-1">
                 {onboardingData?.income > 50000 ? "Growing Investor" : "Beginner Investor"}
               </p>
@@ -450,8 +450,8 @@ export default function DashboardHome() {
               <div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
             </div>
             <div className="flex justify-between text-xs text-gray-500">
-              <span>₹{savings.toLocaleString()}</span>
-              <span>Target: ₹{target.toLocaleString()}</span>
+              <span>₹{savings.toLocaleString('en-IN')}</span>
+              <span>Target: ₹{target.toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>
@@ -466,7 +466,7 @@ export default function DashboardHome() {
                 <span className="text-xs text-gray-400">Monthly</span>
               </div>
               <p className="text-sm text-gray-500">{card.title}</p>
-              <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString()}</h2>
+              <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
               <p className={`text-xs mt-2 font-medium ${card.insight.includes("⚠️") ? "text-red-500" : "text-green-600"}`}>{card.insight}</p>
             </div>
           ))}
@@ -481,8 +481,8 @@ export default function DashboardHome() {
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={[{ name: "Needs(50%)", Target: income * 0.50, Actual: expenses * 0.625 }, { name: "Wants(30%)", Target: income * 0.30, Actual: expenses * 0.375 }, { name: "Savings(20%)", Target: income * 0.20, Actual: savings + investments }]} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
                 <XAxis dataKey="name" fontSize={12} tickMargin={8} />
-                <YAxis fontSize={11} tickFormatter={(val) => `₹${val >= 1000 ? val / 1000 + 'k' : val}`} />
-                <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString()}`} cursor={{ fill: '#f1f5f9' }} />
+                <YAxis fontSize={11} tickFormatter={(val) => `₹${val >= 100000 ? (val / 100000) + 'L' : val >= 1000 ? (val / 1000) + 'k' : val}`} />
+                <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString('en-IN')}`} cursor={{ fill: '#f1f5f9' }} />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={40} />
                 <Bar dataKey="Actual" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={40} />
@@ -496,8 +496,8 @@ export default function DashboardHome() {
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
                 <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
+                <YAxis tickFormatter={(val) => `₹${val >= 100000 ? (val / 100000) + 'L' : val >= 1000 ? (val / 1000) + 'k' : val}`} />
+                <Tooltip formatter={(val) => `₹${Number(val).toLocaleString('en-IN')}`} />
                 <Bar dataKey="value" fill="#3b82f6" />
               </BarChart>
             </ResponsiveContainer>
@@ -573,7 +573,7 @@ export default function DashboardHome() {
             </div>
 
             <p className="text-xs text-gray-500 mb-4">
-              Target: ₹{(expenses * 6).toLocaleString()}
+              Target: ₹{(expenses * 6).toLocaleString('en-IN')}
             </p>
 
             {/* 💡 WHY IT MATTERS */}

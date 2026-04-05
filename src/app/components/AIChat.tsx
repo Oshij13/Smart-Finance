@@ -17,7 +17,8 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         income: "",
         expenses: "",
         investments: "",
-        emergencyFund: ""
+        emergencyFund: "",
+        jobType: ""
     });
 
     const chatRef = useRef<HTMLDivElement>(null);
@@ -60,7 +61,18 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         const updated = { ...formData };
 
         if (step === 0) updated.name = value;
-        if (step === 1) updated.occupation = value;
+        if (step === 1) {
+            updated.occupation = value;
+            if (value === "Salaried") {
+                setMessages(prev => [...prev, { role: "assistant", content: "Are you in a Private or Government job?" }]);
+                setFormData(updated);
+                setStep(1.5); // Sub-step for job type
+                return;
+            }
+        }
+        if (step === 1.5) {
+            updated.jobType = value;
+        }
         if (step === 2) updated.city = value;
         if (step === 3) updated.income = value;
         if (step === 4) updated.expenses = value;
@@ -76,8 +88,9 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
             setMessages(prev => [...prev, { role: "assistant", content: `Nice to meet you, ${value}! What's your occupation?` }]);
         }
 
-        if (step === 1) {
+        if (step === 1 || step === 1.5) {
             setMessages(prev => [...prev, { role: "assistant", content: "Great! Which city are you currently residing in?" }]);
+            if (step === 1.5) setStep(2); // Jump back to main flow
         }
 
         if (step === 2) {
@@ -85,15 +98,15 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         }
 
         if (step === 3) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Nice. What are your average monthly expenses?" }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Nice. What are your average monthly expenses? (Income set to ₹${Number(value).toLocaleString('en-IN')})` }]);
         }
 
         if (step === 4) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Good. How much have you invested in total?" }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Good. How much have you invested in total? (Expenses set to ₹${Number(value).toLocaleString('en-IN')})` }]);
         }
 
         if (step === 5) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Final question: What's your current emergency fund balance?" }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Final question: What's your current emergency fund balance? (Investments set to ₹${Number(value).toLocaleString('en-IN')})` }]);
         }
 
         if (step === 6) {
@@ -101,7 +114,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
             return;
         }
 
-        setStep(prev => prev + 1);
+        if (step !== 1.5) setStep(prev => prev + 1);
     };
 
     const finish = (data: any) => {
@@ -137,7 +150,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
             const expenses = debit.toFixed(0);
 
             // Inform user and proceed
-            setMessages(prev => [...prev, { role: "user", content: `Uploaded statement (Calculated Expenses: ₹${expenses})` }]);
+            setMessages(prev => [...prev, { role: "user", content: `Uploaded statement (Calculated Expenses: ₹${Number(expenses).toLocaleString('en-IN')})` }]);
             handleNext(expenses);
         };
 
@@ -156,9 +169,11 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
     const quickOptions =
         step === 1
             ? ["Student", "Salaried", "Freelancer"]
-            : step === 5
-                ? ["Zerodha", "INDmoney", "Groww"]
-                : [];
+            : step === 1.5
+                ? ["Private", "Government"]
+                : step === 5
+                    ? ["Zerodha", "INDmoney", "Groww"]
+                    : [];
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/20">
