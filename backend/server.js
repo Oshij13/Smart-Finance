@@ -15,6 +15,20 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+/* ===========================
+   🧠 SESSION MEMORY STORE (MVP)
+=========================== */
+const sessions = {}; // { sessionId: [messages] }
+
+// Clean old sessions every 1 hour (optional safety)
+setInterval(() => {
+  for (const key in sessions) {
+    if (sessions[key].length > 50) {
+      sessions[key] = sessions[key].slice(-20);
+    }
+  }
+}, 1000 * 60 * 60);
+
 // Test route
 app.get("/", (req, res) => {
   res.send("Backend is running ✅");
@@ -25,7 +39,18 @@ app.get("/", (req, res) => {
 =========================== */
 const handleAdvisor = async (req, res) => {
   try {
-    const { message, userData, history } = req.body;
+    const { message, userData, sessionId } = req.body;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID required" });
+    }
+
+    // Initialize session if not exists
+    if (!sessions[sessionId]) {
+      sessions[sessionId] = [];
+    }
+
+    const history = sessions[sessionId];
 
     const {
       income = 0,
@@ -124,10 +149,13 @@ OUTPUT — STRICT JSON ONLY
    }
 `;
 
+    // Push user message into session
+    history.push({ role: "user", content: message });
+
     const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        ...(history || []),
+        ...history.slice(-10), // limit context
         { role: "user", content: prompt }
       ],
       response_format: { type: "json_object" },
@@ -143,6 +171,12 @@ OUTPUT — STRICT JSON ONLY
       };
     }
 
+    // Save AI response into session
+    history.push({
+      role: "assistant",
+      content: reply.message || "No response",
+    });
+
     res.json({ reply });
 
   } catch (error) {
@@ -155,20 +189,15 @@ OUTPUT — STRICT JSON ONLY
    ROUTES
 =========================== */
 
-// Original route
 app.post("/advisor", handleAdvisor);
-
-// ✅ NEW ROUTE (IMPORTANT FIX)
 app.post("/api/chat", handleAdvisor);
 
 /* ===========================
    ANALYZE FINANCE
 =========================== */
 app.post("/api/analyze-finance", async (req, res) => {
-  console.log("🚨 ANALYZE ROUTE WORKING");
-
   try {
-    const { income, expenses, savings, investments, occupation } = req.body;
+    const { income, expenses, savings, investments } = req.body;
 
     const inc = Number(income) || 0;
     const exp = Number(expenses) || 0;
