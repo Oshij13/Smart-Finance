@@ -5,6 +5,8 @@ import { getUserData, setUserData } from "../store/userStore";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+import Onboarding from "./Onboarding";
+
 import {
   PieChart,
   Pie,
@@ -22,6 +24,17 @@ export default function DashboardHome() {
   const navigate = useNavigate();
 
   const onboardingData = getUserData();
+
+  if (!onboardingData) {
+    return <Onboarding />;
+  }
+
+  const colorMap: Record<string, string> = {
+    red: "text-red-600 bg-red-100",
+    orange: "text-orange-600 bg-orange-100",
+    blue: "text-blue-600 bg-blue-100",
+    green: "text-green-600 bg-green-100",
+  };
 
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -158,8 +171,8 @@ export default function DashboardHome() {
         const trimmed = line.trim();
         // Skip headers, action labels, or empty lines
         if (
-          !trimmed || 
-          trimmed.includes("ACTION:") || 
+          !trimmed ||
+          trimmed.includes("ACTION:") ||
           trimmed.includes("Action Step") ||
           trimmed.includes("Insights") ||
           trimmed.includes("Financial Analysis")
@@ -251,6 +264,89 @@ export default function DashboardHome() {
     },
   ];
 
+  function generateFinancialInsight({
+    income,
+    expenses,
+    savings,
+    investments,
+    emergencyMonths = 0,
+  }: {
+    income: number;
+    expenses: number;
+    savings: number;
+    investments: number;
+    emergencyMonths?: number;
+  }) {
+    const expenseRatio = expenses / income;
+    const savingsRatio = savings / income;
+
+    // 🚨 Critical Case
+    if (expenses > income) {
+      return {
+        message:
+          "Your expenses exceed your income, which is financially unsustainable. Focus on cutting costs immediately and stabilizing your cash flow.",
+        color: "red",
+        icon: "🚨",
+      };
+    }
+
+    // 🔴 High Spending
+    if (expenseRatio > 0.7) {
+      return {
+        message:
+          "A large portion of your income is going into expenses. Try reducing discretionary spending and optimize your monthly budget.",
+        color: "red",
+        icon: "⚠️",
+      };
+    }
+
+    // 🟠 Low Savings
+    if (savingsRatio < 0.2) {
+      return {
+        message:
+          "Your savings rate is low. Aim to save at least 20% of your income to build financial security.",
+        color: "orange",
+        icon: "📊",
+      };
+    }
+
+    // 🟡 Weak Emergency Fund
+    if (emergencyMonths < 3) {
+      return {
+        message:
+          "Your emergency fund is insufficient. Build at least 3–6 months of expenses as a safety net.",
+        color: "orange",
+        icon: "🛡️",
+      };
+    }
+
+    // 🔵 Low Investments
+    if (investments < savings * 0.3) {
+      return {
+        message:
+          "You're saving well but not investing enough. Consider allocating more funds towards investments for long-term growth.",
+        color: "blue",
+        icon: "📈",
+      };
+    }
+
+    // 🟢 Strong Financial Health
+    return {
+      message:
+        "You're managing your finances very well. Keep optimizing your investments and planning for long-term wealth creation.",
+      color: "green",
+      icon: "🏆",
+    };
+  }
+
+  const insight = generateFinancialInsight({
+    income,
+    expenses,
+    savings,
+    investments,
+    emergencyMonths,
+  });
+
   return (
     <div id="dashboard-content" className="p-6">
       <div className="space-y-6">
@@ -329,9 +425,10 @@ export default function DashboardHome() {
             <div className="w-full bg-gray-200 h-3 rounded-full mb-4">
               <div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} />
             </div>
-            <p className="text-sm mb-3">
-              {score > 75 ? "✅ Excellent financial health" : score > 50 ? "⚠️ Good, but can improve" : "🚨 Needs attention"}
-            </p>
+            <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[insight.color]}`}>
+              <span>{insight.icon}</span>
+              <span>{insight.message}</span>
+            </div>
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div><p className="text-gray-500">Savings</p><p className="font-semibold">{savingsRate.toFixed(1)}%</p></div>
               <div><p className="text-gray-500">Emergency</p><p className="font-semibold">{emergencyMonths.toFixed(1)} months</p></div>
@@ -419,14 +516,37 @@ export default function DashboardHome() {
             </div>
           </div>
 
-          {/* NEXT BEST ACTION (AI) */}
-          <div className="bg-green-50 p-6 rounded-2xl shadow-sm hover:shadow-md transition border border-green-100">
-            <p className="font-semibold text-green-700 flex items-center gap-2">
-              ✨ AI Recommendation
+          {/* 💡 SMART FINANCIAL INSIGHT */}
+          <div
+            className={`p-6 rounded-2xl shadow-sm hover:shadow-md transition border ${insight.color === "red"
+              ? "bg-red-50 border-red-100 text-red-800"
+              : insight.color === "orange"
+                ? "bg-orange-50 border-orange-100 text-orange-800"
+                : insight.color === "blue"
+                  ? "bg-blue-50 border-blue-100 text-blue-800"
+                  : "bg-green-50 border-green-100 text-green-800"
+              }`}
+          >
+            <p
+              className={`font-semibold flex items-center gap-2 ${insight.color === "red"
+                ? "text-red-700"
+                : insight.color === "orange"
+                  ? "text-orange-700"
+                  : insight.color === "blue"
+                    ? "text-blue-700"
+                    : "text-green-700"
+                }`}
+            >
+              {insight.icon} Smart Insight
             </p>
-            <p className="text-sm mt-3 leading-relaxed text-green-800">
-              {action || "AI will suggest actions here based on your data."}
+            <p className="text-sm mt-3 leading-relaxed">
+              {insight.message}
             </p>
+            {action && (
+              <p className="text-xs mt-3 opacity-70 border-t pt-3 border-current">
+                ✨ AI Recommendation: {action}
+              </p>
+            )}
           </div>
         </div>
 
