@@ -136,7 +136,9 @@ OUTPUT — STRICT JSON ONLY
 2. STRICTLY NO MARKDOWN.
 3. Use visuals (charts/tables) liberally to make it fun.
 4. If plan requested, give a 12-month roadmap table.
-5. JSON SCHEMA (MUST FOLLOW):
+5. If user asks for a plan, set mode to "structured".
+6. If the user chooses "❓ Others", ask them what they want to know.
+7. JSON SCHEMA (MUST FOLLOW):
    {
      "mode": "chat | structured",
      "message": "Plain text response",
