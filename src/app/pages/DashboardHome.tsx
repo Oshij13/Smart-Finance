@@ -141,15 +141,14 @@ export default function DashboardHome() {
 
       await new Promise((r) => setTimeout(r, 1200));
 
+      document.body.style.overflow = "hidden";
+
       const canvas = await html2canvas(element, {
         scale: 3,
         useCORS: true,
         backgroundColor: "#f9fafb",
-        ignoreElements: (el: Element) => {
-          const htmlEl = el as HTMLElement;
-          const text = htmlEl.textContent || "";
-          return (htmlEl.tagName === "BUTTON" && (text.includes("AI") || text.includes("PDF"))) ||
-            htmlEl.getAttribute("data-html2canvas-ignore") === "true";
+        ignoreElements: (el) => {
+          return el.classList?.contains("pdf-ignore");
         }
       });
 
@@ -208,9 +207,12 @@ export default function DashboardHome() {
         position += pageCanvasHeight;
       }
 
+      setPdfStatus("Finalizing High-Quality Download...");
       pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
+      document.body.style.overflow = "auto";
     } catch (err) {
       console.error(err);
+      document.body.style.overflow = "auto";
     } finally {
       setIsGeneratingPDF(false);
       setPdfStatus("");
@@ -347,8 +349,8 @@ export default function DashboardHome() {
             <p className="text-sm opacity-90">Your financial dashboard</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => navigate("/ai-advisor")} className="px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">✨ AI Advisor</button>
-            <button onClick={handleDownloadPDF} className="px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">📄 Download PDF</button>
+            <button onClick={() => navigate("/ai-advisor")} className="pdf-ignore px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">✨ AI Advisor</button>
+            <button onClick={handleDownloadPDF} className="pdf-ignore px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">📄 Download PDF</button>
           </div>
         </div>
 
@@ -470,11 +472,19 @@ export default function DashboardHome() {
       </div>
 
       {isGeneratingPDF && (
-        <div className="fixed bottom-4 right-4 bg-black text-white px-5 py-3 rounded-xl z-[9999] shadow-2xl animate-bounce flex items-center gap-3">
-          <span className="text-xl">🚀</span>
-          <div className="flex flex-col">
-            <span className="font-semibold text-sm">Generating PDF Report</span>
-            <span className="text-xs opacity-80">{pdfStatus}</span>
+        <div className="pdf-ignore popup fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div className="bg-white px-8 py-6 rounded-2xl shadow-2xl flex items-center gap-4 animate-in fade-in zoom-in duration-300">
+            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-2xl animate-pulse">
+              📄
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-gray-900 leading-none mb-1">
+                Generating Report
+              </span>
+              <span className="text-sm font-medium text-gray-500">
+                {pdfStatus || "Please wait..."}
+              </span>
+            </div>
           </div>
         </div>
       )}
