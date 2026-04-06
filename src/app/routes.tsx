@@ -10,20 +10,29 @@ import { SpendingReduction } from "./pages/SpendingReduction";
 import { RetirementPlanning } from "./pages/RetirementPlanning";
 import { Resources } from "./pages/Resources";
 import AdvisorChat from "./components/AdvisorChat";
+import FirstAction from "./pages/FirstAction";
 
 export const router = createBrowserRouter([
+
+  // ✅ FIRST ACTION (OUTSIDE DASHBOARD)
+  {
+    path: "/first-action",
+    element: <FirstAction />,
+  },
+
+  // ✅ MAIN DASHBOARD LAYOUT
   {
     path: "/",
-    element: <DashboardLayout />,   // ✅ MAIN LAYOUT WITH SIDEBAR
+    element: <DashboardLayout />,
     children: [
-      { index: true, element: <DashboardHome /> }, 
+      { index: true, element: <DashboardHome /> },
       {
         path: "dashboard",
-        element: <DashboardHome />,  // ✅ inside layout
+        element: <DashboardHome />,
       },
       {
         path: "ai-advisor",
-        element: <AdvisorChat />,    // ✅ ALSO inside layout
+        element: <AdvisorChat />,
       },
       { path: "personal-finance", Component: PersonalFinance },
       { path: "savings", Component: SavingsManagement },
@@ -35,4 +44,5 @@ export const router = createBrowserRouter([
       { path: "resources", Component: Resources },
     ],
   },
+
 ]);

@@ -29,6 +29,17 @@ export default function Onboarding() {
         emergencyFund: ""
     });
 
+    const handleInputChange = (val: string) => {
+        const key = questions[step].key;
+        if (["name", "occupation", "city"].includes(key)) {
+            // Restrict to alphabets and spaces
+            setInput(val.replace(/[^a-zA-Z\s]/g, ""));
+        } else {
+            // Restrict to numeric only
+            setInput(val.replace(/[^0-9]/g, ""));
+        }
+    };
+
     const handleNext = () => {
         const key = questions[step].key;
 
@@ -45,7 +56,7 @@ export default function Onboarding() {
             setMode(null); // Reset mode for next step
         } else {
             setUserData(updatedData);
-            navigate("/"); // go to dashboard
+            navigate("/first-action"); // go to first action screen
         }
     };
 
@@ -93,7 +104,7 @@ export default function Onboarding() {
                 {questions[step].key !== "expenses" && (
                     <input
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={(e) => handleInputChange(e.target.value)}
                         className="w-full border px-3 py-2 rounded mb-3 focus:ring-2 focus:ring-purple-500/50 outline-none"
                         placeholder="Type here..."
                     />
@@ -127,7 +138,7 @@ export default function Onboarding() {
                                 <button onClick={() => setMode(null)} className="text-xs text-gray-400 hover:text-gray-600 transition">← Back to options</button>
                                 <input
                                     value={input}
-                                    onChange={(e) => setInput(e.target.value)}
+                                    onChange={(e) => handleInputChange(e.target.value)}
                                     placeholder="Enter your expenses"
                                     className="w-full border px-3 py-2 rounded-xl focus:ring-2 focus:ring-purple-500/50 outline-none"
                                 />

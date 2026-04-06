@@ -40,6 +40,7 @@ export default function DashboardHome() {
   const [loading, setLoading] = useState(true);
   const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [goalInput, setGoalInput] = useState(onboardingData?.goal || "");
+  const [nextAction, setNextAction] = useState<any>(null);
 
   useEffect(() => {
     if (!onboardingData) {
@@ -65,6 +66,32 @@ export default function DashboardHome() {
     };
 
     fetchAnalysis();
+  }, []);
+
+  useEffect(() => {
+    const fetchNextAction = async () => {
+      try {
+        const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+
+        const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/next-action", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userData: onboardingData,
+            progress: progress,
+          }),
+        });
+
+        const data = await res.json();
+        setNextAction(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchNextAction();
   }, []);
 
   // ✅ PDF DOWNLOAD FUNCTION
@@ -98,6 +125,7 @@ export default function DashboardHome() {
   };
 
   if (loading) return <div className="p-6">Loading your dashboard...</div>;
+  if (!nextAction) return <div className="p-6">Loading actions...</div>;
 
   const income = Number(onboardingData?.income || 0);
   const expenses = Number(onboardingData?.expenses || 0);
@@ -350,6 +378,44 @@ export default function DashboardHome() {
     emergencyMonths,
   });
 
+  const progressData = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+  const savedAmount = progressData?.saved || 0;
+  const targetAmount = progressData?.target || emergencyTarget;
+  const progressPercent = targetAmount > 0 ? (savedAmount / targetAmount) * 100 : 0;
+
+  const handleAction = async () => {
+    try {
+      const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+
+      const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/update-progress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: nextAction?.type,
+          amount: 500,
+          currentSaved: progress?.saved || 0,
+          target: progress?.target || 0,
+        }),
+      });
+
+      const data = await res.json();
+
+      localStorage.setItem(
+        "sf_progress",
+        JSON.stringify({
+          saved: data.newSaved,
+          target: data.target,
+        })
+      );
+
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div id="dashboard-content" className="p-6">
       <div className="space-y-6">
@@ -379,6 +445,32 @@ export default function DashboardHome() {
             >
               📄 Download PDF
             </button>
+          </div>
+        </div>
+
+        {/* 🚀 NEXT ACTION CARD (NEW CORE FEATURE) */}
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-2">🚀 Your Next Move</h2>
+          <p className="text-sm opacity-90 mb-4">{nextAction?.text}</p>
+
+          <button
+            onClick={handleAction}
+            className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition"
+          >
+            {nextAction?.cta}
+          </button>
+
+          {/* Progress */}
+          <div className="mt-4">
+            <div className="w-full bg-white/30 h-2 rounded-full">
+              <div
+                className="bg-white h-2 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(progressPercent, 100)}%` }}
+              />
+            </div>
+            <p className="text-xs mt-1 opacity-80">
+              ₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}
+            </p>
           </div>
         </div>
 

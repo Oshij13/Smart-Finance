@@ -42,7 +42,7 @@ export default function AdvisorChat() {
             {
                 role: "assistant",
                 content:
-                    "👋 Hi! I'm your Smart Finance AI.\n\nAsk me anything about your money — budgeting, savings, taxes, or planning.",
+                    "👋 Hi! I'm your Smart Finance AI.\n\nPick a topic below — I’ll guide you and help you take action.",
                 options: quickOptions,
             },
         ]);
@@ -89,6 +89,38 @@ export default function AdvisorChat() {
         });
     };
 
+    const handleCTA = (msg: any) => {
+        const text = msg?.content?.toLowerCase() || "";
+
+        // SIMPLE INTENT DETECTION (MVP)
+        if (text.includes("save") || text.includes("emergency")) {
+            const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+
+            const saved = progress?.saved || 0;
+            const target = progress?.target || 50000;
+
+            const newSaved = saved + 500;
+
+            localStorage.setItem(
+                "sf_progress",
+                JSON.stringify({
+                    saved: newSaved,
+                    target: target,
+                })
+            );
+
+            alert("✅ ₹500 saved! You're making progress.");
+        }
+
+        else if (text.includes("invest")) {
+            alert("📈 Investment flow coming soon (MVP)");
+        }
+
+        else {
+            alert("✅ Action noted!");
+        }
+    };
+
     const sendMessage = async (text: string) => {
         if (!text.trim()) return;
 
@@ -131,8 +163,16 @@ export default function AdvisorChat() {
                     data: data.reply?.data || data.reply,
                     mode: data.reply?.mode,
                     showActions: shouldShowActions,
+
+                    // ✅ NEW
+                    cta: {
+                        text: "Take action on this",
+                        type: "action",
+                    },
                 },
             ]);
+
+            setIsCustomMode(true);
         } catch {
             setMessages((prev) => [
                 ...prev,
@@ -255,6 +295,17 @@ export default function AdvisorChat() {
                                     </div>
                                 )}
 
+                                {msg.cta && (
+                                    <div className="mt-2">
+                                        <button
+                                            onClick={() => handleCTA(msg)}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition"
+                                        >
+                                            🚀 {msg.cta.text}
+                                        </button>
+                                    </div>
+                                )}
+
                                 {/* QUICK OPTIONS */}
                                 {!isCustomMode && msg.options && (
                                     <div className="flex flex-wrap gap-2 mt-2">
@@ -266,7 +317,7 @@ export default function AdvisorChat() {
                                                         setIsCustomMode(true);
                                                     } else {
                                                         sendMessage(opt);
-                                                        setIsCustomMode(true); // enable input AFTER response
+                                                        // ❌ DO NOT enable typing yet
                                                     }
                                                 }}
                                                 className="text-sm px-3 py-1.5 rounded-full bg-purple-100 hover:bg-purple-200 transition"

@@ -256,6 +256,91 @@ Instructions (STRICT):
   }
 });
 
+/* ===========================
+   NEW API ENDPOINTS (MVP)
+=========================== */
+
+app.post("/api/generate-plan", (req, res) => {
+  try {
+    const { income = 0, expenses = 0, investments = 0, emergencyFund = 0 } = req.body;
+
+    const inc = Number(income);
+    const exp = Number(expenses);
+
+    const emergencyTarget = exp * 6 || inc * 3 || 50000;
+    const weeklySaving = Math.round(emergencyTarget / 24);
+    const firstStep = Math.min(500, weeklySaving);
+
+    res.json({
+      emergencyTarget,
+      weeklySaving,
+      firstStep,
+      nextAction: "Start building your emergency fund",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to generate plan" });
+  }
+});
+
+app.post("/api/next-action", (req, res) => {
+  try {
+    const { userData = {}, progress = {} } = req.body;
+
+    const income = Number(userData.income || 0);
+    const expenses = Number(userData.expenses || 0);
+    const investments = Number(userData.investments || 0);
+
+    const saved = Number(progress.saved || 0);
+    const target = Number(progress.target || expenses * 6 || income * 3);
+
+    let response = {};
+
+    if (saved < target) {
+      response = {
+        text: `Save ₹${Math.min(500, target - saved)} today to build your emergency fund`,
+        cta: "Save Now",
+        type: "save",
+      };
+    } else if (investments < income * 0.15) {
+      response = {
+        text: "Start investing ₹1000/month",
+        cta: "Start Investing",
+        type: "invest",
+      };
+    } else {
+      response = {
+        text: "You’re doing great! Optimize your finances",
+        cta: "Optimize",
+        type: "optimize",
+      };
+    }
+
+    res.json(response);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to generate next action" });
+  }
+});
+
+app.post("/api/update-progress", (req, res) => {
+  try {
+    const { action, amount = 0, currentSaved = 0, target = 0 } = req.body;
+
+    let newSaved = currentSaved;
+
+    if (action === "save") {
+      newSaved = currentSaved + amount;
+    }
+
+    res.json({
+      newSaved,
+      target,
+      message: "Great! You're making progress 🚀",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update progress" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
