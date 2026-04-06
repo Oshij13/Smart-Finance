@@ -121,34 +121,57 @@ export default function DashboardHome() {
   }
 
 
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
   // ✅ PDF DOWNLOAD FUNCTION
   const handleDownloadPDF = async () => {
     const element = document.getElementById("dashboard-content");
     if (!element) return;
 
-    const canvas = await html2canvas(element, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
+    try {
+      setIsGeneratingPDF(true);
+      
+      // ✅ Optimize Capture
+      const canvas = await html2canvas(element, {
+        scale: 2, // High quality
+        useCORS: true,
+        logging: false,
+        allowTaint: true,
+        backgroundColor: "#f8fafc", // Match dashboard bg
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
 
-    const pdf = new jsPDF("p", "mm", "a4");
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
 
-    const imgWidth = 210;
-    const pageHeight = 295;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    let heightLeft = imgHeight;
-    let position = 0;
+      let heightLeft = imgHeight;
+      let position = 0;
 
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+      // Add First Page
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+      heightLeft -= pdfHeight;
 
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // Add Extra Pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
+    } catch (err) {
+      console.error("PDF Generation Error:", err);
+      alert("Failed to generate PDF. Please try again.");
+    } finally {
+      setIsGeneratingPDF(false);
     }
-
-    pdf.save("SmartFinanceDashboard.pdf");
   };
 
   if (loading) return <div className="p-6">Loading your dashboard...</div>;

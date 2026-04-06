@@ -166,6 +166,18 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         if (e.key === "Enter") sendMessage();
     };
 
+    const handleInputChange = (val: string) => {
+        if ([0, 1, 1.5, 2].includes(step)) {
+            // ✅ Strictly alphabets and spaces
+            setInput(val.replace(/[^a-zA-Z\s]/g, ""));
+        } else if ([3, 4, 5, 6].includes(step)) {
+            // ✅ Strictly numbers only
+            setInput(val.replace(/[^0-9]/g, ""));
+        } else {
+            setInput(val);
+        }
+    };
+
     const quickOptions =
         step === 1
             ? ["Student", "Salaried", "Freelancer"]
@@ -282,10 +294,14 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
                     <input
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={(e) => handleInputChange(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Type your answer..."
-                        className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500/50 outline-none"
+                        placeholder={
+                            [0, 1, 1.5, 2].includes(step) 
+                                ? "Enter text only..." 
+                                : "Enter amount..."
+                        }
+                        className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
                     />
                     <button
                         onClick={sendMessage}
