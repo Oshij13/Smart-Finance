@@ -142,32 +142,46 @@ export default function DashboardHome() {
       await new Promise((r) => setTimeout(r, 1200));
 
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         backgroundColor: "#f9fafb",
         ignoreElements: (el: Element) => {
           const htmlEl = el as HTMLElement;
           const text = htmlEl.textContent || "";
-          return (htmlEl.tagName === "BUTTON" && (text.includes("AI") || text.includes("PDF"))) || 
-                 htmlEl.getAttribute("data-html2canvas-ignore") === "true";
+          return (htmlEl.tagName === "BUTTON" && (text.includes("AI") || text.includes("PDF"))) ||
+            htmlEl.getAttribute("data-html2canvas-ignore") === "true";
         }
       });
 
       element.style.width = originalWidth;
 
       const imgData = canvas.toDataURL("image/jpeg", 0.95);
-      const pdf = new jsPDF("p", "mm", "a4");
+      const pdf = new jsPDF("l", "mm", "a4");
 
-      const pageWidth = 210;
-      const pageHeight = 297;
+      const pageWidth = 297;
+      const pageHeight = 210;
 
-      // 🔥 SCALE IMAGE TO FIT ONE PAGE
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Maintain aspect ratio
+      const ratio = Math.min(
+        pageWidth / canvas.width,
+        pageHeight / canvas.height
+      );
 
-      const finalHeight = imgHeight > pageHeight ? pageHeight : imgHeight;
+      const imgWidth = canvas.width * ratio;
+      const imgHeight = canvas.height * ratio;
 
-      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, finalHeight);
+      // Center the content
+      const x = (pageWidth - imgWidth) / 2;
+      const y = 10; // small top margin
+
+      pdf.addImage(
+        imgData,
+        "JPEG",
+        x,
+        y,
+        imgWidth,
+        imgHeight
+      );
 
       pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
     } catch (err) {
@@ -371,7 +385,7 @@ export default function DashboardHome() {
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={[{ name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, { name: "Savings", Target: income * 0.2, Actual: savings + investments }]}>
                 <XAxis dataKey="name" fontSize={12} />
-                <YAxis fontSize={11} tickFormatter={(val) => `₹${val/1000}k`} />
+                <YAxis fontSize={11} tickFormatter={(val) => `₹${val / 1000}k`} />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} />
@@ -384,7 +398,7 @@ export default function DashboardHome() {
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
                 <XAxis dataKey="name" />
-                <YAxis tickFormatter={(val) => `₹${val/1000}k`} />
+                <YAxis tickFormatter={(val) => `₹${val / 1000}k`} />
                 <Tooltip />
                 <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               </BarChart>
