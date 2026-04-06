@@ -161,17 +161,14 @@ export default function DashboardHome() {
       const pageWidth = 297;
       const pageHeight = 210;
 
-      // Maintain aspect ratio
-      const ratio = Math.min(
-        pageWidth / canvas.width,
-        pageHeight / canvas.height
-      );
+      // 🔥 SCALE ONLY BY WIDTH (IMPORTANT)
+      const ratio = pageWidth / canvas.width;
 
-      const imgWidth = canvas.width * ratio;
+      const imgWidth = pageWidth;
       const imgHeight = canvas.height * ratio;
 
       // Center the content
-      const x = (pageWidth - imgWidth) / 2;
+      const x = 0;
       const y = 10; // small top margin
 
       pdf.addImage(
