@@ -130,29 +130,25 @@ export default function DashboardHome() {
       setIsGeneratingPDF(true);
       setPdfStatus("Generating clean PDF...");
 
-      window.scrollTo(0, 0);
 
       const element = document.getElementById("dashboard-content");
       if (!element) throw new Error("Dashboard not found");
-
-      // Lock width for consistency
-      const originalWidth = element.style.width;
-      element.style.width = "1100px";
 
       await new Promise((r) => setTimeout(r, 1200));
 
       document.body.style.overflow = "hidden";
 
       const canvas = await html2canvas(element, {
-        scale: 3,
+        scale: 2,
         useCORS: true,
         backgroundColor: "#f9fafb",
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
         ignoreElements: (el) => {
           return el.classList?.contains("pdf-ignore");
         }
       });
 
-      element.style.width = originalWidth;
 
       const imgData = canvas.toDataURL("image/jpeg", 0.95);
       const pdf = new jsPDF("l", "mm", "a4");
