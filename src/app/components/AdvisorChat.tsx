@@ -6,16 +6,14 @@ import { generateFinancePDF } from "../../utils/generatePDF";
 import SmartChart from "./SmartChart";
 
 export default function AdvisorChat() {
-    const [messages, setMessages] = useState<any[]>(() => {
-        const saved = sessionStorage.getItem("sf_chat");
-        return saved ? JSON.parse(saved) : [];
-    });
+    const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState("");
     const [sessionId, setSessionId] = useState<string>("");
     const [isCustomMode, setIsCustomMode] = useState(false);
     const [actionLoading, setActionLoading] = useState<number | null>(null);
     const [actionSuccess, setActionSuccess] = useState<number | null>(null);
+    const [resetBackend, setResetBackend] = useState(false);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const chartRef = useRef<any>(null);
@@ -43,6 +41,15 @@ export default function AdvisorChat() {
 
         setSessionId(existingSession);
 
+        // 🚨 KEY FIX: detect reload
+        const navEntries = performance.getEntriesByType("navigation");
+        const isReload = navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === "reload";
+
+        if (isReload) {
+            sessionStorage.removeItem("sf_chat");
+            setResetBackend(true);
+        }
+
         const saved = sessionStorage.getItem("sf_chat");
 
         if (!saved || JSON.parse(saved).length === 0) {
@@ -54,8 +61,10 @@ export default function AdvisorChat() {
                     options: quickOptions,
                 },
             ]);
+        } else {
+            setMessages(JSON.parse(saved));
         }
-    }, [quickOptions]);
+    }, []);
 
     useEffect(() => {
         sessionStorage.setItem("sf_chat", JSON.stringify(messages));
@@ -174,9 +183,12 @@ export default function AdvisorChat() {
                     message: text,
                     userData: getUserData(),
                     history: messages.slice(-6),
-                    sessionId: currentSessionId
+                    sessionId: currentSessionId,
+                    resetSession: resetBackend
                 }),
             });
+
+            setResetBackend(false);
 
             if (!res.ok) {
                 throw new Error("Backend error");

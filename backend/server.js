@@ -45,8 +45,8 @@ const handleAdvisor = async (req, res) => {
       return res.status(400).json({ error: "Session ID required" });
     }
 
-    // Initialize session if not exists
-    if (!sessions[sessionId]) {
+    // Initialize session if not exists or if reset is requested
+    if (!sessions[sessionId] || req.body.resetSession) {
       sessions[sessionId] = [];
     }
 
