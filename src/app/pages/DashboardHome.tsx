@@ -152,7 +152,14 @@ export default function DashboardHome() {
 
       for (let i = 0; i < sections.length; i++) {
         const element = document.getElementById(sections[i]);
-        if (!element) continue;
+
+        if (!element) {
+          console.error("Missing:", sections[i]);
+          continue;
+        }
+
+        // ⏳ WAIT FOR UI (VERY IMPORTANT)
+        await new Promise((r) => setTimeout(r, 800));
 
         const canvas = await html2canvas(element, {
           scale: 1,

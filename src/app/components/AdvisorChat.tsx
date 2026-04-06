@@ -6,7 +6,10 @@ import { generateFinancePDF } from "../../utils/generatePDF";
 import SmartChart from "./SmartChart";
 
 export default function AdvisorChat() {
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<any[]>(() => {
+        const saved = localStorage.getItem("sf_chat");
+        return saved ? JSON.parse(saved) : [];
+    });
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState("");
     const [sessionId, setSessionId] = useState<string>("");
@@ -40,14 +43,30 @@ export default function AdvisorChat() {
 
         setSessionId(existingSession);
 
-        setMessages([
-            {
-                role: "assistant",
-                content:
-                    "👋 Hi! I'm your Smart Finance AI.\n\nPick a topic below — I’ll guide you and help you take action.",
-                options: quickOptions,
-            },
-        ]);
+        // Only add welcome message if no history exists
+        const saved = localStorage.getItem("sf_chat");
+        if (!saved || JSON.parse(saved).length === 0) {
+            setMessages([
+                {
+                    role: "assistant",
+                    content:
+                        "👋 Hi! I'm your Smart Finance AI.\n\nPick a topic below — I’ll guide you and help you take action.",
+                    options: quickOptions,
+                },
+            ]);
+        }
+    }, [quickOptions]);
+
+    useEffect(() => {
+        localStorage.setItem("sf_chat", JSON.stringify(messages));
+    }, [messages]);
+
+    useEffect(() => {
+        const handleUnload = () => {
+            localStorage.removeItem("sf_chat");
+        };
+        window.addEventListener("beforeunload", handleUnload);
+        return () => window.removeEventListener("beforeunload", handleUnload);
     }, []);
 
     useEffect(() => {
