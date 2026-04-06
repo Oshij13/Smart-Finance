@@ -188,7 +188,8 @@ export default function DashboardHome() {
   const savings = income - (expenses + investments);
   const emergencyTarget = expenses * 6;
   const savingsRate = income > 0 ? (savings / income) * 100 : 0;
-  const emergencyMonths = expenses > 0 ? emergencyFund / expenses : 0;
+  const rawMonths = expenses > 0 ? emergencyFund / expenses : 0;
+  const emergencyMonths = Math.min(rawMonths, 12);
   const investmentRate = income > 0 ? (investments / income) * 100 : 0;
 
   let score = 0;
@@ -253,14 +254,49 @@ export default function DashboardHome() {
   }
 
   const currentInsight = generateFinancialInsight();
-  const savedAmount = progressData?.saved !== undefined ? progressData.saved : emergencyFund;
-  const targetAmount = progressData?.target || emergencyTarget;
+  const savedAmount = emergencyFund;
+  const targetAmount = emergencyTarget;
   const progressPercent = targetAmount > 0 ? (savedAmount / targetAmount) * 100 : 0;
 
   const handleAction = () => {
-    if (nextAction?.type === "save") navigate("/ai-advisor", { state: { query: "Help me build my savings plan" } });
-    else navigate("/ai-advisor", { state: { query: nextAction?.type === "invest" ? "Suggest investment plan for me" : "How to optimize my finances?" } });
+    const smartAction = getSmartNextMove();
+    if (smartAction.type === "save") navigate("/ai-advisor", { state: { query: "Help me build my savings plan" } });
+    else navigate("/ai-advisor", { state: { query: smartAction.type === "invest" ? "Suggest investment plan for me" : "How to optimize my finances?" } });
   };
+
+  function getSmartNextMove() {
+    if (emergencyMonths < 3) {
+      return {
+        text: "Build your emergency fund. Save ₹500 today",
+        cta: "Save Now",
+        type: "save"
+      };
+    }
+
+    if (investments < income * 0.1) {
+      return {
+        text: "You have a safety buffer. Start investing now",
+        cta: "Start Investing",
+        type: "invest"
+      };
+    }
+
+    if (savingsRate < 20) {
+      return {
+        text: "Increase your savings rate",
+        cta: "Optimize Savings",
+        type: "optimize"
+      };
+    }
+
+    return {
+      text: "You are doing great. Optimize your finances",
+      cta: "View Plan",
+      type: "optimize"
+    };
+  }
+
+  const smartAction = getSmartNextMove();
 
   return (
     <div id="dashboard-content" className="p-6 bg-[#f9fafb]">
@@ -280,8 +316,8 @@ export default function DashboardHome() {
         {/* NEXT MOVE */}
         <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg">
           <h2 className="text-lg font-semibold mb-2">🚀 Your Next Move</h2>
-          <p className="text-sm opacity-90 mb-4">{nextAction?.text}</p>
-          <button onClick={handleAction} className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition">{nextAction?.cta}</button>
+          <p className="text-sm opacity-90 mb-4">{smartAction.text}</p>
+          <button onClick={handleAction} className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition">{smartAction.cta}</button>
           <div className="mt-4">
             <div className="w-full bg-white/30 h-2 rounded-full"><div className="bg-white h-2 rounded-full transition-all" style={{ width: `${Math.min(progressPercent, 100)}%` }} /></div>
             <p className="text-xs mt-1 opacity-80">₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}</p>
