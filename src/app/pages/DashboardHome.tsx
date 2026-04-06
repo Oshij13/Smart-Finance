@@ -143,45 +143,50 @@ export default function DashboardHome() {
   const handleDownloadPDF = async () => {
     try {
       setIsGeneratingPDF(true);
-      setPdfStatus("Initializing...");
-      window.scrollTo(0, 0); // 🚀 CRITICAL: Reset scroll before capture
+      setPdfStatus("Initializing 1-to-1 Dashboard Capture...");
+      window.scrollTo(0, 0); // 🚀 Critical for html2canvas offset
 
+      const element = document.getElementById("dashboard-content");
+      if (!element) throw new Error("Dashboard container not found");
+
+      // ⏳ WAIT FOR UI (Ensure charts/animations are done)
+      await new Promise((r) => setTimeout(r, 1200));
+
+      const canvas = await html2canvas(element, {
+        scale: 1, // Keep scale 1 for memory safety on long dashboards
+        useCORS: true,
+        backgroundColor: "#f9fafb", // Match dashboard gray
+        logging: false,
+        allowTaint: true,
+        // Ignore the header buttons for a cleaner PDF
+        ignoreElements: (el) => {
+          return el.tagName === "BUTTON" && (el.innerText.includes("AI") || el.innerText.includes("PDF"));
+        }
+      });
+
+      setPdfStatus("Slicing Canvas Into PDF Pages...");
+      
+      const imgData = canvas.toDataURL("image/jpeg", 0.9);
       const pdf = new jsPDF("p", "mm", "a4");
-      const sections = [
-        "pdf-section-1",
-        "pdf-section-2",
-        "pdf-section-3",
-        "pdf-section-4",
-      ];
+      
+      const imgWidth = 210; // A4 Width
+      const pageHeight = 297; // A4 Height
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
 
-      for (let i = 0; i < sections.length; i++) {
-        setPdfStatus(`Capturing Section ${i + 1}/4...`);
-        const element = document.getElementById(sections[i]);
+      // Add the first page
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
 
-        if (!element) {
-          console.error("Missing:", sections[i]);
-          continue;
-        }
-
-        // ⏳ WAIT FOR UI (VERY IMPORTANT)
-        await new Promise((r) => setTimeout(r, 1000));
-
-        const canvas = await html2canvas(element, {
-          scale: 1,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          logging: false,
-          allowTaint: true
-        });
-
-        if (canvas.width > 0 && canvas.height > 0) {
-          const imgData = canvas.toDataURL("image/jpeg", 0.9);
-          const imgWidth = 210;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-          if (i !== 0) pdf.addPage();
-          pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
-        }
+      // Add subsequent pages if the content is longer than A4
+      while (heightLeft > 0) {
+        setPdfStatus(`Compiling Page ${pdf.getNumberOfPages() + 1}...`);
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
 
       setPdfStatus("Finalizing Download...");
