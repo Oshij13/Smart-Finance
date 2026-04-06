@@ -116,6 +116,14 @@ export default function DashboardHome() {
     return () => window.removeEventListener("progressUpdated", handleStorageChange);
   }, []);
 
+  useEffect(() => {
+    // ✅ Clear old data once to ensure fresh state with new logic
+    if (!localStorage.getItem("sf_data_cleared")) {
+      localStorage.removeItem("sf_progress");
+      localStorage.setItem("sf_data_cleared", "true");
+    }
+  }, []);
+
   if (!onboardingData) {
     return <Onboarding />;
   }

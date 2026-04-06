@@ -320,21 +320,28 @@ app.post("/api/next-action", (req, res) => {
 
     let response = {};
 
-    if (saved < target) {
+    // PRIORITY 1: Emergency fund too low
+    if (saved < target * 0.5) {
       response = {
-        text: `Save ₹${Math.min(500, target - saved)} today to build your emergency fund`,
+        text: `Build your emergency fund. Save ₹${Math.min(500, target - saved)} today`,
         cta: "Save Now",
         type: "save",
       };
-    } else if (investments < income * 0.15) {
+    }
+
+    // PRIORITY 2: Emergency fund OK but no investments
+    else if (investments === 0) {
       response = {
-        text: "Start investing ₹1000/month",
+        text: "You have enough emergency buffer. Start investing now",
         cta: "Start Investing",
         type: "invest",
       };
-    } else {
+    }
+
+    // PRIORITY 3: Balanced user
+    else {
       response = {
-        text: "You’re doing great! Optimize your finances",
+        text: "You’re on track. Optimize your finances",
         cta: "Optimize",
         type: "optimize",
       };
