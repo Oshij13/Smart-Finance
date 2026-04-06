@@ -163,22 +163,50 @@ export default function DashboardHome() {
 
       // 🔥 SCALE ONLY BY WIDTH (IMPORTANT)
       const ratio = pageWidth / canvas.width;
-
       const imgWidth = pageWidth;
       const imgHeight = canvas.height * ratio;
 
-      // Center the content
-      const x = 0;
-      const y = 10; // small top margin
+      // Height of one PDF page in canvas units
+      const pageCanvasHeight = canvas.height * (pageHeight / imgHeight);
 
-      pdf.addImage(
-        imgData,
-        "JPEG",
-        x,
-        y,
-        imgWidth,
-        imgHeight
-      );
+      let position = 0;
+
+      while (position < canvas.height) {
+        const pageCanvas = document.createElement("canvas");
+        const ctx = pageCanvas.getContext("2d");
+
+        if (!ctx) break;
+
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = pageCanvasHeight;
+
+        ctx.drawImage(
+          canvas,
+          0,
+          position,
+          canvas.width,
+          pageCanvasHeight,
+          0,
+          0,
+          canvas.width,
+          pageCanvasHeight
+        );
+
+        const pageData = pageCanvas.toDataURL("image/jpeg", 0.95);
+
+        if (position > 0) pdf.addPage();
+
+        pdf.addImage(
+          pageData,
+          "JPEG",
+          0,
+          0, // Flush to top to ensure continuous flow
+          pageWidth,
+          pageHeight
+        );
+
+        position += pageCanvasHeight;
+      }
 
       pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
     } catch (err) {
