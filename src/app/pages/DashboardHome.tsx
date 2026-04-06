@@ -42,6 +42,8 @@ export default function DashboardHome() {
     return JSON.parse(localStorage.getItem("sf_progress") || "{}");
   });
 
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
   useEffect(() => {
     if (!onboardingData) {
       setLoading(false);
@@ -71,16 +73,21 @@ export default function DashboardHome() {
   useEffect(() => {
     const fetchNextAction = async () => {
       try {
-        const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
-
         const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/next-action", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userData: onboardingData,
-            progress: progress,
+            userData: {
+              income: onboardingData?.income,
+              expenses: onboardingData?.expenses,
+              investments: onboardingData?.investments || 0,
+            },
+            progress: {
+              saved: onboardingData?.emergencyFund || 0,   // ✅ FIXED
+              target: onboardingData?.expenses * 6,
+            },
           }),
         });
 
@@ -129,66 +136,43 @@ export default function DashboardHome() {
   }
 
 
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // ✅ PDF DOWNLOAD FUNCTION
   const handleDownloadPDF = async () => {
-    const element = document.getElementById("dashboard-content");
-    if (!element) return;
-
     try {
       setIsGeneratingPDF(true);
-      
-      // ✅ Step 1: Prepare the UI for capture
-      window.scrollTo(0, 0);
-      await new Promise(r => setTimeout(r, 600)); // ⏳ Give charts time to settle
 
-      const element = document.getElementById("dashboard-content");
-      if (!element) throw new Error("Dashboard container not found");
-
-      // ✅ Step 2: Advanced Capture with Memory Optimization
-      const canvas = await html2canvas(element, {
-        scale: 1.2, // Lightweight but clear
-        useCORS: true,
-        backgroundColor: "#f8fafc",
-        logging: false,
-        imageTimeout: 20000,
-        onclone: (clonedDoc) => {
-          const el = clonedDoc.getElementById("dashboard-content");
-          if (el) {
-            el.style.padding = "10px";
-            el.style.width = "1200px"; // Force a standard width for the PDF layout
-          }
-        }
-      });
-
-      // ✅ Step 3: Use JPEG for massive memory savings (PNG is too heavy for large canvases)
-      const imgData = canvas.toDataURL("image/jpeg", 0.85);
       const pdf = new jsPDF("p", "mm", "a4");
+      const sections = [
+        "pdf-section-1",
+        "pdf-section-2",
+        "pdf-section-3",
+        "pdf-section-4",
+      ];
 
-      const pdfWidth = 210;
-      const pdfHeight = 297;
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      for (let i = 0; i < sections.length; i++) {
+        const element = document.getElementById(sections[i]);
+        if (!element) continue;
 
-      let heightLeft = imgHeight;
-      let position = 0;
+        const canvas = await html2canvas(element, {
+          scale: 1,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+        });
 
-      // ✅ Step 4: Multi-page logic
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
-      heightLeft -= pdfHeight;
+        const imgData = canvas.toDataURL("image/jpeg", 0.9);
 
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
-        heightLeft -= pdfHeight;
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        if (i !== 0) pdf.addPage();
+
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
       }
 
       pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
     } catch (err) {
-      console.error("PDF Generation Error:", err);
-      alert("PDF failed. This usually happens if the dashboard is very long. Try scrolling through the dashboard once then try again.");
+      console.error("PDF Error:", err);
     } finally {
       setIsGeneratingPDF(false);
     }
@@ -470,287 +454,302 @@ export default function DashboardHome() {
     <div id="dashboard-content" className="p-6">
       <div className="space-y-6">
 
-        {/* TOP */}
-        {/* HEADER */}
-        <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
-          <div>
-            <h1 className="text-2xl font-bold">
-              Hey {onboardingData?.name || "User"} 👋
-            </h1>
-            <p className="text-sm opacity-90">Your financial dashboard</p>
-          </div>
-
-          {/* ✅ BUTTON GROUP */}
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate("/ai-advisor")}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg focus:ring-2 focus:ring-purple-500/50 outline-none"
-            >
-              ✨ AI Advisor
-            </button>
-
-            <button
-              onClick={handleDownloadPDF}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg focus:ring-2 focus:ring-purple-500/50 outline-none"
-            >
-              📄 Download PDF
-            </button>
-          </div>
-        </div>
-
-        {/* 🚀 NEXT ACTION CARD (NEW CORE FEATURE) */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">🚀 Your Next Move</h2>
-          <p className="text-sm opacity-90 mb-4">{nextAction?.text}</p>
-
-          <button
-            onClick={handleAction}
-            className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition"
-          >
-            {nextAction?.cta}
-          </button>
-
-          {/* Progress */}
-          <div className="mt-4">
-            <div className="w-full bg-white/30 h-2 rounded-full">
-              <div
-                className="bg-white h-2 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(progressPercent, 100)}%` }}
-              />
-            </div>
-            <p className="text-xs mt-1 opacity-80">
-              ₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}
-            </p>
-          </div>
-        </div>
-
-        {/* 👤 PROFILE CARD */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
-              {(onboardingData?.name || "U")[0]}
-            </div>
-
+        <div id="pdf-section-1" className="space-y-6">
+          {/* TOP */}
+          {/* HEADER */}
+          <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
             <div>
-              <h2 className="text-lg font-semibold">{onboardingData?.name || "User"}</h2>
-              <p className="text-sm text-gray-500">Monthly Income: ₹{Number(onboardingData?.income || 0).toLocaleString('en-IN')}</p>
-              <p className="text-xs text-gray-400 mt-1">
-                {onboardingData?.income > 50000 ? "Growing Investor" : "Beginner Investor"}
+              <h1 className="text-2xl font-bold">
+                Hey {onboardingData?.name || "User"} 👋
+              </h1>
+              <p className="text-sm opacity-90">Your financial dashboard</p>
+            </div>
+
+            {/* ✅ BUTTON GROUP */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate("/ai-advisor")}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg focus:ring-2 focus:ring-purple-500/50 outline-none"
+              >
+                ✨ AI Advisor
+              </button>
+
+              <button
+                onClick={handleDownloadPDF}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-transparent text-white border border-white/30 hover:bg-white/10 transition-all duration-200 hover:scale-105 hover:shadow-lg focus:ring-2 focus:ring-purple-500/50 outline-none"
+              >
+                📄 Download PDF
+              </button>
+            </div>
+          </div>
+
+          {/* 🚀 NEXT ACTION CARD (NEW CORE FEATURE) */}
+          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg">
+            <h2 className="text-lg font-semibold mb-2">🚀 Your Next Move</h2>
+            <p className="text-sm opacity-90 mb-4">{nextAction?.text}</p>
+
+            <button
+              onClick={handleAction}
+              className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition"
+            >
+              {nextAction?.cta}
+            </button>
+
+            {/* Progress */}
+            <div className="mt-4">
+              <div className="w-full bg-white/30 h-2 rounded-full">
+                <div
+                  className="bg-white h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(progressPercent, 100)}%` }}
+                />
+              </div>
+              <p className="text-xs mt-1 opacity-80">
+                ₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}
               </p>
             </div>
           </div>
+        </div>
 
-          <div className="text-right">
-            {!isEditingGoal ? (
-              <>
-                <p className="text-sm text-gray-500">Primary Goal</p>
-                <p className="font-semibold text-blue-600">{onboardingData?.goal || "Wealth Building"}</p>
-                <button onClick={() => setIsEditingGoal(true)} className="text-xs text-blue-500 mt-1 hover:underline focus:ring-2 focus:ring-purple-500/50 outline-none">Edit</button>
-              </>
-            ) : (
-              <div className="flex flex-col items-end gap-2">
-                <input value={goalInput} onChange={(e) => setGoalInput(e.target.value)} className="border px-2 py-1 rounded text-sm focus:ring-2 focus:ring-purple-500/50 outline-none" placeholder="Enter goal" />
-                <div className="flex gap-2">
-                  <button onClick={() => { const updated = { ...onboardingData, goal: goalInput }; setUserData(updated); setIsEditingGoal(false); }} className="text-xs px-2 py-1 bg-green-500 text-white rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Save</button>
-                  <button onClick={() => setIsEditingGoal(false)} className="text-xs px-2 py-1 bg-gray-200 rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Cancel</button>
-                </div>
+        <div id="pdf-section-2" className="space-y-6">
+          {/* 👤 PROFILE CARD */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+                {(onboardingData?.name || "U")[0]}
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* CORE STATUS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* 💯 FINANCIAL HEALTH SCORE */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">💯 Financial Health</h3>
-              <span className="text-2xl font-bold text-blue-600">{score}/100</span>
+              <div>
+                <h2 className="text-lg font-semibold">{onboardingData?.name || "User"}</h2>
+                <p className="text-sm text-gray-500">Monthly Income: ₹{Number(onboardingData?.income || 0).toLocaleString('en-IN')}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {onboardingData?.income > 50000 ? "Growing Investor" : "Beginner Investor"}
+                </p>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 h-3 rounded-full mb-4">
-              <div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} />
-            </div>
-            <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[insight.color]}`}>
-              <span>{insight.icon}</span>
-              <span>{insight.message}</span>
-            </div>
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div><p className="text-gray-500">Savings</p><p className="font-semibold">{savingsRate.toFixed(1)}%</p></div>
-              <div><p className="text-gray-500">Emergency</p><p className="font-semibold">{emergencyMonths.toFixed(1)} months</p></div>
-              <div><p className="text-gray-500">Investments</p><p className="font-semibold">{investmentRate.toFixed(1)}%</p></div>
-            </div>
-          </div>
 
-          {/* 🎯 GOAL PROGRESS TRACKER */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3>
-              <span className="text-sm text-gray-500">{progress.toFixed(0)}%</span>
-            </div>
-            <p className="text-sm text-gray-600 mb-2">{goal}</p>
-            <div className="w-full bg-gray-200 h-3 rounded-full mb-3">
-              <div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
-            </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>₹{savings.toLocaleString('en-IN')}</span>
-              <span>Target: ₹{target.toLocaleString('en-IN')}</span>
+            <div className="text-right">
+              {!isEditingGoal ? (
+                <>
+                  <p className="text-sm text-gray-500">Primary Goal</p>
+                  <p className="font-semibold text-blue-600">{onboardingData?.goal || "Wealth Building"}</p>
+                  <button onClick={() => setIsEditingGoal(true)} className="text-xs text-blue-500 mt-1 hover:underline focus:ring-2 focus:ring-purple-500/50 outline-none">Edit</button>
+                </>
+              ) : (
+                <div className="flex flex-col items-end gap-2">
+                  <input value={goalInput} onChange={(e) => setGoalInput(e.target.value)} className="border px-2 py-1 rounded text-sm focus:ring-2 focus:ring-purple-500/50 outline-none" placeholder="Enter goal" />
+                  <div className="flex gap-2">
+                    <button onClick={() => { const updated = { ...onboardingData, goal: goalInput }; setUserData(updated); setIsEditingGoal(false); }} className="text-xs px-2 py-1 bg-green-500 text-white rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Save</button>
+                    <button onClick={() => setIsEditingGoal(false)} className="text-xs px-2 py-1 bg-gray-200 rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Cancel</button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
 
-        {/* FINANCIAL SNAPSHOT */}
-        {/* CARDS */}
-        <div className="grid grid-cols-4 gap-4">
-          {cards.map((card, i) => (
-            <div key={i} className={`p-6 rounded-2xl shadow-sm hover:shadow-md transition ${card.bg}`}>
+          {/* CORE STATUS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 💯 FINANCIAL HEALTH SCORE */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">💯 Financial Health</h3>
+                <span className="text-2xl font-bold text-blue-600">{score}/100</span>
+              </div>
+              <div className="w-full bg-gray-200 h-3 rounded-full mb-4">
+                <div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} />
+              </div>
+              <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[insight.color]}`}>
+                <span>{insight.icon}</span>
+                <span>{insight.message}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div><p className="text-gray-500">Savings</p><p className="font-semibold">{savingsRate.toFixed(1)}%</p></div>
+                <div><p className="text-gray-500">Emergency</p><p className="font-semibold">{emergencyMonths.toFixed(1)} months</p></div>
+                <div><p className="text-gray-500">Investments</p><p className="font-semibold">{investmentRate.toFixed(1)}%</p></div>
+              </div>
+            </div>
+
+            {/* 🎯 GOAL PROGRESS TRACKER */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-xl">{card.icon}</span>
-                <span className="text-xs text-gray-400">Monthly</span>
+                <h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3>
+                <span className="text-sm text-gray-500">{progress.toFixed(0)}%</span>
               </div>
-              <p className="text-sm text-gray-500">{card.title}</p>
-              <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
-              <p className={`text-xs mt-2 font-medium ${card.insight.includes("⚠️") ? "text-red-500" : "text-green-600"}`}>{card.insight}</p>
+              <p className="text-sm text-gray-600 mb-2">{goal}</p>
+              <div className="w-full bg-gray-200 h-3 rounded-full mb-3">
+                <div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
+              </div>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>₹{savings.toLocaleString('en-IN')}</span>
+                <span>Target: ₹{target.toLocaleString('en-IN')}</span>
+              </div>
             </div>
-          ))}
-        </div>
-
-        {/* VISUAL */}
-        {/* CHARTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* 50/30/20 RULE GRAPH */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚖️ 50/30/20 Rule Analysis</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={[{ name: "Needs(50%)", Target: income * 0.50, Actual: expenses * 0.625 }, { name: "Wants(30%)", Target: income * 0.30, Actual: expenses * 0.375 }, { name: "Savings(20%)", Target: income * 0.20, Actual: savings + investments }]} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
-                <XAxis dataKey="name" fontSize={12} tickMargin={8} />
-                <YAxis fontSize={11} tickFormatter={(val) => `₹${val >= 100000 ? (val / 100000) + 'L' : val >= 1000 ? (val / 1000) + 'k' : val}`} />
-                <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString('en-IN')}`} cursor={{ fill: '#f1f5f9' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Bar dataKey="Actual" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* BAR */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Monthly Overview</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(val) => `₹${val >= 100000 ? (val / 100000) + 'L' : val >= 1000 ? (val / 1000) + 'k' : val}`} />
-                <Tooltip formatter={(val) => `₹${Number(val).toLocaleString('en-IN')}`} />
-                <Bar dataKey="value" fill="#3b82f6" />
-              </BarChart>
-            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* ACTION */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* ⚡ WHAT SHOULD I DO NEXT */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚡ What Should You Do Next?</h3>
-            <div className="space-y-3">
-              {actions.map((item, i) => (
-                <div key={i} onClick={() => navigate("/ai-advisor", { state: { query: item.action } })} className="p-4 rounded-xl border hover:bg-gray-50 hover:shadow cursor-pointer transition">
-                  <p className="text-sm font-medium">{item.text}</p>
-                  <p className="text-xs text-gray-500 mt-1">Click to explore →</p>
+        <div id="pdf-section-3" className="space-y-6">
+          {/* FINANCIAL SNAPSHOT */}
+          {/* CARDS */}
+          <div className="grid grid-cols-4 gap-4">
+            {cards.map((card, i) => (
+              <div key={i} className={`p-6 rounded-2xl shadow-sm hover:shadow-md transition ${card.bg}`}>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xl">{card.icon}</span>
+                  <span className="text-xs text-gray-400">Monthly</span>
                 </div>
-              ))}
-            </div>
+                <p className="text-sm text-gray-500">{card.title}</p>
+                <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
+                <p className={`text-xs mt-2 font-medium ${card.insight.includes("⚠️") ? "text-red-500" : "text-green-600"}`}>{card.insight}</p>
+              </div>
+            ))}
           </div>
 
-          {/* 💡 SMART FINANCIAL INSIGHT */}
-          <div
-            className={`p-6 rounded-2xl shadow-sm hover:shadow-md transition border ${insight.color === "red"
-              ? "bg-red-50 border-red-100 text-red-800"
-              : insight.color === "orange"
-                ? "bg-orange-50 border-orange-100 text-orange-800"
-                : insight.color === "blue"
-                  ? "bg-blue-50 border-blue-100 text-blue-800"
-                  : "bg-green-50 border-green-100 text-green-800"
-              }`}
-          >
-            <p
-              className={`font-semibold flex items-center gap-2 ${insight.color === "red"
-                ? "text-red-700"
+          {/* VISUAL */}
+          {/* CHARTS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 50/30/20 RULE GRAPH */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">⚖️ 50/30/20 Rule Analysis</h3>
+              <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={[{ name: "Needs(50%)", Target: income * 0.50, Actual: expenses * 0.625 }, { name: "Wants(30%)", Target: income * 0.30, Actual: expenses * 0.375 }, { name: "Savings(20%)", Target: income * 0.20, Actual: savings + investments }]} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
+                    <XAxis dataKey="name" fontSize={12} tickMargin={8} />
+                    <YAxis fontSize={11} tickFormatter={(val) => `₹${val >= 100000 ? (val / 100000) + 'L' : val >= 1000 ? (val / 1000) + 'k' : val}`} />
+                    <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString('en-IN')}`} cursor={{ fill: '#f1f5f9' }} />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                    <Bar dataKey="Actual" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* BAR */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Monthly Overview</h3>
+              <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
+                    <XAxis dataKey="name" />
+                    <YAxis tickFormatter={(val) => `₹${val >= 100000 ? (val / 100000) + 'L' : val >= 1000 ? (val / 1000) + 'k' : val}`} />
+                    <Tooltip formatter={(val) => `₹${Number(val).toLocaleString('en-IN')}`} />
+                    <Bar dataKey="value" fill="#3b82f6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="pdf-section-4" className="space-y-6">
+          {/* ACTION */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* ⚡ WHAT SHOULD I DO NEXT */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">⚡ What Should You Do Next?</h3>
+              <div className="space-y-3">
+                {actions.map((item, i) => (
+                  <div key={i} onClick={() => navigate("/ai-advisor", { state: { query: item.action } })} className="p-4 rounded-xl border hover:bg-gray-50 hover:shadow cursor-pointer transition">
+                    <p className="text-sm font-medium">{item.text}</p>
+                    <p className="text-xs text-gray-500 mt-1">Click to explore →</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 💡 SMART FINANCIAL INSIGHT */}
+            <div
+              className={`p-6 rounded-2xl shadow-sm hover:shadow-md transition border ${insight.color === "red"
+                ? "bg-red-50 border-red-100 text-red-800"
                 : insight.color === "orange"
-                  ? "text-orange-700"
+                  ? "bg-orange-50 border-orange-100 text-orange-800"
                   : insight.color === "blue"
-                    ? "text-blue-700"
-                    : "text-green-700"
+                    ? "bg-blue-50 border-blue-100 text-blue-800"
+                    : "bg-green-50 border-green-100 text-green-800"
                 }`}
             >
-              {insight.icon} Smart Insight
-            </p>
-            <p className="text-sm mt-3 leading-relaxed">
-              {insight.message}
-            </p>
-            {action && (
-              <p className="text-xs mt-3 opacity-70 border-t pt-3 border-current">
-                ✨ AI Recommendation: {action}
+              <p
+                className={`font-semibold flex items-center gap-2 ${insight.color === "red"
+                  ? "text-red-700"
+                  : insight.color === "orange"
+                    ? "text-orange-700"
+                    : insight.color === "blue"
+                      ? "text-blue-700"
+                      : "text-green-700"
+                  }`}
+              >
+                {insight.icon} Smart Insight
               </p>
-            )}
-          </div>
-        </div>
-
-        {/* INSIGHTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* 🛡️ EMERGENCY FUND */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">🛡️ Emergency Fund</h3>
-
-            <p className="text-sm text-gray-500 mb-3">
-              {emergencyMonths.toFixed(1)} months covered
-            </p>
-
-            {/* Progress Bar */}
-            <div className="w-full bg-gray-200 h-3 rounded-full mb-3">
-              <div
-                className="bg-blue-500 h-3 rounded-full"
-                style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }}
-              />
-            </div>
-
-            <p className="text-xs text-gray-500 mb-4">
-              Target: ₹{(expenses * 6).toLocaleString('en-IN')}
-            </p>
-
-            {/* 💡 WHY IT MATTERS */}
-            <div className="bg-blue-50 p-4 rounded-xl text-sm text-gray-700 space-y-2">
-              <p>
-                💡 <strong>Why is an emergency fund important?</strong>
+              <p className="text-sm mt-3 leading-relaxed">
+                {insight.message}
               </p>
-              <p>
-                It protects you from unexpected situations like job loss, medical emergencies,
-                or urgent expenses — so you don’t rely on loans or credit cards.
-              </p>
-              <p>
-                📊 <strong>Why 3–6 months?</strong>
-              </p>
-              <p>
-                Having at least 3–6 months of expenses saved gives you enough time to recover
-                financially without stress if your income stops.
-              </p>
+              {action && (
+                <p className="text-xs mt-3 opacity-70 border-t pt-3 border-current">
+                  ✨ AI Recommendation: {action}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* 💡 SMART INSIGHTS */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 Smart Insights</h3>
-            <div className="space-y-3">
-              {(insights || []).map((insight, i) => (
-                <div key={i} className="bg-blue-50 p-3 rounded-xl text-sm text-gray-700">
-                  {insight}
-                </div>
-              ))}
+          {/* INSIGHTS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 🛡️ EMERGENCY FUND */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">🛡️ Emergency Fund</h3>
+              <p className="text-sm text-gray-500 mb-3">
+                {emergencyMonths.toFixed(1)} months covered
+              </p>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 h-3 rounded-full mb-3">
+                <div
+                  className="bg-blue-500 h-3 rounded-full"
+                  style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }}
+                />
+              </div>
+
+              <p className="text-xs text-gray-500 mb-4">
+                Target: ₹{(expenses * 6).toLocaleString('en-IN')}
+              </p>
+
+              {/* 💡 WHY IT MATTERS */}
+              <div className="bg-blue-50 p-4 rounded-xl text-sm text-gray-700 space-y-2">
+                <p>
+                  💡 <strong>Why is an emergency fund important?</strong>
+                </p>
+                <p>
+                  It protects you from unexpected situations like job loss, medical emergencies,
+                  or urgent expenses — so you don’t rely on loans or credit cards.
+                </p>
+                <p>
+                  📊 <strong>Why 3–6 months?</strong>
+                </p>
+                <p>
+                  Having at least 3–6 months of expenses saved gives you enough time to recover
+                  financially without stress if your income stops.
+                </p>
+              </div>
+            </div>
+
+            {/* 💡 SMART INSIGHTS */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 Smart Insights</h3>
+              <div className="space-y-3">
+                {(insights || []).map((insight, i) => (
+                  <div key={i} className="bg-blue-50 p-3 rounded-xl text-sm text-gray-700">
+                    {insight}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
       </div>
+      {isGeneratingPDF && (
+        <div className="fixed bottom-4 right-4 bg-black text-white px-4 py-2 rounded z-[9999] shadow-2xl animate-bounce">
+          🚀 Generating 4-Page PDF...
+        </div>
+      )}
     </div>
   );
 }
