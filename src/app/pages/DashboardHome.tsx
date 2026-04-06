@@ -128,16 +128,21 @@ export default function DashboardHome() {
   const handleDownloadPDF = async () => {
     try {
       setIsGeneratingPDF(true);
-      setPdfStatus("Initializing 1-to-1 Dashboard Capture...");
+      setPdfStatus("Initializing High-Fidelity Capture...");
       window.scrollTo(0, 0);
 
       const element = document.getElementById("dashboard-content");
       if (!element) throw new Error("Dashboard container not found");
 
-      await new Promise((r) => setTimeout(r, 1200));
+      // 🚀 VIEWPORT STABILIZATION: Lock width during capture to prevent "disorientation"
+      const originalWidth = element.style.width;
+      element.style.width = "1100px";
+
+      // ⏳ WAIT FOR UI (Render charts at locked width)
+      await new Promise((r) => setTimeout(r, 1500));
 
       const canvas = await html2canvas(element, {
-        scale: 1,
+        scale: 2, // 🎯 2x Scale for razor-sharp text
         useCORS: true,
         backgroundColor: "#f9fafb",
         logging: false,
@@ -149,29 +154,37 @@ export default function DashboardHome() {
         }
       });
 
-      setPdfStatus("Slicing Canvas Into PDF Pages...");
-      const imgData = canvas.toDataURL("image/jpeg", 0.9);
+      // 🔓 RESTORE UI
+      element.style.width = originalWidth;
+
+      setPdfStatus("Slicing Canvas Into Document Pages...");
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
       const pdf = new jsPDF("p", "mm", "a4");
       
-      const imgWidth = 210;
+      const pageWidth = 210;
       const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const margin = 10; // 📏 Professional Document Margins
+      const contentWidth = pageWidth - (margin * 2);
+      const contentHeight = (canvas.height * contentWidth) / canvas.width;
       
-      let heightLeft = imgHeight;
-      let position = 0;
+      let heightLeft = contentHeight;
+      let position = margin; // Start with top margin
 
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // 📄 FIRST PAGE
+      pdf.addImage(imgData, "JPEG", margin, position, contentWidth, contentHeight);
+      heightLeft -= (pageHeight - (margin * 2));
 
+      // 📄 SUBSEQUENT PAGES
       while (heightLeft > 0) {
         setPdfStatus(`Compiling Page ${pdf.getNumberOfPages() + 1}...`);
-        position = heightLeft - imgHeight;
+        // Calculate shifted position for slicing
+        position = heightLeft - contentHeight + margin; 
         pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        pdf.addImage(imgData, "JPEG", margin, position, contentWidth, contentHeight);
+        heightLeft -= (pageHeight - (margin * 2));
       }
 
-      setPdfStatus("Finalizing Download...");
+      setPdfStatus("Finalizing High-Quality Download...");
       pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
       
     } catch (err: any) {
