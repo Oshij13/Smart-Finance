@@ -43,8 +43,8 @@ export default function AdvisorChat() {
 
         setSessionId(existingSession);
 
-        // Only add welcome message if no history exists
-        const saved = localStorage.getItem("sf_chat");
+        const saved = sessionStorage.getItem("sf_chat");
+
         if (!saved || JSON.parse(saved).length === 0) {
             setMessages([
                 {
