@@ -89,35 +89,46 @@ export default function AdvisorChat() {
         });
     };
 
-    const handleCTA = (msg: any) => {
-        const text = msg?.content?.toLowerCase() || "";
+    const handleActionClick = async (action: any) => {
+        try {
+            if (action.type === "save") {
+                const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
 
-        // SIMPLE INTENT DETECTION (MVP)
-        if (text.includes("save") || text.includes("emergency")) {
-            const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+                const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/update-progress", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        action: "save",
+                        amount: action.amount || 500,
+                        currentSaved: progress?.saved || 0,
+                        target: progress?.target || 0,
+                    }),
+                });
 
-            const saved = progress?.saved || 0;
-            const target = progress?.target || 50000;
+                const data = await res.json();
 
-            const newSaved = saved + 500;
+                localStorage.setItem(
+                    "sf_progress",
+                    JSON.stringify({
+                        saved: data.newSaved,
+                        target: data.target,
+                    })
+                );
 
-            localStorage.setItem(
-                "sf_progress",
-                JSON.stringify({
-                    saved: newSaved,
-                    target: target,
-                })
-            );
+                alert(`✅ ₹${action.amount} saved!`);
+            }
 
-            alert("✅ ₹500 saved! You're making progress.");
-        }
+            else if (action.type === "invest") {
+                alert("📈 Investment flow coming soon (MVP)");
+            }
 
-        else if (text.includes("invest")) {
-            alert("📈 Investment flow coming soon (MVP)");
-        }
-
-        else {
-            alert("✅ Action noted!");
+            else {
+                alert("✅ Action completed");
+            }
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -163,12 +174,7 @@ export default function AdvisorChat() {
                     data: data.reply?.data || data.reply,
                     mode: data.reply?.mode,
                     showActions: shouldShowActions,
-
-                    // ✅ NEW
-                    cta: {
-                        text: "Take action on this",
-                        type: "action",
-                    },
+                    actions: data.reply?.actions || [], // ✅ NEW
                 },
             ]);
 
@@ -295,14 +301,17 @@ export default function AdvisorChat() {
                                     </div>
                                 )}
 
-                                {msg.cta && (
-                                    <div className="mt-2">
-                                        <button
-                                            onClick={() => handleCTA(msg)}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition"
-                                        >
-                                            🚀 {msg.cta.text}
-                                        </button>
+                                {msg.actions && msg.actions.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {msg.actions.map((action: any, idx: number) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleActionClick(action)}
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition"
+                                            >
+                                                🚀 {action.label}
+                                            </button>
+                                        ))}
                                     </div>
                                 )}
 

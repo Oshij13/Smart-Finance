@@ -105,6 +105,7 @@ Analyze their spending patterns based on income. Identify areas of potential lea
 7. Retirement Planning
 Ask for their current age and desired retirement age. Calculate the retirement corpus they'll need (accounting for inflation at ~6%). Suggest instruments: NPS, EPF, PPF, mutual fund SIPs. Show projections visually using tables or growth charts.
 
+
 VISUAL COMMUNICATION
 
 Use tables to compare options (e.g., Old vs New Tax Regime, investment returns).
@@ -119,6 +120,24 @@ RESPONSE RULES (FOLLOW STRICTLY):
 4. For structured financial plans/comparisons, set mode to "structured".
 5. Use "insights" array and "table" object when helpful.
 6. For tax questions, include the full tax comparison schema.
+7. ALWAYS include an "actions" array in the JSON response.
+
+ACTION RULES:
+- Suggest 1 or 2 simple actions max.
+- Actions must be specific and executable.
+- Examples: 
+  Saving → "Save ₹500"
+  Investing → "Start SIP ₹1000"
+  Budget → "Reduce expenses by ₹2000"
+
+ACTION FORMAT:
+"actions": [
+  {
+    "label": "Save ₹500",
+    "type": "save",
+    "amount": 500
+  }
+]
 
 CHART SCHEMAS (STRICTLY FOLLOW FOR VISUALS):
 1. PIE CHART (Use for Budget breakdown ONLY):
@@ -142,6 +161,7 @@ OUTPUT — STRICT JSON ONLY
    {
      "mode": "chat | structured",
      "message": "Plain text response",
+     "actions": [ { "label": "Save ₹500", "type": "save", "amount": 500 } ],
      "data": {
        "chartConfig": { ...one of the schemas above... },
        "insights": ["Point 1"],
@@ -171,6 +191,11 @@ OUTPUT — STRICT JSON ONLY
         mode: "chat",
         message: "Sorry, something went wrong.",
       };
+    }
+
+    // ✅ Ensure actions always exist (MVP safety)
+    if (!reply.actions) {
+      reply.actions = [];
     }
 
     // Save AI response into session

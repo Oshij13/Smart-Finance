@@ -383,36 +383,17 @@ export default function DashboardHome() {
   const targetAmount = progressData?.target || emergencyTarget;
   const progressPercent = targetAmount > 0 ? (savedAmount / targetAmount) * 100 : 0;
 
-  const handleAction = async () => {
-    try {
-      const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
-
-      const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/update-progress", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: nextAction?.type,
-          amount: 500,
-          currentSaved: progress?.saved || 0,
-          target: progress?.target || 0,
-        }),
+  const handleAction = () => {
+    if (nextAction?.type === "save") {
+      navigate("/ai-advisor", {
+        state: { query: "Help me build my savings plan" },
       });
+    }
 
-      const data = await res.json();
-
-      localStorage.setItem(
-        "sf_progress",
-        JSON.stringify({
-          saved: data.newSaved,
-          target: data.target,
-        })
-      );
-
-      window.location.reload();
-    } catch (err) {
-      console.error(err);
+    if (nextAction?.type === "invest" || nextAction?.type === "optimize") {
+      navigate("/ai-advisor", {
+        state: { query: nextAction?.type === "invest" ? "Suggest investment plan for me" : "How to optimize my finances?" },
+      });
     }
   };
 
