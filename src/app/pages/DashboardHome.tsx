@@ -128,68 +128,50 @@ export default function DashboardHome() {
   const handleDownloadPDF = async () => {
     try {
       setIsGeneratingPDF(true);
-      setPdfStatus("Initializing High-Fidelity Capture...");
+      setPdfStatus("Generating clean PDF...");
+
       window.scrollTo(0, 0);
 
       const element = document.getElementById("dashboard-content");
-      if (!element) throw new Error("Dashboard container not found");
+      if (!element) throw new Error("Dashboard not found");
 
-      // 🚀 VIEWPORT STABILIZATION: Lock width during capture to prevent "disorientation"
+      // Lock width for consistency
       const originalWidth = element.style.width;
       element.style.width = "1100px";
 
-      // ⏳ WAIT FOR UI (Render charts at locked width)
-      await new Promise((r) => setTimeout(r, 1500));
+      await new Promise((r) => setTimeout(r, 1200));
 
       const canvas = await html2canvas(element, {
-        scale: 2, // 🎯 2x Scale for razor-sharp text
+        scale: 2,
         useCORS: true,
         backgroundColor: "#f9fafb",
-        logging: false,
-        allowTaint: true,
         ignoreElements: (el: Element) => {
           const htmlEl = el as HTMLElement;
           const text = htmlEl.textContent || "";
-          return htmlEl.tagName === "BUTTON" && (text.includes("AI") || text.includes("PDF"));
+          return (htmlEl.tagName === "BUTTON" && (text.includes("AI") || text.includes("PDF"))) || 
+                 htmlEl.getAttribute("data-html2canvas-ignore") === "true";
         }
       });
 
-      // 🔓 RESTORE UI
       element.style.width = originalWidth;
 
-      setPdfStatus("Slicing Canvas Into Document Pages...");
       const imgData = canvas.toDataURL("image/jpeg", 0.95);
       const pdf = new jsPDF("p", "mm", "a4");
-      
+
       const pageWidth = 210;
       const pageHeight = 297;
-      const margin = 10; // 📏 Professional Document Margins
-      const contentWidth = pageWidth - (margin * 2);
-      const contentHeight = (canvas.height * contentWidth) / canvas.width;
-      
-      let heightLeft = contentHeight;
-      let position = margin; // Start with top margin
 
-      // 📄 FIRST PAGE
-      pdf.addImage(imgData, "JPEG", margin, position, contentWidth, contentHeight);
-      heightLeft -= (pageHeight - (margin * 2));
+      // 🔥 SCALE IMAGE TO FIT ONE PAGE
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      // 📄 SUBSEQUENT PAGES
-      while (heightLeft > 0) {
-        setPdfStatus(`Compiling Page ${pdf.getNumberOfPages() + 1}...`);
-        // Calculate shifted position for slicing
-        position = heightLeft - contentHeight + margin; 
-        pdf.addPage();
-        pdf.addImage(imgData, "JPEG", margin, position, contentWidth, contentHeight);
-        heightLeft -= (pageHeight - (margin * 2));
-      }
+      const finalHeight = imgHeight > pageHeight ? pageHeight : imgHeight;
 
-      setPdfStatus("Finalizing High-Quality Download...");
+      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, finalHeight);
+
       pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
-      
-    } catch (err: any) {
-      console.error("PDF Error:", err);
-      alert("⚠️ PDF Generation Failed: " + (err.message || "Unknown error"));
+    } catch (err) {
+      console.error(err);
     } finally {
       setIsGeneratingPDF(false);
       setPdfStatus("");
