@@ -138,9 +138,13 @@ export default function DashboardHome() {
 
 
   // ✅ PDF DOWNLOAD FUNCTION
+  const [pdfStatus, setPdfStatus] = useState("");
+
   const handleDownloadPDF = async () => {
     try {
       setIsGeneratingPDF(true);
+      setPdfStatus("Initializing...");
+      window.scrollTo(0, 0); // 🚀 CRITICAL: Reset scroll before capture
 
       const pdf = new jsPDF("p", "mm", "a4");
       const sections = [
@@ -151,6 +155,7 @@ export default function DashboardHome() {
       ];
 
       for (let i = 0; i < sections.length; i++) {
+        setPdfStatus(`Capturing Section ${i + 1}/4...`);
         const element = document.getElementById(sections[i]);
 
         if (!element) {
@@ -159,29 +164,35 @@ export default function DashboardHome() {
         }
 
         // ⏳ WAIT FOR UI (VERY IMPORTANT)
-        await new Promise((r) => setTimeout(r, 800));
+        await new Promise((r) => setTimeout(r, 1000));
 
         const canvas = await html2canvas(element, {
           scale: 1,
           useCORS: true,
           backgroundColor: "#ffffff",
+          logging: false,
+          allowTaint: true
         });
 
-        const imgData = canvas.toDataURL("image/jpeg", 0.9);
+        if (canvas.width > 0 && canvas.height > 0) {
+          const imgData = canvas.toDataURL("image/jpeg", 0.9);
+          const imgWidth = 210;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        const imgWidth = 210;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        if (i !== 0) pdf.addPage();
-
-        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+          if (i !== 0) pdf.addPage();
+          pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+        }
       }
 
+      setPdfStatus("Finalizing Download...");
       pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
-    } catch (err) {
+      
+    } catch (err: any) {
       console.error("PDF Error:", err);
+      alert("⚠️ PDF Generation Failed: " + (err.message || "Unknown error"));
     } finally {
       setIsGeneratingPDF(false);
+      setPdfStatus("");
     }
   };
 
@@ -753,8 +764,12 @@ export default function DashboardHome() {
 
       </div>
       {isGeneratingPDF && (
-        <div className="fixed bottom-4 right-4 bg-black text-white px-4 py-2 rounded z-[9999] shadow-2xl animate-bounce">
-          🚀 Generating 4-Page PDF...
+        <div className="fixed bottom-4 right-4 bg-black text-white px-5 py-3 rounded-xl z-[9999] shadow-2xl animate-bounce flex items-center gap-3">
+          <span className="text-xl">🚀</span>
+          <div className="flex flex-col">
+            <span className="font-semibold text-sm">Generating PDF Report</span>
+            <span className="text-xs opacity-80">{pdfStatus}</span>
+          </div>
         </div>
       )}
     </div>
