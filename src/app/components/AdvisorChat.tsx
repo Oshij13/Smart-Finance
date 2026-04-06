@@ -7,7 +7,7 @@ import SmartChart from "./SmartChart";
 
 export default function AdvisorChat() {
     const [messages, setMessages] = useState<any[]>(() => {
-        const saved = localStorage.getItem("sf_chat");
+        const saved = sessionStorage.getItem("sf_chat");
         return saved ? JSON.parse(saved) : [];
     });
     const [loading, setLoading] = useState(false);
@@ -58,16 +58,9 @@ export default function AdvisorChat() {
     }, [quickOptions]);
 
     useEffect(() => {
-        localStorage.setItem("sf_chat", JSON.stringify(messages));
+        sessionStorage.setItem("sf_chat", JSON.stringify(messages));
     }, [messages]);
 
-    useEffect(() => {
-        const handleUnload = () => {
-            localStorage.removeItem("sf_chat");
-        };
-        window.addEventListener("beforeunload", handleUnload);
-        return () => window.removeEventListener("beforeunload", handleUnload);
-    }, []);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -345,8 +338,8 @@ export default function AdvisorChat() {
                                                     onClick={() => handleActionClick(action, idx)}
                                                     disabled={isLoading || isSuccess}
                                                     className={`px-4 py-2 rounded-xl text-sm transition ${isSuccess
-                                                            ? "bg-green-600 text-white"
-                                                            : "bg-blue-600 text-white hover:bg-blue-700"
+                                                        ? "bg-green-600 text-white"
+                                                        : "bg-blue-600 text-white hover:bg-blue-700"
                                                         }`}
                                                 >
                                                     {isLoading
