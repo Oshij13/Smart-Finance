@@ -271,142 +271,128 @@ export default function DashboardHome() {
     <div id="dashboard-content" className="p-6 bg-[#f9fafb]">
       <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex justify-between items-center bg-gradient-to-br from-[#6366f1] via-[#8b5cf6] to-[#ec4899] text-white p-8 rounded-3xl shadow-xl">
+        <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Hey {onboardingData?.name || "User"} 👋</h1>
-            <p className="text-sm opacity-90 mt-1 font-medium">Welcome back to your financial intelligence hub</p>
+            <h1 className="text-2xl font-bold">Hey {onboardingData?.name || "User"} 👋</h1>
+            <p className="text-sm opacity-90">Your financial dashboard</p>
           </div>
-          <div className="flex gap-4">
-            <button onClick={() => navigate("/ai-advisor")} className="px-5 py-2.5 rounded-2xl text-sm font-semibold bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 hover:scale-105 transition-all duration-300">✨ AI Advisor</button>
-            <button onClick={handleDownloadPDF} className="px-5 py-2.5 rounded-2xl text-sm font-semibold bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:scale-105 transition-all duration-300">📄 Download PDF</button>
+          <div className="flex gap-3">
+            <button onClick={() => navigate("/ai-advisor")} className="px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">✨ AI Advisor</button>
+            <button onClick={handleDownloadPDF} className="px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">📄 Download PDF</button>
           </div>
         </div>
 
         {/* NEXT MOVE */}
-        <div className="bg-gradient-to-br from-[#10b981] to-[#059669] text-white p-8 rounded-3xl shadow-lg relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform duration-700" />
-          <h2 className="text-xl font-bold mb-3 flex items-center gap-2">🚀 Your Next Move</h2>
-          <p className="text-sm opacity-90 mb-6 leading-relaxed max-w-2xl">{nextAction?.text}</p>
-          <button onClick={handleAction} className="bg-white text-[#059669] px-6 py-2.5 rounded-2xl font-bold shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">{nextAction?.cta}</button>
-          <div className="mt-8 bg-black/10 p-4 rounded-2xl border border-white/10">
-            <div className="flex justify-between text-xs mb-2 font-semibold">
-              <span>Goal Progress</span>
-              <span>₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}</span>
-            </div>
-            <div className="w-full bg-white/20 h-2.5 rounded-full overflow-hidden">
-              <div className="bg-white h-full rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-700" style={{ width: `${Math.min(progressPercent, 100)}%` }} />
-            </div>
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-2">🚀 Your Next Move</h2>
+          <p className="text-sm opacity-90 mb-4">{nextAction?.text}</p>
+          <button onClick={handleAction} className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition">{nextAction?.cta}</button>
+          <div className="mt-4">
+            <div className="w-full bg-white/30 h-2 rounded-full"><div className="bg-white h-2 rounded-full transition-all" style={{ width: `${Math.min(progressPercent, 100)}%` }} /></div>
+            <p className="text-xs mt-1 opacity-80">₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}</p>
           </div>
         </div>
 
         {/* PROFILE */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#6366f1] to-[#8b5cf6] flex items-center justify-center text-white text-2xl font-black shadow-lg">{(onboardingData?.name || "U")[0]}</div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">{(onboardingData?.name || "U")[0]}</div>
             <div>
-              <h2 className="text-xl font-bold text-gray-800">{onboardingData?.name || "User"}</h2>
-              <p className="text-sm text-gray-500 font-medium">Monthly Income: <span className="text-gray-800">₹{Number(onboardingData?.income || 0).toLocaleString('en-IN')}</span></p>
+              <h2 className="text-lg font-semibold">{onboardingData?.name || "User"}</h2>
+              <p className="text-sm text-gray-500">Monthly Income: ₹{Number(onboardingData?.income || 0).toLocaleString('en-IN')}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Primary Goal</p>
-            <p className="font-extrabold text-[#6366f1] text-lg">{onboardingData?.goal || "Wealth Building"}</p>
+            <p className="text-sm text-gray-500">Primary Goal</p>
+            <p className="font-semibold text-blue-600">{onboardingData?.goal || "Wealth Building"}</p>
           </div>
         </div>
 
         {/* CORE STATUS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-            <div className="flex justify-between items-center mb-6"><h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">💯 Financial Health</h3><span className="text-3xl font-black text-[#6366f1]">{score}<small className="text-sm text-gray-400">/100</small></span></div>
-            <div className="w-full bg-gray-100 h-3 rounded-full mb-6 overflow-hidden"><div className="h-full rounded-full transition-all duration-1000 shadow-inner" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#10b981" : score > 50 ? "#f59e0b" : "#ef4444" }} /></div>
-            <div className={`px-4 py-3 rounded-2xl text-sm font-medium flex items-center gap-3 ${colorMap[currentInsight.color]}`}><span>{currentInsight.icon}</span><span>{currentInsight.message}</span></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm">
+            <div className="flex justify-between items-center mb-4"><h3 className="text-lg font-semibold text-gray-800">💯 Financial Health</h3><span className="text-2xl font-bold text-blue-600">{score}/100</span></div>
+            <div className="w-full bg-gray-200 h-3 rounded-full mb-4"><div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} /></div>
+            <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[currentInsight.color]}`}><span>{currentInsight.icon}</span><span>{currentInsight.message}</span></div>
           </div>
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-            <div className="flex justify-between items-center mb-4"><h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">🎯 Goal Progress</h3><span className="text-lg font-bold text-[#8b5cf6]">{progress.toFixed(0)}%</span></div>
-            <p className="text-sm text-gray-500 mb-4 font-medium flex items-center gap-2">Target: <span className="text-gray-800">{goal}</span></p>
-            <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden"><div className="bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] h-full rounded-full transition-all duration-1000 shadow-md" style={{ width: `${Math.min(progress, 100)}%` }} /></div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm">
+            <div className="flex justify-between items-center mb-3"><h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3><span className="text-sm text-gray-500">{progress.toFixed(0)}%</span></div>
+            <p className="text-sm text-gray-600 mb-2">{goal}</p>
+            <div className="w-full bg-gray-200 h-3 rounded-full"><div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} /></div>
           </div>
         </div>
 
         {/* SNAPSHOT */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {cards.map((card, i) => (
-            <div key={i} className={`p-6 rounded-3xl shadow-sm border border-gray-100 transition-hover hover:shadow-md transition-all duration-300 ${card.bg}`}>
-              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-xl mb-4 shadow-sm">{card.icon}</div>
-              <p className="text-xs text-gray-400 font-bold uppercase tracking-widest leading-none">{card.title}</p>
-              <h2 className={`text-2xl font-black mt-2 ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
+            <div key={i} className={`p-6 rounded-2xl shadow-sm ${card.bg}`}>
+              <span className="text-xl">{card.icon}</span>
+              <p className="text-sm text-gray-500 mt-2">{card.title}</p>
+              <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
             </div>
           ))}
         </div>
 
         {/* CHARTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 min-h-[400px]">
-            <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">⚖️ 50/30/20 Rule Analysis</h3>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={[{ name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, { name: "Savings", Target: income * 0.2, Actual: savings + investments }]} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <XAxis dataKey="name" fontSize={12} axisLine={false} tickLine={false} tickMargin={10} />
-                <YAxis fontSize={11} tickFormatter={(val) => `₹${val/1000}k`} axisLine={false} tickLine={false} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
-                <Bar dataKey="Target" fill="#94a3b8" radius={[6, 6, 6, 6]} barSize={24} />
-                <Bar dataKey="Actual" fill="#6366f1" radius={[6, 6, 6, 6]} barSize={24} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm min-h-[350px]">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚖️ 50/30/20 Rule Analysis</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={[{ name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, { name: "Savings", Target: income * 0.2, Actual: savings + investments }]}>
+                <XAxis dataKey="name" fontSize={12} />
+                <YAxis fontSize={11} tickFormatter={(val) => `₹${val/1000}k`} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Actual" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 min-h-[400px]">
-            <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">📈 Monthly Overview</h3>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tickMargin={10} fontSize={12} />
-                <YAxis tickFormatter={(val) => `₹${val/1000}k`} axisLine={false} tickLine={false} fontSize={11} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                <Bar dataKey="value" fill="#8b5cf6" radius={[6, 6, 6, 6]} barSize={40} />
+          <div className="bg-white p-6 rounded-2xl shadow-sm min-h-[350px]">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Monthly Overview</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(val) => `₹${val/1000}k`} />
+                <Tooltip />
+                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* ACTION & INSIGHTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">⚡ What Should You Do Next?</h3>
-            <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚡ What Should You Do Next?</h3>
+            <div className="space-y-3">
               {actions.map((item, i) => (
-                <div key={i} onClick={() => navigate("/ai-advisor", { state: { query: item.action } })} className="p-5 rounded-2xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-lg hover:border-[#6366f1]/20 cursor-pointer transition-all duration-300 group">
-                  <p className="text-sm font-bold text-gray-700 group-hover:text-[#6366f1]">{item.text} <span className="inline-block transition-transform group-hover:translate-x-1 ml-1">→</span></p>
+                <div key={i} onClick={() => navigate("/ai-advisor", { state: { query: item.action } })} className="p-4 rounded-xl border hover:bg-gray-50 cursor-pointer transition">
+                  <p className="text-sm font-medium">{item.text} →</p>
                 </div>
               ))}
             </div>
           </div>
-          <div className={`p-8 rounded-3xl shadow-sm border transition-all duration-300 ${colorMap[currentInsight.color]} border-current/10`}>
-            <p className="font-bold text-lg flex items-center gap-2 mb-4"><span>{currentInsight.icon}</span> Smart Insight</p>
-            <p className="text-sm leading-relaxed font-medium opacity-90">{currentInsight.message}</p>
-            {action && (
-              <div className="mt-6 pt-6 border-t border-current/20">
-                <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">✨ AI Recommendation</p>
-                <p className="text-sm font-bold leading-relaxed italic">"{action}"</p>
-              </div>
-            )}
+          <div className={`p-6 rounded-2xl shadow-sm border ${colorMap[currentInsight.color]}`}>
+            <p className="font-semibold flex items-center gap-2">{currentInsight.icon} Smart Insight</p>
+            <p className="text-sm mt-3 leading-relaxed">{currentInsight.message}</p>
+            {action && <p className="text-xs mt-3 opacity-70 border-t pt-3 border-current">✨ AI Recommendation: {action}</p>}
           </div>
         </div>
 
         {/* EMERGENCY & AI INSIGHTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">🛡️ Emergency Fund</h3>
-            <p className="text-sm text-gray-400 font-bold mb-6">{emergencyMonths.toFixed(1)} months covered</p>
-            <div className="w-full bg-gray-100 h-3 rounded-full mb-6 overflow-hidden shadow-inner"><div className="bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] h-full rounded-full shadow-md" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} /></div>
-            <div className="bg-blue-50/50 border border-blue-100 p-5 rounded-2xl text-sm leading-relaxed text-blue-900 font-medium">💡 <strong>Strategy:</strong> 3–6 months of savings protects you from unexpected job loss or medical emergencies. You are currently at <span className="font-black underline">{emergencyMonths.toFixed(1)}</span> months.</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">🛡️ Emergency Fund</h3>
+            <p className="text-sm text-gray-500 mb-3">{emergencyMonths.toFixed(1)} months covered</p>
+            <div className="w-full bg-gray-200 h-2 rounded-full"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} /></div>
+            <div className="bg-blue-50 p-4 rounded-xl text-sm mt-4">💡 3–6 months of savings protects you from unexpected job loss or medical emergencies.</div>
           </div>
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">💡 AI Smart Insights</h3>
-            <div className="space-y-4">
+          <div className="bg-white p-6 rounded-2xl shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 AI Smart Insights</h3>
+            <div className="space-y-3">
               {insights.slice(0, 3).map((text, i) => (
-                <div key={i} className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl text-sm font-medium text-indigo-900 flex items-start gap-3">
-                  <span className="mt-1">✨</span>
-                  <span>{text}</span>
-                </div>
+                <div key={i} className="bg-blue-50 p-3 rounded-xl text-sm">{text}</div>
               ))}
             </div>
           </div>
@@ -414,7 +400,7 @@ export default function DashboardHome() {
       </div>
 
       {isGeneratingPDF && (
-        <div data-html2canvas-ignore="true" className="fixed bottom-4 right-4 bg-black text-white px-5 py-3 rounded-xl z-[9999] shadow-2xl animate-bounce flex items-center gap-3">
+        <div className="fixed bottom-4 right-4 bg-black text-white px-5 py-3 rounded-xl z-[9999] shadow-2xl animate-bounce flex items-center gap-3">
           <span className="text-xl">🚀</span>
           <div className="flex flex-col">
             <span className="font-semibold text-sm">Generating PDF Report</span>
