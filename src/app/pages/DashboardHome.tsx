@@ -20,6 +20,13 @@ import {
   Legend,
 } from "recharts";
 
+const colorMap: Record<string, string> = {
+  red: "text-red-600 bg-red-100",
+  orange: "text-orange-600 bg-orange-100",
+  blue: "text-blue-600 bg-blue-100",
+  green: "text-green-600 bg-green-100",
+};
+
 export default function DashboardHome() {
   const navigate = useNavigate();
 
@@ -398,12 +405,6 @@ export default function DashboardHome() {
     emergencyMonths,
   });
 
-  const [colorMap] = useState<Record<string, string>>({
-    red: "text-red-600 bg-red-100",
-    orange: "text-orange-600 bg-orange-100",
-    blue: "text-blue-600 bg-blue-100",
-    green: "text-green-600 bg-green-100",
-  });
   const savedAmount = progressData?.saved || 0;
   const targetAmount = progressData?.target || emergencyTarget;
   const progressPercent = targetAmount > 0 ? (savedAmount / targetAmount) * 100 : 0;
