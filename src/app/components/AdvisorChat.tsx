@@ -116,6 +116,9 @@ export default function AdvisorChat() {
 
             if (action.type === "save") {
                 const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+                const onboarding = getUserData();
+                const baselineSaved = Number(onboarding?.emergencyFund || 0);
+                const baselineTarget = Number(onboarding?.expenses || 0) * 6;
 
                 const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/update-progress", {
                     method: "POST",
@@ -125,8 +128,8 @@ export default function AdvisorChat() {
                     body: JSON.stringify({
                         action: "save",
                         amount: action.amount || 500,
-                        currentSaved: progress?.saved || 0,
-                        target: progress?.target || 0,
+                        currentSaved: progress?.saved !== undefined ? progress.saved : baselineSaved,
+                        target: progress?.target || baselineTarget,
                     }),
                 });
 

@@ -450,7 +450,7 @@ export default function DashboardHome() {
     emergencyMonths,
   });
 
-  const savedAmount = progressData?.saved || 0;
+  const savedAmount = progressData?.saved !== undefined ? progressData.saved : emergencyFund;
   const targetAmount = progressData?.target || emergencyTarget;
   const progressPercent = targetAmount > 0 ? (savedAmount / targetAmount) * 100 : 0;
 
