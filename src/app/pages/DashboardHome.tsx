@@ -131,18 +131,31 @@ export default function DashboardHome() {
     try {
       setIsGeneratingPDF(true);
       
-      // ✅ Optimize Capture
+      // ✅ Step 1: Prepare the UI for capture
+      window.scrollTo(0, 0);
+      await new Promise(r => setTimeout(r, 600)); // ⏳ Give charts time to settle
+
+      const element = document.getElementById("dashboard-content");
+      if (!element) throw new Error("Dashboard container not found");
+
+      // ✅ Step 2: Advanced Capture with Memory Optimization
       const canvas = await html2canvas(element, {
-        scale: 2, // High quality
+        scale: 1.2, // Lightweight but clear
         useCORS: true,
+        backgroundColor: "#f8fafc",
         logging: false,
-        allowTaint: true,
-        backgroundColor: "#f8fafc", // Match dashboard bg
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
+        imageTimeout: 20000,
+        onclone: (clonedDoc) => {
+          const el = clonedDoc.getElementById("dashboard-content");
+          if (el) {
+            el.style.padding = "10px";
+            el.style.width = "1200px"; // Force a standard width for the PDF layout
+          }
+        }
       });
 
-      const imgData = canvas.toDataURL("image/png");
+      // ✅ Step 3: Use JPEG for massive memory savings (PNG is too heavy for large canvases)
+      const imgData = canvas.toDataURL("image/jpeg", 0.85);
       const pdf = new jsPDF("p", "mm", "a4");
 
       const pdfWidth = 210;
@@ -153,22 +166,21 @@ export default function DashboardHome() {
       let heightLeft = imgHeight;
       let position = 0;
 
-      // Add First Page
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+      // ✅ Step 4: Multi-page logic
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
       heightLeft -= pdfHeight;
 
-      // Add Extra Pages if needed
       while (heightLeft > 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
         heightLeft -= pdfHeight;
       }
 
       pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
     } catch (err) {
       console.error("PDF Generation Error:", err);
-      alert("Failed to generate PDF. Please try again.");
+      alert("PDF failed. This usually happens if the dashboard is very long. Try scrolling through the dashboard once then try again.");
     } finally {
       setIsGeneratingPDF(false);
     }
