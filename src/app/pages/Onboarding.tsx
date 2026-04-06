@@ -140,7 +140,8 @@ export default function Onboarding() {
                                     value={input}
                                     onChange={(e) => handleInputChange(e.target.value)}
                                     placeholder="Enter your expenses"
-                                    className="w-full border px-3 py-2 rounded-xl focus:ring-2 focus:ring-purple-500/50 outline-none"
+                                    className="w-full border px-3 py-2 rounded-xl focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
+                                    inputMode="numeric"
                                 />
                             </div>
                         ) : (

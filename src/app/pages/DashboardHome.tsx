@@ -94,6 +94,34 @@ export default function DashboardHome() {
     fetchNextAction();
   }, []);
 
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "sf_progress" || !e.key) {
+        const updated = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+        setProgressData(updated);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const updated = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+      setProgressData(updated);
+    };
+
+    window.addEventListener("progressUpdated", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("progressUpdated", handleStorageChange);
+    };
+  }, []);
+
   // ✅ PDF DOWNLOAD FUNCTION
   const handleDownloadPDF = async () => {
     const element = document.getElementById("dashboard-content");
@@ -378,7 +406,9 @@ export default function DashboardHome() {
     emergencyMonths,
   });
 
-  const progressData = JSON.parse(localStorage.getItem("sf_progress") || "{}");
+  const [progressData, setProgressData] = useState(() => {
+    return JSON.parse(localStorage.getItem("sf_progress") || "{}");
+  });
   const savedAmount = progressData?.saved || 0;
   const targetAmount = progressData?.target || emergencyTarget;
   const progressPercent = targetAmount > 0 ? (savedAmount / targetAmount) * 100 : 0;

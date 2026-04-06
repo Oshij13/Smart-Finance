@@ -11,6 +11,8 @@ export default function AdvisorChat() {
     const [input, setInput] = useState("");
     const [sessionId, setSessionId] = useState<string>("");
     const [isCustomMode, setIsCustomMode] = useState(false);
+    const [actionLoading, setActionLoading] = useState<number | null>(null);
+    const [actionSuccess, setActionSuccess] = useState<number | null>(null);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const chartRef = useRef<any>(null);
@@ -89,8 +91,10 @@ export default function AdvisorChat() {
         });
     };
 
-    const handleActionClick = async (action: any) => {
+    const handleActionClick = async (action: any, index: number) => {
         try {
+            setActionLoading(index);
+
             if (action.type === "save") {
                 const progress = JSON.parse(localStorage.getItem("sf_progress") || "{}");
 
@@ -117,18 +121,22 @@ export default function AdvisorChat() {
                     })
                 );
 
+                window.dispatchEvent(new Event("progressUpdated")); // ✅ NEW
                 alert(`✅ ₹${action.amount} saved!`);
             }
 
-            else if (action.type === "invest") {
-                alert("📈 Investment flow coming soon (MVP)");
-            }
+            // mark success
+            setActionLoading(null);
+            setActionSuccess(index);
 
-            else {
-                alert("✅ Action completed");
-            }
+            // reset success after 2 sec
+            setTimeout(() => {
+                setActionSuccess(null);
+            }, 2000);
+
         } catch (err) {
             console.error(err);
+            setActionLoading(null);
         }
     };
 
@@ -142,6 +150,8 @@ export default function AdvisorChat() {
             // Wake up backend (Render sleep fix)
             await fetch("https://smart-finance-backend-w4ou.onrender.com");
 
+            const currentSessionId = sessionId || sessionStorage.getItem("sessionId");
+
             const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -149,7 +159,7 @@ export default function AdvisorChat() {
                     message: text,
                     userData: getUserData(),
                     history: messages.slice(-6),
-                    sessionId: sessionId
+                    sessionId: currentSessionId
                 }),
             });
 
@@ -303,15 +313,28 @@ export default function AdvisorChat() {
 
                                 {msg.actions && msg.actions.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mt-2">
-                                        {msg.actions.map((action: any, idx: number) => (
-                                            <button
-                                                key={idx}
-                                                onClick={() => handleActionClick(action)}
-                                                className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition"
-                                            >
-                                                🚀 {action.label}
-                                            </button>
-                                        ))}
+                                        {msg.actions.map((action: any, idx: number) => {
+                                            const isLoading = actionLoading === idx;
+                                            const isSuccess = actionSuccess === idx;
+
+                                            return (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => handleActionClick(action, idx)}
+                                                    disabled={isLoading || isSuccess}
+                                                    className={`px-4 py-2 rounded-xl text-sm transition ${isSuccess
+                                                            ? "bg-green-600 text-white"
+                                                            : "bg-blue-600 text-white hover:bg-blue-700"
+                                                        }`}
+                                                >
+                                                    {isLoading
+                                                        ? "Processing..."
+                                                        : isSuccess
+                                                            ? "✓ Done"
+                                                            : action.label}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 )}
 
