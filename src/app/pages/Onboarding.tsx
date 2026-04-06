@@ -105,8 +105,9 @@ export default function Onboarding() {
                     <input
                         value={input}
                         onChange={(e) => handleInputChange(e.target.value)}
-                        className="w-full border px-3 py-2 rounded mb-3 focus:ring-2 focus:ring-purple-500/50 outline-none"
+                        className="w-full border px-3 py-2 rounded mb-3 focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
                         placeholder="Type here..."
+                        inputMode={["name", "occupation", "city"].includes(questions[step].key) ? "text" : "numeric"}
                     />
                 )}
 
@@ -114,7 +115,7 @@ export default function Onboarding() {
                 {questions[step].key === "expenses" && (
                     <div className="mb-4">
                         {!mode ? (
-                            <div className="mt-3 space-y-3">
+                            <div className="mt-3 space-y-3 text-black">
                                 <p className="text-sm text-gray-500">
                                     Choose how you want to proceed:
                                 </p>

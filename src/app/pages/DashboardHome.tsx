@@ -25,22 +25,15 @@ export default function DashboardHome() {
 
   const onboardingData = getUserData();
 
-  if (!onboardingData) {
-    return <Onboarding />;
-  }
-
-  const colorMap: Record<string, string> = {
-    red: "text-red-600 bg-red-100",
-    orange: "text-orange-600 bg-orange-100",
-    blue: "text-blue-600 bg-blue-100",
-    green: "text-green-600 bg-green-100",
-  };
-
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [goalInput, setGoalInput] = useState(onboardingData?.goal || "");
   const [nextAction, setNextAction] = useState<any>(null);
+
+  const [progressData, setProgressData] = useState(() => {
+    return JSON.parse(localStorage.getItem("sf_progress") || "{}");
+  });
 
   useEffect(() => {
     if (!onboardingData) {
@@ -66,7 +59,7 @@ export default function DashboardHome() {
     };
 
     fetchAnalysis();
-  }, []);
+  }, [onboardingData]);
 
   useEffect(() => {
     const fetchNextAction = async () => {
@@ -91,8 +84,8 @@ export default function DashboardHome() {
       }
     };
 
-    fetchNextAction();
-  }, []);
+    if (onboardingData) fetchNextAction();
+  }, [onboardingData]);
 
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -103,10 +96,7 @@ export default function DashboardHome() {
     };
 
     window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   useEffect(() => {
@@ -116,11 +106,13 @@ export default function DashboardHome() {
     };
 
     window.addEventListener("progressUpdated", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("progressUpdated", handleStorageChange);
-    };
+    return () => window.removeEventListener("progressUpdated", handleStorageChange);
   }, []);
+
+  if (!onboardingData) {
+    return <Onboarding />;
+  }
+
 
   // ✅ PDF DOWNLOAD FUNCTION
   const handleDownloadPDF = async () => {
@@ -406,8 +398,11 @@ export default function DashboardHome() {
     emergencyMonths,
   });
 
-  const [progressData, setProgressData] = useState(() => {
-    return JSON.parse(localStorage.getItem("sf_progress") || "{}");
+  const [colorMap] = useState<Record<string, string>>({
+    red: "text-red-600 bg-red-100",
+    orange: "text-orange-600 bg-orange-100",
+    blue: "text-blue-600 bg-blue-100",
+    green: "text-green-600 bg-green-100",
   });
   const savedAmount = progressData?.saved || 0;
   const targetAmount = progressData?.target || emergencyTarget;
