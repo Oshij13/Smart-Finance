@@ -320,8 +320,14 @@ app.post("/api/next-action", (req, res) => {
 
     let response = {};
 
-    // PRIORITY 1: Emergency fund too low
-    if (saved < target * 0.5) {
+    // calculate monthly expenses safely
+    const monthlyExpenses = expenses > 0 ? expenses : income * 0.6;
+
+    // calculate months of emergency coverage
+    const monthsCovered = monthlyExpenses > 0 ? saved / monthlyExpenses : 0;
+
+    // PRIORITY 1: Emergency fund insufficient (< 3 months)
+    if (monthsCovered < 3) {
       response = {
         text: `Build your emergency fund. Save ₹${Math.min(500, target - saved)} today`,
         cta: "Save Now",
@@ -329,16 +335,16 @@ app.post("/api/next-action", (req, res) => {
       };
     }
 
-    // PRIORITY 2: Emergency fund OK but no investments
-    else if (investments === 0) {
+    // PRIORITY 2: Emergency fund OK but low investing
+    else if (investments < income * 0.1) {
       response = {
-        text: "You have enough emergency buffer. Start investing now",
+        text: "You have a good safety buffer. Start investing now",
         cta: "Start Investing",
         type: "invest",
       };
     }
 
-    // PRIORITY 3: Balanced user
+    // PRIORITY 3: Balanced
     else {
       response = {
         text: "You’re on track. Optimize your finances",
