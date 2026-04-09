@@ -29,10 +29,13 @@ const navItems = [
   { icon: Sparkles, label: "Personal Finance", path: "/personal-finance" },
   { icon: PiggyBank, label: "Savings", path: "/savings" },
   { icon: TrendingUp, label: "Investments", path: "/investments" },
+  { icon: TrendingUp, label: "SIP/SWP Calculator", path: "/sip-swp" },
   { icon: Wallet, label: "Budget", path: "/spending" },
   { icon: Lightbulb, label: "Income Tax Calculator", path: "/tax-calculator" },
   { icon: Leaf, label: "Retirement", path: "/retirement" },
   { icon: BookOpen, label: "Resources", path: "/resources" },
+
+
 ];
 
 export function DashboardLayout() {

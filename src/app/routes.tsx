@@ -11,6 +11,7 @@ import { RetirementPlanning } from "./pages/RetirementPlanning";
 import { Resources } from "./pages/Resources";
 import AdvisorChat from "./components/AdvisorChat";
 import FirstAction from "./pages/FirstAction";
+import { SipSwpCalculator } from "./pages/SipSwpCalculator";
 
 export const router = createBrowserRouter([
 
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
       { path: "spending", Component: SpendingReduction },
       { path: "retirement", Component: RetirementPlanning },
       { path: "resources", Component: Resources },
+      { path: "sip-swp", Component: SipSwpCalculator },
     ],
   },
 
