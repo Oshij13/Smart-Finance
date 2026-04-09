@@ -240,14 +240,36 @@ export function SipSwpCalculator() {
             {/* EDUCATION */}
             <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
                 <CardHeader>
-                    <CardTitle>{mode === "sip" ? "What is SIP?" : "What is SWP?"}</CardTitle>
+                    <CardTitle>
+                        {mode === "sip" ? "What is SIP?" : "What is SWP?"}
+                    </CardTitle>
                 </CardHeader>
-                <CardContent>
+
+                <CardContent className="space-y-3">
+
+                    {/* WHAT IS IT */}
                     <p className="text-sm text-gray-700">
                         {mode === "sip"
-                            ? "SIP (Systematic Investment Plan) helps you invest regularly and benefit from compounding over time."
-                            : "SWP (Systematic Withdrawal Plan) allows you to withdraw a fixed amount regularly from your investments."}
+                            ? "SIP (Systematic Investment Plan) lets you invest a fixed amount every month in mutual funds. It helps you grow money steadily through compounding without needing a large upfront investment."
+                            : "SWP (Systematic Withdrawal Plan) lets you withdraw a fixed amount regularly from your investments. It provides a steady income while the remaining money continues to stay invested."}
                     </p>
+
+                    {/* WHY USEFUL */}
+                    <p className="text-sm text-gray-700">
+                        <span className="font-semibold">Why is it useful? </span>
+                        {mode === "sip"
+                            ? "It builds discipline, reduces risk of market timing, and helps in long-term wealth creation."
+                            : "It helps generate regular income without withdrawing your entire investment at once."}
+                    </p>
+
+                    {/* WHO IS IT FOR */}
+                    <p className="text-sm text-gray-700">
+                        <span className="font-semibold">Who is it for? </span>
+                        {mode === "sip"
+                            ? "Best for beginners, students, and salaried individuals starting their investment journey."
+                            : "Best for retirees or anyone looking for stable monthly income from their investments."}
+                    </p>
+
                 </CardContent>
             </Card>
 
