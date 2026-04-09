@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -13,36 +13,60 @@ export function SavingsManagement() {
   const [riskAppetite, setRiskAppetite] = useState<"low" | "moderate" | "high">("moderate");
   const [showResults, setShowResults] = useState(false);
 
+  // ✅ Auto-fill income from onboarding (localStorage)
+  useEffect(() => {
+    const onboardingData = localStorage.getItem("userData");
+
+    if (onboardingData) {
+      try {
+        const parsed = JSON.parse(onboardingData);
+
+        if (parsed?.income) {
+          setIncome(parsed.income.toString());
+        }
+      } catch (error) {
+        console.error("Error parsing onboarding data:", error);
+      }
+    }
+  }, []);
+
   const handleCalculate = () => {
     if (income) setShowResults(true);
   };
 
-  const monthlyIncome = (parseInt(income) || 0) / 12;
+  // ✅ FIXED: Treat income as MONTHLY (no division)
+  const monthlyIncome = parseInt(income) || 0;
   const recommendedSavings = monthlyIncome * 0.2;
   const emergencyFund = monthlyIncome * 6;
-  
-  const riskLevel = riskAppetite === "low" ? "Conservative" : riskAppetite === "moderate" ? "Moderate" : "Aggressive";
-  
-  const savingsAllocation = riskLevel === "Conservative" 
-    ? [
+
+  const riskLevel =
+    riskAppetite === "low"
+      ? "Conservative"
+      : riskAppetite === "moderate"
+        ? "Moderate"
+        : "Aggressive";
+
+  const savingsAllocation =
+    riskLevel === "Conservative"
+      ? [
         { name: "Fixed Deposits", value: 40, color: "#10b981" },
         { name: "Liquid Funds", value: 30, color: "#3b82f6" },
         { name: "Recurring Deposits", value: 20, color: "#8b5cf6" },
         { name: "PPF/EPF", value: 10, color: "#f59e0b" },
       ]
-    : riskLevel === "Moderate"
-    ? [
-        { name: "Hybrid Funds", value: 30, color: "#10b981" },
-        { name: "Fixed Deposits", value: 25, color: "#3b82f6" },
-        { name: "Liquid Funds", value: 25, color: "#8b5cf6" },
-        { name: "Index Funds", value: 20, color: "#f59e0b" },
-      ]
-    : [
-        { name: "Equity Mutual Funds", value: 40, color: "#10b981" },
-        { name: "Index Funds", value: 30, color: "#3b82f6" },
-        { name: "Hybrid Funds", value: 20, color: "#8b5cf6" },
-        { name: "Liquid Funds", value: 10, color: "#f59e0b" },
-      ];
+      : riskLevel === "Moderate"
+        ? [
+          { name: "Hybrid Funds", value: 30, color: "#10b981" },
+          { name: "Fixed Deposits", value: 25, color: "#3b82f6" },
+          { name: "Liquid Funds", value: 25, color: "#8b5cf6" },
+          { name: "Index Funds", value: 20, color: "#f59e0b" },
+        ]
+        : [
+          { name: "Equity Mutual Funds", value: 40, color: "#10b981" },
+          { name: "Index Funds", value: 30, color: "#3b82f6" },
+          { name: "Hybrid Funds", value: 20, color: "#8b5cf6" },
+          { name: "Liquid Funds", value: 10, color: "#f59e0b" },
+        ];
 
   return (
     <div className="space-y-6">
@@ -66,12 +90,13 @@ export function SavingsManagement() {
           <CardDescription>Tell us about your income and savings goals</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* ✅ Label fixed (Monthly) */}
           <div className="space-y-2">
-            <Label htmlFor="annual-income">Annual Income (₹)</Label>
+            <Label htmlFor="annual-income">Monthly Income (₹)</Label>
             <Input
               id="annual-income"
               type="number"
-              placeholder="e.g., 800000"
+              placeholder="e.g., 50000"
               value={income}
               onChange={(e) => setIncome(e.target.value)}
               className="text-lg"
@@ -83,7 +108,7 @@ export function SavingsManagement() {
             <Input
               id="current-savings"
               type="number"
-              placeholder="e.g., 50000"
+              placeholder="e.g., 20000"
               value={currentSavings}
               onChange={(e) => setCurrentSavings(e.target.value)}
               className="text-lg"
@@ -103,7 +128,10 @@ export function SavingsManagement() {
             />
           </div>
 
-          <Button onClick={handleCalculate} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600">
+          <Button
+            onClick={handleCalculate}
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600"
+          >
             Generate Savings Plan
           </Button>
         </CardContent>
@@ -116,41 +144,37 @@ export function SavingsManagement() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
               <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <p className="text-sm text-gray-600">Recommended Monthly Savings</p>
-                </div>
-                <p className="text-3xl font-bold text-gray-900">₹{recommendedSavings.toLocaleString()}</p>
+                <p className="text-sm text-gray-600">Recommended Monthly Savings</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  ₹{recommendedSavings.toLocaleString()}
+                </p>
                 <p className="text-sm text-gray-600 mt-1">20% of monthly income</p>
               </CardContent>
             </Card>
 
             <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
               <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <p className="text-sm text-gray-600">Emergency Fund Target</p>
-                </div>
-                <p className="text-3xl font-bold text-gray-900">₹{emergencyFund.toLocaleString()}</p>
-                <p className="text-sm text-gray-600 mt-1">6 months of expenses</p>
+                <p className="text-sm text-gray-600">Emergency Fund Target</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  ₹{emergencyFund.toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">6 months of income</p>
               </CardContent>
             </Card>
 
             <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
               <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                    <PiggyBank className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <p className="text-sm text-gray-600">Current Savings</p>
-                </div>
-                <p className="text-3xl font-bold text-gray-900">₹{(parseInt(currentSavings) || 0).toLocaleString()}</p>
+                <p className="text-sm text-gray-600">Current Savings</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  ₹{(parseInt(currentSavings) || 0).toLocaleString()}
+                </p>
                 <p className="text-sm text-gray-600 mt-1">
-                  {emergencyFund > 0 ? Math.round(((parseInt(currentSavings) || 0) / emergencyFund) * 100) : 0}% of target
+                  {emergencyFund > 0
+                    ? Math.round(
+                      ((parseInt(currentSavings) || 0) / emergencyFund) * 100
+                    )
+                    : 0}
+                  % of target
                 </p>
               </CardContent>
             </Card>
@@ -181,56 +205,29 @@ export function SavingsManagement() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip 
-                      formatter={(value: number) => `${value}%`}
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                        border: 'none', 
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                      }}
-                    />
+                    <Tooltip formatter={(value: number) => `${value}%`} />
                   </PieChart>
                 </ResponsiveContainer>
 
                 <div className="space-y-4">
                   {savingsAllocation.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }}></div>
-                        <span className="font-medium text-gray-900">{item.name}</span>
-                      </div>
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 rounded-lg border border-gray-200"
+                    >
+                      <span>{item.name}</span>
                       <div className="text-right">
-                        <p className="font-bold text-gray-900">{item.value}%</p>
-                        <p className="text-sm text-gray-600">₹{((recommendedSavings * item.value) / 100).toLocaleString()}</p>
+                        <p className="font-bold">{item.value}%</p>
+                        <p className="text-sm text-gray-600">
+                          ₹{(
+                            (recommendedSavings * item.value) /
+                            100
+                          ).toLocaleString()}
+                        </p>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Savings Tips */}
-          <Card className="border-none shadow-lg bg-gradient-to-br from-emerald-50 to-teal-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-emerald-600" />
-                Smart Savings Tips
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-4 bg-white rounded-lg">
-                <h3 className="font-semibold text-emerald-900 mb-1">Automate Your Savings</h3>
-                <p className="text-sm text-gray-600">Set up automatic transfers on salary day to avoid spending temptation.</p>
-              </div>
-              <div className="p-4 bg-white rounded-lg">
-                <h3 className="font-semibold text-emerald-900 mb-1">Maintain Liquidity</h3>
-                <p className="text-sm text-gray-600">Keep 3 months of expenses in a liquid fund for immediate emergencies.</p>
-              </div>
-              <div className="p-4 bg-white rounded-lg">
-                <h3 className="font-semibold text-emerald-900 mb-1">Review Quarterly</h3>
-                <p className="text-sm text-gray-600">Reassess your allocation every 3 months as income and goals change.</p>
               </div>
             </CardContent>
           </Card>
