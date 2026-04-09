@@ -282,12 +282,53 @@ export default function DashboardHome() {
 
   function generateFinancialInsight() {
     const expenseRatio = expenses / income;
-    if (expenses > income) return { message: "Expenses exceed income. Fix flow immediately.", color: "red", icon: "🚨" };
-    if (expenseRatio > 0.7) return { message: "High spending. Optimize budget.", color: "red", icon: "⚠️" };
-    if (savingsRate < 20) return { message: "Low savings. Aim for 20%.", color: "orange", icon: "📊" };
-    if (emergencyMonths < 3) return { message: "Weak emergency fund. Build 3-6 months.", color: "orange", icon: "🛡️" };
-    if (investments < savings * 0.3) return { message: "Good savings, low investing.", color: "blue", icon: "📈" };
-    return { message: "Excellent financial health. Keep optimizing.", color: "green", icon: "🏆" };
+    const idealSavings = income * 0.2;
+
+    if (expenses > income) {
+      return {
+        message: `You're spending ₹${expenses.toLocaleString('en-IN')} which is more than your income ₹${income.toLocaleString('en-IN')}. This is risky — reduce expenses immediately.`,
+        color: "red",
+        icon: "🚨"
+      };
+    }
+
+    if (expenseRatio > 0.7) {
+      return {
+        message: `You're spending ₹${expenses.toLocaleString('en-IN')} (~${Math.round(expenseRatio * 100)}% of your income). Try to bring this below 60% for better financial stability.`,
+        color: "red",
+        icon: "⚠️"
+      };
+    }
+
+    if (savingsRate < 20) {
+      return {
+        message: `You're saving ₹${savings.toLocaleString('en-IN')} (~${Math.round(savingsRate)}%). Based on your income ₹${income.toLocaleString('en-IN')}, you should aim for ₹${idealSavings.toLocaleString('en-IN')} (20%) monthly.`,
+        color: "orange",
+        icon: "📊"
+      };
+    }
+
+    if (emergencyMonths < 3) {
+      return {
+        message: `You currently have ${emergencyMonths.toFixed(1)} months of emergency savings. Try to reach at least 3–6 months (₹${(expenses * 6).toLocaleString('en-IN')}) for safety.`,
+        color: "orange",
+        icon: "🛡️"
+      };
+    }
+
+    if (investments < savings * 0.3) {
+      return {
+        message: `You're saving well (₹${savings.toLocaleString('en-IN')}), but investing only ₹${investments.toLocaleString('en-IN')}. Consider investing more to grow your wealth.`,
+        color: "blue",
+        icon: "📈"
+      };
+    }
+
+    return {
+      message: `Excellent! You're saving ₹${savings.toLocaleString('en-IN')} and investing ₹${investments.toLocaleString('en-IN')}. You're on track for strong financial growth.`,
+      color: "green",
+      icon: "🏆"
+    };
   }
 
   const currentInsight = generateFinancialInsight();
@@ -333,6 +374,24 @@ export default function DashboardHome() {
     };
   }
 
+  function calculateFutureNetWorth() {
+    const monthlyInvestment = investments;
+    const monthlySavings = savings;
+
+    const totalMonthly = monthlyInvestment + monthlySavings;
+
+    const rate = 0.12 / 12; // 12% annual return
+    const months = 60; // 5 years
+
+    let value = 0;
+
+    for (let i = 1; i <= months; i++) {
+      value = (value + totalMonthly) * (1 + rate);
+    }
+
+    return Math.round(value);
+  }
+
   const smartAction = getSmartNextMove();
 
   return (
@@ -359,6 +418,22 @@ export default function DashboardHome() {
             <div className="w-full bg-white/30 h-2 rounded-full"><div className="bg-white h-2 rounded-full transition-all" style={{ width: `${Math.min(progressPercent, 100)}%` }} /></div>
             <p className="text-xs mt-1 opacity-80">₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}</p>
           </div>
+        </div>
+
+        {/* FUTURE PROJECTION */}
+        <div className="bg-gradient-to-r from-indigo-500 to-blue-600 text-white p-6 rounded-2xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-2">📈 Future Projection</h2>
+          <p className="text-sm opacity-90">
+            At your current pace, your net worth can grow to
+          </p>
+
+          <p className="text-2xl font-bold mt-2">
+            ₹{calculateFutureNetWorth().toLocaleString('en-IN')}
+          </p>
+
+          <p className="text-sm opacity-80 mt-1">
+            in the next 5 years
+          </p>
         </div>
 
         {/* PROFILE */}
