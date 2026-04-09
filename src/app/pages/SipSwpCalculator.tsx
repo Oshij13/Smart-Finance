@@ -248,8 +248,8 @@ export function SipSwpCalculator() {
                 <CardContent>
                     <p className="text-sm text-gray-700">
                         {mode === "sip"
-                            ? "SIP (Systematic Investment Plan) lets you invest a fixed amount every month in mutual funds. It helps you grow money steadily through compounding without needing a large upfront investment."
-                            : "SWP (Systematic Withdrawal Plan) lets you withdraw a fixed amount regularly from your investments while the rest stays invested."}
+                            ? "A Systematic Investment Plan (SIP) is a disciplined, automated method for investing a fixed sum of money into mutual funds at regular intervals (weekly, monthly, or quarterly). It acts like a recurring deposit but invests in the market, allowing investors to start with small amounts (as low as ₹500) to build wealth over time, mitigating volatility through rupee cost averaging."
+                            : "SWP stands for a Systematic Withdrawal Plan, a mutual fund facility that enables investors to withdraw a fixed or variable amount from their investments at regular intervals (monthly, quarterly, annually). It serves as a structured method to generate a steady income stream, often used for retirement or financial planning."}
                     </p>
                 </CardContent>
             </Card>
@@ -264,8 +264,8 @@ export function SipSwpCalculator() {
                 <CardContent>
                     <p className="text-sm text-gray-700">
                         {mode === "sip"
-                            ? "It builds investment discipline, reduces the risk of timing the market, and helps create wealth over time through compounding."
-                            : "It provides a steady income from your investments without withdrawing everything at once, helping your money last longer."}
+                            ? "It is useful because it offers a disciplined, affordable, and flexible way to invest in mutual funds, reducing market risk through rupee cost averaging. By investing a fixed amount regularly, it enables wealth creation through compounding, eliminates the need to time the market, and protects investors from emotional decision-making."
+                            : "A Systematic Withdrawal Plan (SWP) is useful because it provides a reliable, automated, and tax-efficient stream of regular income from mutual fund investments. It keeps your capital invested, allowing for potential growth while withdrawing, and avoids the need to time the market."}
                     </p>
                 </CardContent>
             </Card>
@@ -280,8 +280,8 @@ export function SipSwpCalculator() {
                 <CardContent>
                     <p className="text-sm text-gray-700">
                         {mode === "sip"
-                            ? "Ideal for beginners, students, and salaried individuals who want to start investing regularly with small amounts."
-                            : "Ideal for retirees or individuals who want a regular monthly income from their investments."}
+                            ? "Ideal for disciplined investors, beginners, and anyone looking to build wealth long-term without needing a large lump sum. It benefits individuals looking to manage market volatility through rupee-cost averaging, automate their savings, or achieve specific financial goals like retirement, education, or marriage. "
+                            : "Ideal for for retirees, investors seeking regular, predictable income, and those in high tax brackets who want a tax-efficient, disciplined method to withdraw funds from mutual funds. It offers a steady cash flow while keeping the principal amount invested for potential growth."}
                     </p>
                 </CardContent>
             </Card>
