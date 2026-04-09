@@ -11,6 +11,8 @@ export function SipSwpCalculator() {
     const [amount, setAmount] = useState("");
     const [rate, setRate] = useState("");
     const [years, setYears] = useState("");
+    const [inflation, setInflation] = useState("");
+    const [withdrawalIncrease, setWithdrawalIncrease] = useState("");
 
     const [result, setResult] = useState<number | null>(null);
     const [chartData, setChartData] = useState<any[]>([]);
@@ -34,7 +36,7 @@ export function SipSwpCalculator() {
                 if (i % 12 === 0) {
                     data.push({
                         year: i / 12,
-                        value: Math.round(value),
+                        corpus: Math.max(0, Math.round(value)),
                     });
                 }
             }
@@ -46,18 +48,32 @@ export function SipSwpCalculator() {
         if (mode === "swp") {
             let value = P;
 
+            const rMonthly = r;
+            const inflationRate = (parseFloat(inflation) || 0) / 100;
+            const increaseRate = (parseFloat(withdrawalIncrease) || 0) / 100;
+
+            // Base withdrawal (same as before)
+            let withdrawal = P * rMonthly / (1 - Math.pow(1 + rMonthly, -n));
+
+            let data = [];
+
             for (let i = 1; i <= n; i++) {
-                value = value * (1 + r) - P;
+                // Increase withdrawal yearly (inflation adjusted)
+                if (i % 12 === 1 && i !== 1) {
+                    withdrawal = withdrawal * (1 + Math.max(inflationRate, increaseRate));
+                }
+
+                value = value * (1 + rMonthly) - withdrawal;
 
                 if (i % 12 === 0) {
                     data.push({
                         year: i / 12,
-                        value: Math.max(0, Math.round(value)),
+                        corpus: Math.max(0, Math.round(value)),
+                        withdrawal: Math.round(withdrawal),
                     });
                 }
             }
 
-            const withdrawal = P * r / (1 - Math.pow(1 + r, -n));
             setResult(withdrawal);
             setChartData(data);
         }
@@ -174,6 +190,22 @@ export function SipSwpCalculator() {
                         onChange={(e) => setYears(e.target.value)}
                     />
 
+                    {mode === "swp" && (
+                        <>
+                            <Input
+                                placeholder="Inflation Rate (%) (e.g. 5)"
+                                value={inflation}
+                                onChange={(e) => setInflation(e.target.value)}
+                            />
+
+                            <Input
+                                placeholder="Yearly Withdrawal Increase (%) (optional)"
+                                value={withdrawalIncrease}
+                                onChange={(e) => setWithdrawalIncrease(e.target.value)}
+                            />
+                        </>
+                    )}
+
                     <Button
                         onClick={calculate}
                         className="w-full bg-gradient-to-r from-emerald-500 to-teal-600"
@@ -218,7 +250,25 @@ export function SipSwpCalculator() {
                                 <XAxis dataKey="year" />
                                 <YAxis />
                                 <Tooltip />
-                                <Line type="monotone" dataKey="value" strokeWidth={3} />
+
+                                {/* Remaining Corpus */}
+                                <Line
+                                    type="monotone"
+                                    dataKey="corpus"
+                                    strokeWidth={3}
+                                    name="Remaining Corpus"
+                                />
+
+                                {/* Withdrawal */}
+                                {mode === "swp" && (
+                                    <Line
+                                        type="monotone"
+                                        dataKey="withdrawal"
+                                        strokeWidth={3}
+                                        strokeDasharray="5 5"
+                                        name="Withdrawal"
+                                    />
+                                )}
                             </LineChart>
                         </ResponsiveContainer>
                     </CardContent>
@@ -241,7 +291,8 @@ export function SipSwpCalculator() {
             {/* WHAT IS SIP / SWP */}
             <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
                 <CardHeader>
-                    <CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                        <span>📘</span>
                         {mode === "sip" ? "What is SIP?" : "What is SWP?"}
                     </CardTitle>
                 </CardHeader>
@@ -257,7 +308,8 @@ export function SipSwpCalculator() {
             {/* WHY IS IT USEFUL */}
             <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
                 <CardHeader>
-                    <CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                        <span>💡</span>
                         Why is {mode === "sip" ? "SIP" : "SWP"} useful?
                     </CardTitle>
                 </CardHeader>
@@ -273,7 +325,8 @@ export function SipSwpCalculator() {
             {/* WHO IS IT FOR */}
             <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
                 <CardHeader>
-                    <CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                        <span>🎯</span>
                         Who should use {mode === "sip" ? "SIP" : "SWP"}?
                     </CardTitle>
                 </CardHeader>

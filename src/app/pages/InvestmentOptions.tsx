@@ -98,6 +98,83 @@ export function InvestmentOptions() {
         </p>
       </div>
 
+      {/* HISTORICAL NIFTY SIMULATION */}
+      <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
+        <CardHeader>
+          <CardTitle>📈 What if you invested earlier?</CardTitle>
+          <CardDescription>
+            See how ₹1,000 could have grown over time in Nifty Index
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+
+          {/* TOGGLE YEARS */}
+          <div className="flex gap-2">
+            {["2010", "2016", "2020"].map((year) => (
+              <Button
+                key={year}
+                variant={timeHorizon === year ? "default" : "outline"}
+                onClick={() => setTimeHorizon(year)}
+              >
+                {year}
+              </Button>
+            ))}
+          </div>
+
+          {/* CALCULATION */}
+          {timeHorizon && (
+            (() => {
+              const startYear = parseInt(timeHorizon);
+              const currentYear = new Date().getFullYear();
+              const years = currentYear - startYear;
+
+              const cagr = 0.12; // Nifty approx
+              const initial = 1000;
+
+              const data = Array.from({ length: years + 1 }, (_, i) => {
+                const value = Math.round(initial * Math.pow(1 + cagr, i));
+                return {
+                  year: startYear + i,
+                  value,
+                };
+              });
+
+              const finalValue = data[data.length - 1]?.value || 0;
+
+              return (
+                <>
+                  {/* RESULT */}
+                  <div className="p-4 bg-emerald-50 rounded-lg text-center">
+                    <p className="text-sm text-gray-600">
+                      ₹1,000 invested in {startYear}
+                    </p>
+                    <p className="text-2xl font-bold text-emerald-600">
+                      ₹{finalValue.toLocaleString("en-IN")}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      This is why starting early matters 🚀
+                    </p>
+                  </div>
+
+                  {/* GRAPH */}
+                  <ResponsiveContainer width="100%" height={250}>
+                    <LineChart data={data}>
+                      <XAxis dataKey="year" />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(val: number) => `₹${val.toLocaleString("en-IN")}`}
+                      />
+                      <Line type="monotone" dataKey="value" strokeWidth={3} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </>
+              );
+            })()
+          )}
+        </CardContent>
+      </Card>
+
       {/* Calculator */}
       <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
         <CardHeader>
@@ -152,11 +229,11 @@ export function InvestmentOptions() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis type="number" stroke="#6b7280" />
                   <YAxis type="category" dataKey="name" stroke="#6b7280" width={150} />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number) => `₹${value.toLocaleString()}`}
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                      border: 'none', 
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      border: 'none',
                       borderRadius: '8px',
                       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                     }}
@@ -183,11 +260,11 @@ export function InvestmentOptions() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="year" label={{ value: 'Years', position: 'insideBottom', offset: -5 }} stroke="#6b7280" />
                   <YAxis stroke="#6b7280" />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number) => `₹${value.toLocaleString()}`}
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                      border: 'none', 
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      border: 'none',
                       borderRadius: '8px',
                       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                     }}
@@ -219,11 +296,10 @@ export function InvestmentOptions() {
                   <div className="flex-1">
                     <CardTitle className="flex items-center gap-2">
                       {inv.name}
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        inv.risk.includes('Low') ? 'bg-emerald-100 text-emerald-700' :
+                      <span className={`text-xs px-2 py-1 rounded-full ${inv.risk.includes('Low') ? 'bg-emerald-100 text-emerald-700' :
                         inv.risk.includes('Moderate') ? 'bg-blue-100 text-blue-700' :
-                        'bg-rose-100 text-rose-700'
-                      }`}>
+                          'bg-rose-100 text-rose-700'
+                        }`}>
                         {inv.risk}
                       </span>
                     </CardTitle>
