@@ -238,38 +238,51 @@ export function SipSwpCalculator() {
             )}
 
             {/* EDUCATION */}
+            {/* WHAT IS SIP / SWP */}
             <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
                 <CardHeader>
                     <CardTitle>
                         {mode === "sip" ? "What is SIP?" : "What is SWP?"}
                     </CardTitle>
                 </CardHeader>
-
-                <CardContent className="space-y-3">
-
-                    {/* WHAT IS IT */}
+                <CardContent>
                     <p className="text-sm text-gray-700">
                         {mode === "sip"
                             ? "SIP (Systematic Investment Plan) lets you invest a fixed amount every month in mutual funds. It helps you grow money steadily through compounding without needing a large upfront investment."
-                            : "SWP (Systematic Withdrawal Plan) lets you withdraw a fixed amount regularly from your investments. It provides a steady income while the remaining money continues to stay invested."}
+                            : "SWP (Systematic Withdrawal Plan) lets you withdraw a fixed amount regularly from your investments while the rest stays invested."}
                     </p>
+                </CardContent>
+            </Card>
 
-                    {/* WHY USEFUL */}
+            {/* WHY IS IT USEFUL */}
+            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
+                <CardHeader>
+                    <CardTitle>
+                        Why is {mode === "sip" ? "SIP" : "SWP"} useful?
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
                     <p className="text-sm text-gray-700">
-                        <span className="font-semibold">Why is it useful? </span>
                         {mode === "sip"
-                            ? "It builds discipline, reduces risk of market timing, and helps in long-term wealth creation."
-                            : "It helps generate regular income without withdrawing your entire investment at once."}
+                            ? "It builds investment discipline, reduces the risk of timing the market, and helps create wealth over time through compounding."
+                            : "It provides a steady income from your investments without withdrawing everything at once, helping your money last longer."}
                     </p>
+                </CardContent>
+            </Card>
 
-                    {/* WHO IS IT FOR */}
+            {/* WHO IS IT FOR */}
+            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
+                <CardHeader>
+                    <CardTitle>
+                        Who should use {mode === "sip" ? "SIP" : "SWP"}?
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
                     <p className="text-sm text-gray-700">
-                        <span className="font-semibold">Who is it for? </span>
                         {mode === "sip"
-                            ? "Best for beginners, students, and salaried individuals starting their investment journey."
-                            : "Best for retirees or anyone looking for stable monthly income from their investments."}
+                            ? "Ideal for beginners, students, and salaried individuals who want to start investing regularly with small amounts."
+                            : "Ideal for retirees or individuals who want a regular monthly income from their investments."}
                     </p>
-
                 </CardContent>
             </Card>
 
