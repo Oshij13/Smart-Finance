@@ -59,10 +59,16 @@ export default function Onboarding() {
         setInput("");
 
         if (step < questions.length - 1) {
-            setStep(step + 1);
+            setStep((prev) => prev + 1);
             setMode(null);
         } else {
-            setUserData(updatedData);
+            // ensure insurance is included
+            const finalData = {
+                ...updatedData,
+                insurance: updatedData.insurance || 0
+            };
+
+            setUserData(finalData);
             navigate("/first-action");
         }
     };
