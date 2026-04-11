@@ -12,7 +12,8 @@ export default function Onboarding() {
         { key: "income", question: "What's your monthly income?" },
         { key: "expenses", question: "What are your average monthly expenses?" },
         { key: "investments", question: "How much have you invested?" },
-        { key: "emergencyFund", question: "What's your current emergency fund balance?" }
+        { key: "emergencyFund", question: "What's your current emergency fund balance?" },
+        { key: "insurance", question: "What's your total insurance coverage?" }
     ];
 
     const [step, setStep] = useState(0);
@@ -179,28 +180,12 @@ export default function Onboarding() {
                     </div>
                 )}
 
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                        Total Insurance Coverage (₹)
-                    </label>
-
-                    <input
-                        type="number"
-                        placeholder="e.g. 500000"
-                        value={formData.insurance || ""}
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                insurance: Number(e.target.value),
-                            })
-                        }
-                        className="w-full border px-4 py-2 rounded-xl focus:ring-2 focus:ring-blue-500/50 outline-none"
-                    />
-
-                    <p className="text-xs text-gray-500">
+                {/* Insurance Hint */}
+                {questions[step].key === "insurance" && (
+                    <p className="text-xs text-gray-500 mb-3">
                         Include life + health insurance coverage (recommended: 10–12× your annual income)
                     </p>
-                </div>
+                )}
 
                 <button
                     onClick={handleNext}
