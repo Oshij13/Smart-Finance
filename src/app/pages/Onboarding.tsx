@@ -102,7 +102,7 @@ export default function Onboarding() {
             setInput(expenses.toFixed(0)); // Also update input so Next button works
         };
 
-    reader.readAsText(file);
+        reader.readAsText(file);
     };
 
     useEffect(() => {

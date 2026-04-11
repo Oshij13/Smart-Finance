@@ -7,7 +7,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
     const [step, setStep] = useState(0);
     const [error, setError] = useState("");
 
-    const totalSteps = 7;
+    const totalSteps = 8;
     const progress = Math.round((step / totalSteps) * 100);
 
     const [formData, setFormData] = useState<any>({
@@ -18,7 +18,8 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         expenses: "",
         investments: "",
         emergencyFund: "",
-        jobType: ""
+        jobType: "",
+        insurance: "",
     });
 
     const chatRef = useRef<HTMLDivElement>(null);
@@ -44,8 +45,8 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         if (step === 1 && !value.trim()) return "Occupation required";
         if (step === 2 && !value.trim()) return "City required";
 
-        // Income, Expenses, Investments, Emergency Fund should be numbers
-        if ([3, 4, 5, 6].includes(step) && isNaN(Number(value))) {
+        // Income, Expenses, Investments, Emergency Fund, Insurance should be numbers
+        if ([3, 4, 5, 6, 7].includes(step) && isNaN(Number(value))) {
             return "Only numbers allowed";
         }
 
@@ -78,6 +79,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         if (step === 4) updated.expenses = value;
         if (step === 5) updated.investments = value;
         if (step === 6) updated.emergencyFund = value;
+        if (step === 7) updated.insurance = value;
 
         setFormData(updated);
 
@@ -106,10 +108,20 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         }
 
         if (step === 5) {
-            setMessages(prev => [...prev, { role: "assistant", content: `Final question: What's your current emergency fund balance? (Investments set to ₹${Number(value).toLocaleString('en-IN')})` }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Good progress. What's your current emergency fund balance? (Investments set to ₹${Number(value).toLocaleString('en-IN')})` }]);
         }
 
         if (step === 6) {
+            setMessages(prev => [
+                ...prev,
+                {
+                    role: "assistant",
+                    content: `Final step. What's your total insurance coverage? (Recommended: ₹${Number(formData.income * 12).toLocaleString('en-IN')})`
+                }
+            ]);
+        }
+
+        if (step === 7) {
             finish(updated);
             return;
         }
@@ -170,7 +182,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         if ([0, 1, 1.5, 2].includes(step)) {
             // ✅ Strictly alphabets and spaces
             setInput(val.replace(/[^a-zA-Z\s]/g, ""));
-        } else if ([3, 4, 5, 6].includes(step)) {
+        } else if ([3, 4, 5, 6, 7].includes(step)) {
             // ✅ Strictly numbers only
             setInput(val.replace(/[^0-9]/g, ""));
         } else {
@@ -256,22 +268,22 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                     </div>
                 )}
 
-              {/* HELP TEXT & PRIVACY NOTE */}
-              <div className="px-4 py-1 flex flex-col gap-0.5">
-                  {(step === 4 || step === 5) && (
-                      <p className="text-[10px] text-blue-600 font-medium animate-pulse leading-tight">
-                          {step === 4 
-                              ? "💡 Tip: Upload bank statement or input expenses manually" 
-                              : "💡 Tip: Connect investment apps or input manually"}
-                      </p>
-                  )}
-                  <p className="text-[9px] text-gray-400 italic leading-tight">
-                      🔒 We ask for statement/connectivity solely for calculation purposes.
-                  </p>
-              </div>
+                {/* HELP TEXT & PRIVACY NOTE */}
+                <div className="px-4 py-1 flex flex-col gap-0.5">
+                    {(step === 4 || step === 5) && (
+                        <p className="text-[10px] text-blue-600 font-medium animate-pulse leading-tight">
+                            {step === 4
+                                ? "💡 Tip: Upload bank statement or input expenses manually"
+                                : "💡 Tip: Connect investment apps or input manually"}
+                        </p>
+                    )}
+                    <p className="text-[9px] text-gray-400 italic leading-tight">
+                        🔒 We ask for statement/connectivity solely for calculation purposes.
+                    </p>
+                </div>
 
-              {/* Input */}
-              <div className="p-3 border-t flex gap-2 items-center">
+                {/* Input */}
+                <div className="p-3 border-t flex gap-2 items-center">
                     {/* HIDDEN FILE INPUT */}
                     <input
                         type="file"
@@ -297,8 +309,8 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                         onChange={(e) => handleInputChange(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder={
-                            [0, 1, 1.5, 2].includes(step) 
-                                ? "Enter text only..." 
+                            [0, 1, 1.5, 2].includes(step)
+                                ? "Enter text only..."
                                 : "Enter amount..."
                         }
                         className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
