@@ -389,7 +389,7 @@ export default function DashboardHome() {
   const smartAction = getSmartNextMove();
 
   return (
-    <div id="dashboard-content" className="bg-white p-6">
+    <div id="dashboard-content" className="p-6 bg-[#f9fafb]">
       <div className="space-y-6">
         {/* HEADER */}
         <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
