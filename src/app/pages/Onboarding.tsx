@@ -58,10 +58,7 @@ export default function Onboarding() {
         setFormData(updatedData);
         setInput("");
 
-        if (step < questions.length - 1) {
-            setStep((prev) => prev + 1);
-            setMode(null);
-        } else {
+        if (questions[step].key === "insurance") {
             // ensure insurance is included
             const finalData = {
                 ...updatedData,
@@ -70,6 +67,9 @@ export default function Onboarding() {
 
             setUserData(finalData);
             navigate("/first-action");
+        } else {
+            setStep((prev) => prev + 1);
+            setMode(null);
         }
     };
 
