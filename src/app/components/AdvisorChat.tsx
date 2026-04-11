@@ -17,6 +17,7 @@ export default function AdvisorChat() {
     const [feedbackGiven, setFeedbackGiven] = useState<{ [key: number]: boolean }>({});
     const [responseTime, setResponseTime] = useState(0);
     const [timerActive, setTimerActive] = useState(false);
+    const [showInsuranceWarning, setShowInsuranceWarning] = useState(true);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const chartRef = useRef<any>(null);
@@ -314,8 +315,8 @@ Give personalized advice based on this.`,
                                 )}
 
                                 {/* INSURANCE NUDGE */}
-                                {msg.role === "assistant" && getUserData()?.insurance < (getUserData()?.income || 0) * 6 && (
-                                    <p className="text-xs text-red-500 mt-1">
+                                {showInsuranceWarning && msg.role === "assistant" && getUserData()?.insurance < (getUserData()?.income || 0) * 6 && (
+                                    <p className="text-red-500 text-sm mt-2">
                                         ⚠️ You may be underinsured. Ask: "Do I have enough insurance?"
                                     </p>
                                 )}
