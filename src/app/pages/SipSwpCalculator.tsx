@@ -49,26 +49,30 @@ export function SipSwpCalculator() {
         if (mode === "swp") {
             let value = P;
 
-            const rMonthly = r;
             const inflationRate = (parseFloat(inflation) || 0) / 100;
             const increaseRate = (parseFloat(withdrawalIncrease) || 0) / 100;
 
-            // Base withdrawal (same as before)
-            let withdrawal = P * rMonthly / (1 - Math.pow(1 + rMonthly, -n));
-
-            let data = [];
+            let withdrawal = P * r / (1 - Math.pow(1 + r, -n));
 
             for (let i = 1; i <= n; i++) {
-                // Increase withdrawal yearly (inflation adjusted)
-                if (i % 12 === 1 && i !== 1) {
-                    withdrawal = withdrawal * (1 + Math.max(inflationRate, increaseRate));
+
+                // yearly increase
+                if (i % 12 === 0) {
+                    const growthRate = inflationRate || increaseRate || 0;
+                    withdrawal = withdrawal * (1 + growthRate);
                 }
 
-                value = value * (1 + rMonthly) - withdrawal;
+                // cap withdrawal
+                if (withdrawal > value) {
+                    withdrawal = value;
+                }
+
+                value = value * (1 + r) - withdrawal;
 
                 if (i % 12 === 0) {
                     data.push({
                         year: i / 12,
+                        value: Math.max(0, Math.round(value)),
                         corpus: Math.max(0, Math.round(value)),
                         withdrawal: Math.round(withdrawal),
                     });
