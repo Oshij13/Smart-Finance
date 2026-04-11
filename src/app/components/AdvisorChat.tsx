@@ -284,6 +284,21 @@ Give personalized advice based on this.`,
             <h1 className="text-xl font-semibold mb-4">✨ AI Advisor</h1>
 
             <div className="flex-1 overflow-y-auto space-y-6 bg-white p-6 rounded-2xl shadow">
+                {/* GLOBAL INSURANCE NUDGE */}
+                {showInsuranceWarning && getUserData()?.insurance < (getUserData()?.income || 0) * 6 && (
+                    <div className="bg-red-50 border border-red-100 p-4 rounded-xl flex items-center justify-between">
+                        <p className="text-red-700 text-sm">
+                            ⚠️ <strong>Insurance Alert:</strong> You may be underinsured. Ask: "Do I have enough insurance?"
+                        </p>
+                        <button
+                            onClick={() => setShowInsuranceWarning(false)}
+                            className="text-red-400 hover:text-red-600 font-bold ml-4"
+                        >
+                            ×
+                        </button>
+                    </div>
+                )}
+
 
                 {messages.map((msg, i) => (
                     <div key={i}>
@@ -312,13 +327,6 @@ Give personalized advice based on this.`,
                                             )
                                         }
                                     </div>
-                                )}
-
-                                {/* INSURANCE NUDGE */}
-                                {showInsuranceWarning && msg.role === "assistant" && getUserData()?.insurance < (getUserData()?.income || 0) * 6 && (
-                                    <p className="text-red-500 text-sm mt-2">
-                                        ⚠️ You may be underinsured. Ask: "Do I have enough insurance?"
-                                    </p>
                                 )}
 
                                 {/* FEEDBACK */}
