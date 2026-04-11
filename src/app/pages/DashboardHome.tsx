@@ -237,10 +237,22 @@ export default function DashboardHome() {
 
   const goal = onboardingData?.goal || "Wealth Building";
   let target = 0;
-  if (goal.toLowerCase().includes("emergency")) target = expenses * 6;
-  else if (goal.toLowerCase().includes("car")) target = 500000;
-  else if (goal.toLowerCase().includes("house")) target = 2000000;
-  else target = 100000;
+  const goalText = goal.toLowerCase();
+
+  if (goalText.includes("emergency")) {
+    target = expenses * 6;
+  } else if (goalText.includes("car")) {
+    target = 500000;
+  } else if (goalText.includes("house") || goalText.includes("home")) {
+    target = 2000000;
+  } else if (goalText.includes("travel")) {
+    target = 150000;
+  } else if (goalText.includes("education")) {
+    target = 300000;
+  } else {
+    // fallback: use income-based intelligent target
+    target = income * 6;
+  }
   const progress = target > 0 ? (savings / target) * 100 : 0;
 
   const insights: string[] = [];
@@ -392,6 +404,19 @@ export default function DashboardHome() {
     return Math.round(value);
   }
 
+  const handleSaveGoal = () => {
+    const updatedData = {
+      ...onboardingData,
+      goal: goalInput,
+    };
+
+    setUserData(updatedData);
+    setIsEditingGoal(false);
+
+    // force refresh (since store is local)
+    window.location.reload();
+  };
+
   const smartAction = getSmartNextMove();
 
   return (
@@ -447,7 +472,34 @@ export default function DashboardHome() {
           </div>
           <div className="text-right">
             <p className="text-sm text-gray-500">Primary Goal</p>
-            <p className="font-semibold text-blue-600">{onboardingData?.goal || "Wealth Building"}</p>
+
+            {isEditingGoal ? (
+              <div className="flex gap-2 items-center">
+                <input
+                  value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  className="border px-2 py-1 rounded text-sm text-gray-900"
+                  placeholder="Enter your goal"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveGoal}
+                  className="text-green-600 text-sm font-medium hover:text-green-700"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => setIsEditingGoal(true)}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                <p className="font-semibold text-blue-600">
+                  {onboardingData?.goal || "Wealth Building"}
+                </p>
+                <p className="text-xs text-gray-400">Click to edit</p>
+              </div>
+            )}
           </div>
         </div>
 
