@@ -169,7 +169,7 @@ export default function AdvisorChat() {
         const existing = JSON.parse(localStorage.getItem("sf_feedback") || "[]");
 
         existing.push({
-            messageIndex: index,
+            messageIndex: `${index}-${messages[index]?.content?.slice(0, 20)}`,
             feedback: type,
             timestamp: new Date().toISOString(),
         });
@@ -193,15 +193,24 @@ export default function AdvisorChat() {
             await fetch("https://smart-finance-backend-w4ou.onrender.com");
 
             const currentSessionId = sessionId || sessionStorage.getItem("sessionId");
+            const user = getUserData();
 
             const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    message: text,
+                    message: `${text}
+
+User Financial Context:
+- Income: ₹${user?.income || 0}
+- Expenses: ₹${user?.expenses || 0}
+- Investments: ₹${user?.investments || 0}
+- Insurance: ₹${user?.insurance || 0}
+
+Give personalized advice based on this.`,
                     userData: {
-                        ...getUserData(),
-                        insurance: getUserData()?.insurance || 0,
+                        ...user,
+                        insurance: user?.insurance || 0,
                     },
                     history: messages.slice(-6),
                     sessionId: currentSessionId,
@@ -283,8 +292,15 @@ export default function AdvisorChat() {
                                     </div>
                                 )}
 
+                                {/* INSURANCE NUDGE */}
+                                {msg.role === "assistant" && getUserData()?.insurance < (getUserData()?.income || 0) * 6 && (
+                                    <p className="text-xs text-red-500 mt-1">
+                                        ⚠️ You may be underinsured. Ask: "Do I have enough insurance?"
+                                    </p>
+                                )}
+
                                 {/* FEEDBACK */}
-                                {!feedbackGiven[i] && msg.role === "assistant" && i !== 0 && (
+                                {!feedbackGiven[i] && msg.role === "assistant" && msg.content !== undefined && i > 0 && (
                                     <div className="flex items-center gap-2 mt-2">
                                         <span className="text-xs text-gray-500">Was this helpful?</span>
 

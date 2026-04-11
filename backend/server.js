@@ -72,6 +72,8 @@ const handleAdvisor = async (req, res) => {
       insuranceInsight = "Your insurance coverage is strong and provides good financial protection.";
     }
 
+    const insuranceGap = Math.max(0, idealInsurance - insurance);
+
     const prompt = `
 You are Smart Finance, a friendly and knowledgeable AI financial advisor for Indian users. Your job is to make personal finance simple, clear, and actionable.
 IMPORTANT:
@@ -89,6 +91,7 @@ User Data:
 - Monthly Savings: ₹${savings}
 - Investments: ₹${investments}
 - Insurance Status: ${insuranceInsight}
+- Insurance Gap: ₹${insuranceGap}
 
 User's message: ${message}
 
@@ -222,8 +225,10 @@ OUTPUT — STRICT JSON ONLY
     if (!reply.data) reply.data = {};
     if (!reply.data.insights) reply.data.insights = [];
 
-    // Inject insurance status
-    reply.data.insights.push(insuranceInsight);
+    // Inject insurance status if not already present
+    if (!reply.data.insights.some((i) => i.toLowerCase().includes("insurance"))) {
+      reply.data.insights.push(insuranceInsight);
+    }
 
     // Save AI response into session
     history.push({
@@ -251,7 +256,7 @@ app.post("/api/chat", handleAdvisor);
 =========================== */
 app.post("/api/analyze-finance", async (req, res) => {
   try {
-    const { income, expenses, savings, investments } = req.body;
+    const { income, expenses, savings, investments, insurance = 0 } = req.body;
 
     const inc = Number(income) || 0;
     const exp = Number(expenses) || 0;
@@ -264,6 +269,20 @@ app.post("/api/analyze-finance", async (req, res) => {
     const emergencyFundMonths = exp > 0 ? (sav / exp).toFixed(1) : 0;
     const investmentRatio = inc > 0 ? Math.round((inv / inc) * 100) : 0;
 
+    const idealInsurance = inc * 12;
+    let insuranceInsight = "";
+    if (insurance === 0) {
+      insuranceInsight = "You have no insurance coverage, which puts you at high financial risk.";
+    } else if (insurance < idealInsurance * 0.5) {
+      insuranceInsight = `Your insurance is ₹${insurance}, but should be at least ₹${idealInsurance}.`;
+    } else if (insurance < idealInsurance) {
+      insuranceInsight = "Your insurance is decent but can be improved.";
+    } else {
+      insuranceInsight = "Your insurance coverage is strong.";
+    }
+
+    const insuranceGap = Math.max(0, idealInsurance - insurance);
+
     const prompt = `
 You are a smart financial advisor.
 
@@ -272,6 +291,8 @@ Income: ₹${inc}
 Expenses: ₹${exp}
 Savings: ₹${sav}
 Investments: ₹${inv}
+Insurance Status: ${insuranceInsight}
+Insurance Gap: ₹${insuranceGap}
 
 Instructions (STRICT):
 1. Provide exactly 4 concise, single-sentence insights about their finances.
@@ -363,8 +384,8 @@ app.post("/api/next-action", (req, res) => {
       };
     }
 
-    // PRIORITY 2: Insurance coverage critically low
-    else if (insurance === 0) {
+    // PRIORITY 2: Insurance coverage critically low (< 6 months income)
+    else if (insurance < income * 6) {
       response = {
         text: "You have no insurance coverage. Protect your family today",
         cta: "Explore Insurance",

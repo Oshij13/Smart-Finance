@@ -208,7 +208,7 @@ export default function DashboardHome() {
 
   // Savings Score (30)
   if (savingsRate >= 20) score += 30;
-  else score += (savingsRate / 20) * 30;
+  else score += Math.max(0, (savingsRate / 20) * 30);
 
   // Emergency Fund Score (25)
   if (emergencyMonths >= 6) score += 25;
@@ -306,9 +306,7 @@ export default function DashboardHome() {
       insight:
         insuranceStatus === "Strong"
           ? "Well protected ✅"
-          : insuranceStatus === "Moderate"
-          ? "Needs improvement ⚠️"
-          : "Low coverage 🚨",
+          : `₹${insurance.toLocaleString("en-IN")} vs ₹${idealInsurance.toLocaleString("en-IN")} needed`,
     }
   ];
 
@@ -383,6 +381,14 @@ export default function DashboardHome() {
   };
 
   function getSmartNextMove() {
+    if (insurance < idealInsurance * 0.5) {
+      return {
+        text: "You are underinsured. Increase your coverage for safety",
+        cta: "Fix Insurance",
+        type: "optimize"
+      };
+    }
+
     if (emergencyMonths < 3) {
       return {
         text: "Build your emergency fund. Save ₹500 today",
@@ -469,6 +475,11 @@ export default function DashboardHome() {
           <div className="mt-4">
             <div className="w-full bg-white/30 h-2 rounded-full"><div className="bg-white h-2 rounded-full transition-all" style={{ width: `${Math.min(progressPercent, 100)}%` }} /></div>
             <p className="text-xs mt-1 opacity-80">₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}</p>
+            {insurance < idealInsurance * 0.5 && (
+              <p className="text-xs text-red-100 mt-1 font-medium">
+                ⚠️ Your insurance coverage is low
+              </p>
+            )}
           </div>
         </div>
 

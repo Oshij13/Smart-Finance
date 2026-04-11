@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { setUserData } from "../store/userStore";
 import { useNavigate } from "react-router";
 
@@ -45,9 +45,14 @@ export default function Onboarding() {
     const handleNext = () => {
         const key = questions[step].key;
 
+        // ❗ prevent empty input
+        if (!input && key !== "insurance") {
+            return;
+        }
+
         const updatedData = {
             ...formData,
-            [key]: input
+            [key]: input || 0 // allow 0 for insurance
         };
 
         setFormData(updatedData);
@@ -55,10 +60,10 @@ export default function Onboarding() {
 
         if (step < questions.length - 1) {
             setStep(step + 1);
-            setMode(null); // Reset mode for next step
+            setMode(null);
         } else {
             setUserData(updatedData);
-            navigate("/first-action"); // go to first action screen
+            navigate("/first-action");
         }
     };
 
@@ -91,8 +96,14 @@ export default function Onboarding() {
             setInput(expenses.toFixed(0)); // Also update input so Next button works
         };
 
-        reader.readAsText(file);
+    reader.readAsText(file);
     };
+
+    useEffect(() => {
+        if (questions[step].key === "insurance") {
+            setInput("");
+        }
+    }, [step]);
 
     return (
         <div className="h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-500 to-purple-600 text-white px-6">
@@ -103,12 +114,23 @@ export default function Onboarding() {
                     {questions[step].question}
                 </h2>
 
+                {/* 👉 SUGGESTION */}
+                {questions[step].key === "insurance" && formData.income && (
+                    <p className="text-xs text-blue-500 mb-3">
+                        Suggested: ₹{(Number(formData.income) * 12).toLocaleString("en-IN")}
+                    </p>
+                )}
+
                 {questions[step].key !== "expenses" && (
                     <input
                         value={input}
                         onChange={(e) => handleInputChange(e.target.value)}
                         className="w-full border px-3 py-2 rounded mb-3 focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
-                        placeholder="Type here..."
+                        placeholder={
+                            questions[step].key === "insurance"
+                                ? "e.g. 500000"
+                                : "Type here..."
+                        }
                         inputMode={["name", "occupation", "city"].includes(questions[step].key) ? "text" : "numeric"}
                     />
                 )}
