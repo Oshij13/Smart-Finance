@@ -12,6 +12,8 @@ export function InvestmentOptions() {
   const [timeHorizon, setTimeHorizon] = useState("");
   const [historyYear, setHistoryYear] = useState("2010");
   const [showResults, setShowResults] = useState(false);
+  const [customAmount, setCustomAmount] = useState(10000);
+  const [isEditingAmount, setIsEditingAmount] = useState(false);
 
   const calculateReturns = () => {
     if (investmentAmount && timeHorizon) setShowResults(true);
@@ -102,10 +104,32 @@ export function InvestmentOptions() {
       {/* HISTORICAL NIFTY SIMULATION */}
       <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
         <CardHeader>
-          <CardTitle>📈 What if you invested earlier?</CardTitle>
-          <CardDescription>
-            See how ₹10,000 could have grown over time in Nifty Index
-          </CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold">📈 What if you invested earlier?</h2>
+              <p className="text-sm text-gray-500">
+                See how ₹{customAmount.toLocaleString("en-IN")} could have grown over time in Nifty Index
+              </p>
+            </div>
+
+            {!isEditingAmount ? (
+              <button
+                onClick={() => setIsEditingAmount(true)}
+                className="text-xs px-3 py-1 border rounded-lg hover:bg-gray-100"
+              >
+                Change Amount
+              </button>
+            ) : (
+              <input
+                type="number"
+                value={customAmount}
+                onChange={(e) => setCustomAmount(Number(e.target.value))}
+                onBlur={() => setIsEditingAmount(false)}
+                className="w-28 px-2 py-1 border rounded-lg text-sm"
+                autoFocus
+              />
+            )}
+          </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
@@ -132,7 +156,7 @@ export function InvestmentOptions() {
               const yearsCount = currentYear - startYear;
 
               const cagr = 0.12; // Nifty approx
-              const initial = 10000;
+              const initial = customAmount;
 
               const data = Array.from({ length: yearsCount + 1 }, (_, i) => {
                 const value = Math.round(initial * Math.pow(1 + cagr, i));
