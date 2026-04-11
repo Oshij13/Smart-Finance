@@ -15,6 +15,8 @@ export default function AdvisorChat() {
     const [actionSuccess, setActionSuccess] = useState<number | null>(null);
     const [resetBackend, setResetBackend] = useState(false);
     const [feedbackGiven, setFeedbackGiven] = useState<{ [key: number]: boolean }>({});
+    const [responseTime, setResponseTime] = useState(0);
+    const [timerActive, setTimerActive] = useState(false);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const chartRef = useRef<any>(null);
@@ -70,6 +72,22 @@ export default function AdvisorChat() {
     useEffect(() => {
         sessionStorage.setItem("sf_chat", JSON.stringify(messages));
     }, [messages]);
+
+    // Timer Logic
+    useEffect(() => {
+        let interval: any;
+
+        if (timerActive) {
+            const start = Date.now();
+
+            interval = setInterval(() => {
+                const elapsed = (Date.now() - start) / 1000;
+                setResponseTime(elapsed);
+            }, 100);
+        }
+
+        return () => clearInterval(interval);
+    }, [timerActive]);
 
 
     useEffect(() => {
@@ -187,6 +205,8 @@ export default function AdvisorChat() {
 
         setMessages((prev) => [...prev, { role: "user", content: text }]);
         setLoading(true);
+        setTimerActive(true);
+        setResponseTime(0);
 
         try {
             // Wake up backend (Render sleep fix)
@@ -254,6 +274,7 @@ Give personalized advice based on this.`,
         }
 
         setLoading(false);
+        setTimerActive(false);
     };
 
     return (
@@ -461,7 +482,15 @@ Give personalized advice based on this.`,
                     </div>
                 ))}
 
-                {loading && <p>🤖 AI thinking...</p>}
+                {loading && (
+                    <div className="flex flex-col gap-2 mt-2">
+                        <p className="text-sm text-gray-500">🤖 AI thinking...</p>
+
+                        <div className="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-lg w-fit">
+                            ⏱️ Generating response... {responseTime.toFixed(1)}s
+                        </div>
+                    </div>
+                )}
                 <div ref={bottomRef} />
             </div>
 
