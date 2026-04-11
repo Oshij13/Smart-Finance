@@ -53,7 +53,10 @@ export default function DashboardHome() {
         const response = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/analyze-finance", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userData),
+          body: JSON.stringify({
+            ...userData,
+            insurance: userData?.insurance || 0,
+          }),
         });
 
         const data = await response.json();
@@ -81,6 +84,7 @@ export default function DashboardHome() {
               income: userData?.income,
               expenses: userData?.expenses,
               investments: userData?.investments || 0,
+              insurance: userData?.insurance || 0,
             },
             progress: {
               saved: userData?.emergencyFund || 0,
@@ -198,12 +202,39 @@ export default function DashboardHome() {
   const rawMonths = expenses > 0 ? emergencyFund / expenses : 0;
   const emergencyMonths = Math.min(rawMonths, 12);
   const investmentRate = income > 0 ? (investments / income) * 100 : 0;
+  const insurance = Number(userData?.insurance || 0);
 
   let score = 0;
-  if (savingsRate >= 20) score += 40; else score += (savingsRate / 20) * 40;
-  if (emergencyMonths >= 6) score += 30; else score += (emergencyMonths / 6) * 30;
-  if (investmentRate >= 20) score += 30; else score += (investmentRate / 20) * 30;
+
+  // Savings Score (30)
+  if (savingsRate >= 20) score += 30;
+  else score += (savingsRate / 20) * 30;
+
+  // Emergency Fund Score (25)
+  if (emergencyMonths >= 6) score += 25;
+  else score += (emergencyMonths / 6) * 25;
+
+  // Investment Score (25)
+  if (investmentRate >= 20) score += 25;
+  else score += (investmentRate / 20) * 25;
+
+  // Insurance Score (20)
+  const idealInsurance = income * 12;
+
+  let insuranceScore = 0;
+  if (insurance >= idealInsurance) {
+    insuranceScore = 20;
+  } else {
+    insuranceScore = (insurance / idealInsurance) * 20;
+  }
+
+  score += insuranceScore;
+
   score = Math.round(score);
+
+  let insuranceStatus = "Low";
+  if (insurance >= idealInsurance) insuranceStatus = "Strong";
+  else if (insurance >= idealInsurance * 0.5) insuranceStatus = "Moderate";
 
   const goal = userData?.goal || "Wealth Building";
   let target = 0;
@@ -223,7 +254,13 @@ export default function DashboardHome() {
     // fallback: use income-based intelligent target
     target = income * 6;
   }
-  const progress = target > 0 ? (savings / target) * 100 : 0;
+  let currentValue = savings + investments;
+
+  if (goal.toLowerCase().includes("emergency")) {
+    currentValue = emergencyFund;
+  }
+
+  const progress = target > 0 ? (currentValue / target) * 100 : 0;
 
   const insights: string[] = [];
   if (analysis?.insights) {
@@ -259,7 +296,20 @@ export default function DashboardHome() {
     { title: "Income", value: income, color: "text-green-600", bg: "bg-green-50", icon: "💰", insight: "Stable income flow" },
     { title: "Expenses", value: expenses, color: "text-red-500", bg: "bg-red-50", icon: "💸", insight: expenses > income * 0.6 ? "High spending ⚠️" : "Controlled spending ✅" },
     { title: "Savings", value: savings, color: "text-blue-600", bg: "bg-blue-50", icon: "📈", insight: savingsRate >= 20 ? "Strong savings 💪" : "Building phase ⚠️" },
-    { title: "Investments", value: investments, color: "text-purple-600", bg: "bg-purple-50", icon: "💎", insight: investmentRate > 15 ? "Investing expert 🚀" : "Start investing more 📈" }
+    { title: "Investments", value: investments, color: "text-purple-600", bg: "bg-purple-50", icon: "💎", insight: investmentRate > 15 ? "Investing expert 🚀" : "Start investing more 📈" },
+    {
+      title: "Insurance",
+      value: insurance,
+      color: "text-indigo-600",
+      bg: "bg-indigo-50",
+      icon: "🛡️",
+      insight:
+        insuranceStatus === "Strong"
+          ? "Well protected ✅"
+          : insuranceStatus === "Moderate"
+          ? "Needs improvement ⚠️"
+          : "Low coverage 🚨",
+    }
   ];
 
   function generateFinancialInsight() {
@@ -279,6 +329,14 @@ export default function DashboardHome() {
         message: `You're spending ₹${expenses.toLocaleString('en-IN')} (~${Math.round(expenseRatio * 100)}% of your income). Try to bring this below 60% for better financial stability.`,
         color: "red",
         icon: "⚠️"
+      };
+    }
+
+    if (insurance < idealInsurance * 0.5) {
+      return {
+        message: `Your insurance coverage is ₹${insurance.toLocaleString('en-IN')}. Based on your income ₹${income.toLocaleString('en-IN')}, you should aim for at least ₹${idealInsurance.toLocaleString('en-IN')} (10–12× income) to stay financially protected.`,
+        color: "red",
+        icon: "🛡️"
       };
     }
 
@@ -487,7 +545,7 @@ export default function DashboardHome() {
         </div>
 
         {/* SNAPSHOT */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {cards.map((card, i) => (
             <div key={i} className={`p-6 rounded-2xl shadow-sm h-full ${card.bg}`}>
               <span className="text-xl">{card.icon}</span>

@@ -26,7 +26,8 @@ export default function Onboarding() {
         income: "",
         expenses: "",
         investments: "",
-        emergencyFund: ""
+        emergencyFund: "",
+        insurance: 0
     });
 
     const handleInputChange = (val: string) => {
@@ -177,6 +178,29 @@ export default function Onboarding() {
                         <button className="px-3 py-1 bg-green-100 rounded focus:ring-2 focus:ring-purple-500/50 outline-none">Groww</button>
                     </div>
                 )}
+
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                        Total Insurance Coverage (₹)
+                    </label>
+
+                    <input
+                        type="number"
+                        placeholder="e.g. 500000"
+                        value={formData.insurance || ""}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                insurance: Number(e.target.value),
+                            })
+                        }
+                        className="w-full border px-4 py-2 rounded-xl focus:ring-2 focus:ring-blue-500/50 outline-none"
+                    />
+
+                    <p className="text-xs text-gray-500">
+                        Include life + health insurance coverage (recommended: 10–12× your annual income)
+                    </p>
+                </div>
 
                 <button
                     onClick={handleNext}

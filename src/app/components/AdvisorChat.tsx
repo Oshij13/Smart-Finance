@@ -199,7 +199,10 @@ export default function AdvisorChat() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     message: text,
-                    userData: getUserData(),
+                    userData: {
+                        ...getUserData(),
+                        insurance: getUserData()?.insurance || 0,
+                    },
                     history: messages.slice(-6),
                     sessionId: currentSessionId,
                     resetSession: resetBackend

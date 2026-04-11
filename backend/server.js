@@ -57,7 +57,20 @@ const handleAdvisor = async (req, res) => {
       expenses = 0,
       savings = 0,
       investments = 0,
+      insurance = 0,
     } = userData || {};
+
+    const idealInsurance = income * 12;
+    let insuranceInsight = "";
+    if (insurance === 0) {
+      insuranceInsight = "You currently have no insurance coverage. This puts you at high financial risk in case of emergencies.";
+    } else if (insurance < idealInsurance * 0.5) {
+      insuranceInsight = `Your insurance coverage is ₹${insurance}. Ideally, it should be at least ₹${idealInsurance} (10–12× your income).`;
+    } else if (insurance < idealInsurance) {
+      insuranceInsight = `Your insurance coverage is moderate. Consider increasing it to ₹${idealInsurance} for better protection.`;
+    } else {
+      insuranceInsight = "Your insurance coverage is strong and provides good financial protection.";
+    }
 
     const prompt = `
 You are Smart Finance, a friendly and knowledgeable AI financial advisor for Indian users. Your job is to make personal finance simple, clear, and actionable.
@@ -75,6 +88,7 @@ User Data:
 - Monthly Expenses: ₹${expenses}
 - Monthly Savings: ₹${savings}
 - Investments: ₹${investments}
+- Insurance Status: ${insuranceInsight}
 
 User's message: ${message}
 
@@ -200,10 +214,16 @@ OUTPUT — STRICT JSON ONLY
       };
     }
 
-    // ✅ Ensure actions always exist (MVP safety)
+    // ✅ Ensure actions and insights always exist (MVP safety)
     if (!reply.actions) {
       reply.actions = [];
     }
+
+    if (!reply.data) reply.data = {};
+    if (!reply.data.insights) reply.data.insights = [];
+
+    // Inject insurance status
+    reply.data.insights.push(insuranceInsight);
 
     // Save AI response into session
     history.push({
@@ -321,6 +341,7 @@ app.post("/api/next-action", (req, res) => {
     const income = Number(userData.income || 0);
     const expenses = Number(userData.expenses || 0);
     const investments = Number(userData.investments || 0);
+    const insurance = Number(userData.insurance || 0);
 
     const saved = Number(progress.saved || 0);
     const target = Number(progress.target || expenses * 6 || income * 3);
@@ -339,6 +360,15 @@ app.post("/api/next-action", (req, res) => {
         text: `Build your emergency fund. Save ₹${Math.min(500, target - saved)} today`,
         cta: "Save Now",
         type: "save",
+      };
+    }
+
+    // PRIORITY 2: Insurance coverage critically low
+    else if (insurance === 0) {
+      response = {
+        text: "You have no insurance coverage. Protect your family today",
+        cta: "Explore Insurance",
+        type: "protect",
       };
     }
 
