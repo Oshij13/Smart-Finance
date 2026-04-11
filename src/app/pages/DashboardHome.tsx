@@ -27,12 +27,12 @@ const colorMap: Record<string, string> = {
 export default function DashboardHome() {
   const navigate = useNavigate();
 
-  const onboardingData = getUserData();
+  const [userData, setUserDataState] = useState(getUserData());
 
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditingGoal, setIsEditingGoal] = useState(false);
-  const [goalInput, setGoalInput] = useState(onboardingData?.goal || "");
+  const [goalInput, setGoalInput] = useState(userData?.goal || "");
   const [nextAction, setNextAction] = useState<any>(null);
 
   const [progressData, setProgressData] = useState(() => {
@@ -43,7 +43,7 @@ export default function DashboardHome() {
   const [pdfStatus, setPdfStatus] = useState("");
 
   useEffect(() => {
-    if (!onboardingData) {
+    if (!userData) {
       setLoading(false);
       return;
     }
@@ -53,7 +53,7 @@ export default function DashboardHome() {
         const response = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/analyze-finance", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(onboardingData),
+          body: JSON.stringify(userData),
         });
 
         const data = await response.json();
@@ -66,7 +66,7 @@ export default function DashboardHome() {
     };
 
     fetchAnalysis();
-  }, [onboardingData]);
+  }, [userData]);
 
   useEffect(() => {
     const fetchNextAction = async () => {
@@ -78,13 +78,13 @@ export default function DashboardHome() {
           },
           body: JSON.stringify({
             userData: {
-              income: onboardingData?.income,
-              expenses: onboardingData?.expenses,
-              investments: onboardingData?.investments || 0,
+              income: userData?.income,
+              expenses: userData?.expenses,
+              investments: userData?.investments || 0,
             },
             progress: {
-              saved: onboardingData?.emergencyFund || 0,
-              target: onboardingData?.expenses * 6,
+              saved: userData?.emergencyFund || 0,
+              target: userData?.expenses * 6,
             },
           }),
         });
@@ -96,8 +96,8 @@ export default function DashboardHome() {
       }
     };
 
-    if (onboardingData) fetchNextAction();
-  }, [onboardingData]);
+    if (userData) fetchNextAction();
+  }, [userData]);
 
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -121,7 +121,7 @@ export default function DashboardHome() {
     return () => window.removeEventListener("progressUpdated", handleStorageChange);
   }, []);
 
-  if (!onboardingData) {
+  if (!userData) {
     return <Onboarding />;
   }
 
@@ -204,7 +204,7 @@ export default function DashboardHome() {
       }
 
       setPdfStatus("Finalizing High-Quality Download...");
-      pdf.save(`SmartFinance_Report_${onboardingData?.name || "User"}.pdf`);
+      pdf.save(`SmartFinance_Report_${userData?.name || "User"}.pdf`);
       document.body.style.overflow = "auto";
     } catch (err) {
       console.error(err);
@@ -218,10 +218,10 @@ export default function DashboardHome() {
   if (loading) return <div className="p-6">Loading your dashboard...</div>;
   if (!nextAction) return <div className="p-6">Loading actions...</div>;
 
-  const income = Number(onboardingData?.income || 0);
-  const expenses = Number(onboardingData?.expenses || 0);
-  const investments = Number(onboardingData?.investments || 0);
-  const emergencyFund = Number(onboardingData?.emergencyFund || 0);
+  const income = Number(userData?.income || 0);
+  const expenses = Number(userData?.expenses || 0);
+  const investments = Number(userData?.investments || 0);
+  const emergencyFund = Number(userData?.emergencyFund || 0);
   const savings = income - (expenses + investments);
   const emergencyTarget = expenses * 6;
   const savingsRate = income > 0 ? (savings / income) * 100 : 0;
@@ -235,7 +235,7 @@ export default function DashboardHome() {
   if (investmentRate >= 20) score += 30; else score += (investmentRate / 20) * 30;
   score = Math.round(score);
 
-  const goal = onboardingData?.goal || "Wealth Building";
+  const goal = userData?.goal || "Wealth Building";
   let target = 0;
   const goalText = goal.toLowerCase();
 
@@ -406,15 +406,14 @@ export default function DashboardHome() {
 
   const handleSaveGoal = () => {
     const updatedData = {
-      ...onboardingData,
+      ...userData,
       goal: goalInput,
     };
 
-    setUserData(updatedData);
-    setIsEditingGoal(false);
+    setUserData(updatedData);       // save to store
+    setUserDataState(updatedData);  // update UI instantly
 
-    // force refresh (since store is local)
-    window.location.reload();
+    setIsEditingGoal(false);
   };
 
   const smartAction = getSmartNextMove();
@@ -425,7 +424,7 @@ export default function DashboardHome() {
         {/* HEADER */}
         <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
           <div>
-            <h1 className="text-2xl font-bold">Hey {onboardingData?.name || "User"} 👋</h1>
+            <h1 className="text-2xl font-bold">Hey {userData?.name || "User"} 👋</h1>
             <p className="text-sm opacity-90">Your financial dashboard</p>
           </div>
           <div className="flex gap-3">
@@ -464,10 +463,10 @@ export default function DashboardHome() {
         {/* PROFILE */}
         <div className="bg-white p-6 rounded-2xl shadow-sm flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">{(onboardingData?.name || "U")[0]}</div>
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">{(userData?.name || "U")[0]}</div>
             <div>
-              <h2 className="text-lg font-semibold">{onboardingData?.name || "User"}</h2>
-              <p className="text-sm text-gray-500">Monthly Income: ₹{Number(onboardingData?.income || 0).toLocaleString('en-IN')}</p>
+              <h2 className="text-lg font-semibold">{userData?.name || "User"}</h2>
+              <p className="text-sm text-gray-500">Monthly Income: ₹{Number(userData?.income || 0).toLocaleString('en-IN')}</p>
             </div>
           </div>
           <div className="text-right">
@@ -495,7 +494,7 @@ export default function DashboardHome() {
                 className="cursor-pointer hover:opacity-80 transition-opacity"
               >
                 <p className="font-semibold text-blue-600">
-                  {onboardingData?.goal || "Wealth Building"}
+                  {userData?.goal || "Wealth Building"}
                 </p>
                 <p className="text-xs text-gray-400">Click to edit</p>
               </div>
