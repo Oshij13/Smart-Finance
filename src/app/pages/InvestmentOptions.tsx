@@ -10,6 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 export function InvestmentOptions() {
   const [investmentAmount, setInvestmentAmount] = useState("");
   const [timeHorizon, setTimeHorizon] = useState("");
+  const [historyYear, setHistoryYear] = useState("2010");
   const [showResults, setShowResults] = useState(false);
 
   const calculateReturns = () => {
@@ -103,7 +104,7 @@ export function InvestmentOptions() {
         <CardHeader>
           <CardTitle>📈 What if you invested earlier?</CardTitle>
           <CardDescription>
-            See how ₹1,000 could have grown over time in Nifty Index
+            See how ₹10,000 could have grown over time in Nifty Index
           </CardDescription>
         </CardHeader>
 
@@ -114,9 +115,9 @@ export function InvestmentOptions() {
             {["2010", "2016", "2020"].map((year) => (
               <Button
                 key={year}
-                variant={timeHorizon === year ? "default" : "outline"}
-                onClick={() => setTimeHorizon(year)}
-                className={timeHorizon === year ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+                variant={historyYear === year ? "default" : "outline"}
+                onClick={() => setHistoryYear(year)}
+                className={historyYear === year ? "bg-emerald-600 hover:bg-emerald-700" : ""}
               >
                 {year}
               </Button>
@@ -124,14 +125,14 @@ export function InvestmentOptions() {
           </div>
 
           {/* CALCULATION */}
-          {timeHorizon && (
+          {historyYear && (
             (() => {
-              const startYear = parseInt(timeHorizon);
+              const startYear = parseInt(historyYear);
               const currentYear = new Date().getFullYear();
               const yearsCount = currentYear - startYear;
 
               const cagr = 0.12; // Nifty approx
-              const initial = 1000;
+              const initial = 10000;
 
               const data = Array.from({ length: yearsCount + 1 }, (_, i) => {
                 const value = Math.round(initial * Math.pow(1 + cagr, i));
@@ -148,7 +149,7 @@ export function InvestmentOptions() {
                   {/* RESULT */}
                   <div className="p-4 bg-emerald-50 rounded-lg text-center">
                     <p className="text-sm text-gray-600">
-                      ₹1,000 invested in {startYear}
+                      ₹{initial.toLocaleString("en-IN")} invested in {startYear}
                     </p>
                     <p className="text-2xl font-bold text-emerald-600">
                       ₹{finalValue.toLocaleString("en-IN")}
