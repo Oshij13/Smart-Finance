@@ -134,73 +134,43 @@ export default function DashboardHome() {
       const element = document.getElementById("dashboard-content");
       if (!element) throw new Error("Dashboard not found");
 
-      await new Promise((r) => setTimeout(r, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       document.body.style.overflow = "hidden";
 
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 3, // 🔥 HIGH QUALITY
         useCORS: true,
-        backgroundColor: "#f9fafb",
-        windowWidth: document.documentElement.scrollWidth,
-        windowHeight: document.documentElement.scrollHeight,
+        backgroundColor: "#ffffff",
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        windowWidth: document.body.scrollWidth,
         ignoreElements: (el) => {
           return el.classList?.contains("pdf-ignore");
         }
       });
 
 
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
-      const pdf = new jsPDF("l", "mm", "a4");
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
 
-      const pageWidth = 297;
-      const pageHeight = 210;
+      const pageWidth = 210;
+      const pageHeight = 297;
 
-      // 🔥 SCALE ONLY BY WIDTH (IMPORTANT)
-      const ratio = pageWidth / canvas.width;
       const imgWidth = pageWidth;
-      const imgHeight = canvas.height * ratio;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
-      // Height of one PDF page in canvas units
-      const pageCanvasHeight = canvas.height * (pageHeight / imgHeight);
-
+      let heightLeft = imgHeight;
       let position = 0;
 
-      while (position < canvas.height) {
-        const pageCanvas = document.createElement("canvas");
-        const ctx = pageCanvas.getContext("2d");
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
 
-        if (!ctx) break;
-
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = pageCanvasHeight;
-
-        ctx.drawImage(
-          canvas,
-          0,
-          position,
-          canvas.width,
-          pageCanvasHeight,
-          0,
-          0,
-          canvas.width,
-          pageCanvasHeight
-        );
-
-        const pageData = pageCanvas.toDataURL("image/jpeg", 0.95);
-
-        if (position > 0) pdf.addPage();
-
-        pdf.addImage(
-          pageData,
-          "JPEG",
-          0,
-          0, // Flush to top to ensure continuous flow
-          pageWidth,
-          pageHeight
-        );
-
-        position += pageCanvasHeight;
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
 
       setPdfStatus("Finalizing High-Quality Download...");
@@ -419,7 +389,7 @@ export default function DashboardHome() {
   const smartAction = getSmartNextMove();
 
   return (
-    <div id="dashboard-content" className="p-6 bg-[#f9fafb]">
+    <div id="dashboard-content" className="bg-white p-6">
       <div className="space-y-6">
         {/* HEADER */}
         <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
@@ -461,7 +431,7 @@ export default function DashboardHome() {
         </div>
 
         {/* PROFILE */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm flex justify-between items-center">
+        <div className="bg-white p-6 rounded-2xl shadow-sm flex justify-between items-center h-full">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">{(userData?.name || "U")[0]}</div>
             <div>
@@ -504,12 +474,12 @@ export default function DashboardHome() {
 
         {/* CORE STATUS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
             <div className="flex justify-between items-center mb-4"><h3 className="text-lg font-semibold text-gray-800">💯 Financial Health</h3><span className="text-2xl font-bold text-blue-600">{score}/100</span></div>
             <div className="w-full bg-gray-200 h-3 rounded-full mb-4"><div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} /></div>
             <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[currentInsight.color]}`}><span>{currentInsight.icon}</span><span>{currentInsight.message}</span></div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
             <div className="flex justify-between items-center mb-3"><h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3><span className="text-sm text-gray-500">{progress.toFixed(0)}%</span></div>
             <p className="text-sm text-gray-600 mb-2">{goal}</p>
             <div className="w-full bg-gray-200 h-3 rounded-full"><div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} /></div>
@@ -519,7 +489,7 @@ export default function DashboardHome() {
         {/* SNAPSHOT */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {cards.map((card, i) => (
-            <div key={i} className={`p-6 rounded-2xl shadow-sm ${card.bg}`}>
+            <div key={i} className={`p-6 rounded-2xl shadow-sm h-full ${card.bg}`}>
               <span className="text-xl">{card.icon}</span>
               <p className="text-sm text-gray-500 mt-2">{card.title}</p>
               <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
@@ -529,7 +499,7 @@ export default function DashboardHome() {
 
         {/* CHARTS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm min-h-[350px]">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full min-h-[350px]">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">⚖️ 50/30/20 Rule Analysis</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={[{ name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, { name: "Savings", Target: income * 0.2, Actual: savings + investments }]}>
@@ -542,7 +512,7 @@ export default function DashboardHome() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm min-h-[350px]">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full min-h-[350px]">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Monthly Overview</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
@@ -557,7 +527,7 @@ export default function DashboardHome() {
 
         {/* ACTION & INSIGHTS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">⚡ What Should You Do Next?</h3>
             <div className="space-y-3">
               {actions.map((item, i) => (
@@ -567,7 +537,7 @@ export default function DashboardHome() {
               ))}
             </div>
           </div>
-          <div className={`p-6 rounded-2xl shadow-sm border ${colorMap[currentInsight.color]}`}>
+          <div className={`p-6 rounded-2xl shadow-sm border h-full ${colorMap[currentInsight.color]}`}>
             <p className="font-semibold flex items-center gap-2">{currentInsight.icon} Smart Insight</p>
             <p className="text-sm mt-3 leading-relaxed">{currentInsight.message}</p>
             {action && <p className="text-xs mt-3 opacity-70 border-t pt-3 border-current">✨ AI Recommendation: {action}</p>}
@@ -576,13 +546,13 @@ export default function DashboardHome() {
 
         {/* EMERGENCY & AI INSIGHTS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">🛡️ Emergency Fund</h3>
             <p className="text-sm text-gray-500 mb-3">{emergencyMonths.toFixed(1)} months covered</p>
             <div className="w-full bg-gray-200 h-2 rounded-full"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} /></div>
             <div className="bg-blue-50 p-4 rounded-xl text-sm mt-4">💡 3–6 months of savings protects you from unexpected job loss or medical emergencies.</div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 AI Smart Insights</h3>
             <div className="space-y-3">
               {insights.slice(0, 3).map((text, i) => (
