@@ -53,6 +53,7 @@ export function SipSwpCalculator() {
             const increaseRate = (parseFloat(withdrawalIncrease) || 0) / 100;
 
             let withdrawal = P * r / (1 - Math.pow(1 + r, -n));
+            const initialWithdrawal = withdrawal;
 
             for (let i = 1; i <= n; i++) {
 
@@ -79,7 +80,7 @@ export function SipSwpCalculator() {
                 }
             }
 
-            setResult(withdrawal);
+            setResult(initialWithdrawal);
             setChartData(data);
         }
     };
@@ -220,13 +221,32 @@ export function SipSwpCalculator() {
 
                     {/* RESULT */}
                     {result && (
-                        <div className="p-4 bg-green-50 rounded-lg text-center">
-                            <p className="text-sm text-gray-600">
-                                {mode === "sip" ? "Future Value" : "Monthly Withdrawal"}
-                            </p>
-                            <p className="text-3xl font-bold text-green-600">
-                                ₹{Math.round(result).toLocaleString()}
-                            </p>
+                        <div className="p-4 bg-green-50 rounded-lg text-center space-y-3">
+                            {mode === "sip" ? (
+                                <>
+                                    <p className="text-sm text-gray-600 text-center">Future Value</p>
+                                    <p className="text-3xl font-bold text-green-600">
+                                        ₹{Math.round(result).toLocaleString()}
+                                    </p>
+                                </>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 divide-y md:divide-y-0 md:divide-x divide-green-200">
+                                    <div className="flex flex-col justify-center py-2 md:py-0">
+                                        <p className="text-sm text-gray-600">Monthly Withdrawal (Starting)</p>
+                                        <p className="text-2xl font-bold text-teal-600">
+                                            ₹{Math.round(result).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    {chartData.length > 0 && (
+                                        <div className="flex flex-col justify-center py-2 md:py-0">
+                                            <p className="text-sm text-gray-600">Final Withdrawal after {years} years</p>
+                                            <p className="text-2xl font-bold text-green-600">
+                                                ₹{Math.round(chartData[chartData.length - 1].withdrawal).toLocaleString()}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
 
