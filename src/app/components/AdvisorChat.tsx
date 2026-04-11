@@ -329,33 +329,6 @@ Give personalized advice based on this.`,
                                     </div>
                                 )}
 
-                                {/* FEEDBACK */}
-                                {!feedbackGiven[i] && msg.role === "assistant" && msg.content !== undefined && i > 0 && (
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <span className="text-xs text-gray-500">Was this helpful?</span>
-
-                                        <button
-                                            onClick={() => handleFeedback(i, "yes")}
-                                            className="px-3 py-1 text-xs rounded-full bg-green-100 hover:bg-green-200"
-                                        >
-                                            👍 Yes
-                                        </button>
-
-                                        <button
-                                            onClick={() => handleFeedback(i, "maybe")}
-                                            className="px-3 py-1 text-xs rounded-full bg-yellow-100 hover:bg-yellow-200"
-                                        >
-                                            🤔 Maybe
-                                        </button>
-
-                                        <button
-                                            onClick={() => handleFeedback(i, "no")}
-                                            className="px-3 py-1 text-xs rounded-full bg-red-100 hover:bg-red-200"
-                                        >
-                                            👎 No
-                                        </button>
-                                    </div>
-                                )}
 
                                 {/* AFTER FEEDBACK */}
                                 {feedbackGiven[i] && msg.role === "assistant" && (
@@ -414,6 +387,38 @@ Give personalized advice based on this.`,
                                         {msg.data.recommendation && (
                                             <div className="bg-green-100 p-4 rounded-xl">
                                                 ⚡ {msg.data.recommendation}
+                                            </div>
+                                        )}
+
+                                        {/* FEEDBACK (New Position) */}
+                                        {!feedbackGiven[i] && (
+                                            <div className="mt-4 flex items-center justify-between border-t pt-4">
+                                                <p className="text-sm text-gray-600">
+                                                    Was this analysis helpful?
+                                                </p>
+
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleFeedback(i, "yes")}
+                                                        className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
+                                                    >
+                                                        👍 Yes
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => handleFeedback(i, "maybe")}
+                                                        className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200"
+                                                    >
+                                                        🤔 Maybe
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => handleFeedback(i, "no")}
+                                                        className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+                                                    >
+                                                        👎 No
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
