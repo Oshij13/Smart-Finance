@@ -14,6 +14,7 @@ export default function AdvisorChat() {
     const [actionLoading, setActionLoading] = useState<number | null>(null);
     const [actionSuccess, setActionSuccess] = useState<number | null>(null);
     const [resetBackend, setResetBackend] = useState(false);
+    const [feedbackGiven, setFeedbackGiven] = useState<{ [key: number]: boolean }>({});
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const chartRef = useRef<any>(null);
@@ -164,6 +165,23 @@ export default function AdvisorChat() {
         }
     };
 
+    const handleFeedback = (index: number, type: string) => {
+        const existing = JSON.parse(localStorage.getItem("sf_feedback") || "[]");
+
+        existing.push({
+            messageIndex: index,
+            feedback: type,
+            timestamp: new Date().toISOString(),
+        });
+
+        localStorage.setItem("sf_feedback", JSON.stringify(existing));
+
+        setFeedbackGiven((prev) => ({
+            ...prev,
+            [index]: true,
+        }));
+    };
+
     const sendMessage = async (text: string) => {
         if (!text.trim()) return;
 
@@ -260,6 +278,39 @@ export default function AdvisorChat() {
                                             )
                                         }
                                     </div>
+                                )}
+
+                                {/* FEEDBACK */}
+                                {!feedbackGiven[i] && msg.role === "assistant" && (
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <span className="text-xs text-gray-500">Was this helpful?</span>
+
+                                        <button
+                                            onClick={() => handleFeedback(i, "yes")}
+                                            className="px-3 py-1 text-xs rounded-full bg-green-100 hover:bg-green-200"
+                                        >
+                                            👍 Yes
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleFeedback(i, "maybe")}
+                                            className="px-3 py-1 text-xs rounded-full bg-yellow-100 hover:bg-yellow-200"
+                                        >
+                                            🤔 Maybe
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleFeedback(i, "no")}
+                                            className="px-3 py-1 text-xs rounded-full bg-red-100 hover:bg-red-200"
+                                        >
+                                            👎 No
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* AFTER FEEDBACK */}
+                                {feedbackGiven[i] && msg.role === "assistant" && (
+                                    <p className="text-xs text-green-600 mt-2">✅ Feedback received</p>
                                 )}
 
                                 {/* STRUCTURED */}
