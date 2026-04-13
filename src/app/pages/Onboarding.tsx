@@ -11,7 +11,7 @@ export default function Onboarding() {
         { key: "city", question: "Which city are you currently residing in?" },
         { key: "income", question: "What's your monthly income?" },
         { key: "expenses", question: "What are your average monthly expenses?" },
-        { key: "investments", question: "How much have you invested?" },
+        { key: "investments", question: "How much do you invest monthly?" },
         { key: "emergencyFund", question: "What's your current emergency fund balance?" },
         { key: "insurance", question: "What's your total insurance coverage?" }
     ];
@@ -19,10 +19,7 @@ export default function Onboarding() {
     const [step, setStep] = useState(0);
     const [input, setInput] = useState("");
 
-    // ❌ removed upload mode
-    // const [mode, setMode] = useState<"manual" | "upload" | null>(null);
-
-    // ✅ NEW: expense modal state
+    // ✅ NEW STATES
     const [showExpenseModal, setShowExpenseModal] = useState(false);
     const [expenseList, setExpenseList] = useState([
         { category: "", amount: "" }
@@ -51,9 +48,7 @@ export default function Onboarding() {
     const handleNext = () => {
         const key = questions[step].key;
 
-        if (!input && key !== "insurance") {
-            return;
-        }
+        if (!input && key !== "insurance") return;
 
         const updatedData = {
             ...formData,
@@ -91,30 +86,30 @@ export default function Onboarding() {
                     {questions[step].question}
                 </h2>
 
-                {/* 👉 SUGGESTION */}
+                {/* Insurance Suggestion */}
                 {questions[step].key === "insurance" && formData.income && (
                     <p className="text-xs text-blue-500 mb-3">
                         Suggested: ₹{(Number(formData.income) * 12).toLocaleString("en-IN")}
                     </p>
                 )}
 
+                {/* NORMAL INPUT */}
                 {questions[step].key !== "expenses" && (
                     <input
                         value={input}
                         onChange={(e) => handleInputChange(e.target.value)}
-                        className="w-full border px-3 py-2 rounded mb-3 focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
+                        className="w-full border px-3 py-2 rounded mb-3"
                         placeholder={
                             questions[step].key === "insurance"
                                 ? "e.g. 500000"
                                 : "Type here..."
                         }
-                        inputMode={["name", "occupation", "city"].includes(questions[step].key) ? "text" : "numeric"}
                     />
                 )}
 
-                {/* ✅ UPDATED EXPENSES SECTION */}
+                {/* ✅ EXPENSES SECTION */}
                 {questions[step].key === "expenses" && (
-                    <div className="mb-4 space-y-3">
+                    <div className="space-y-3">
 
                         <p className="text-sm text-gray-500">
                             Classify your expenses for better accuracy
@@ -123,23 +118,22 @@ export default function Onboarding() {
                         {/* ➕ BUTTON */}
                         <button
                             onClick={() => setShowExpenseModal(true)}
-                            className="w-full px-3 py-2 bg-purple-50 text-purple-600 rounded-xl font-medium border border-purple-100 hover:bg-purple-100 transition-all"
+                            className="w-full px-3 py-2 bg-purple-50 text-purple-600 rounded-xl border"
                         >
                             ➕ Add Expense Categories
                         </button>
 
-                        {/* MANUAL INPUT OPTION (kept same flow) */}
+                        {/* MANUAL INPUT */}
                         <input
                             value={input}
                             onChange={(e) => handleInputChange(e.target.value)}
-                            placeholder="Or enter total expenses manually"
-                            className="w-full border px-3 py-2 rounded-xl focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
-                            inputMode="numeric"
+                            placeholder="Or enter total manually"
+                            className="w-full border px-3 py-2 rounded"
                         />
                     </div>
                 )}
 
-                {/* Investment Apps UI */}
+                {/* Investment Apps */}
                 {questions[step].key === "investments" && (
                     <div className="flex gap-2 mb-3">
                         <button className="px-3 py-1 bg-blue-100 rounded">Zerodha</button>
@@ -151,7 +145,7 @@ export default function Onboarding() {
                 {/* Insurance Hint */}
                 {questions[step].key === "insurance" && (
                     <p className="text-xs text-gray-500 mb-3">
-                        Include life + health insurance coverage (recommended: 10–12× your annual income)
+                        Include life + health insurance coverage
                     </p>
                 )}
 
@@ -167,49 +161,47 @@ export default function Onboarding() {
                 </div>
             </div>
 
-            {/* ✅ EXPENSE MODAL */}
+            {/* ✅ MODAL */}
             {showExpenseModal && (
                 <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
-                    <div className="bg-white p-5 rounded-xl w-80 shadow-lg text-black">
-                        <h3 className="font-semibold mb-3">Classify Your Expenses</h3>
+                    <div className="bg-white p-5 rounded-xl w-80 text-black">
 
-                        {expenseList.map((item, index) => (
-                            <div key={index} className="flex gap-2 mb-2">
+                        <h3 className="font-semibold mb-3">Add Expenses</h3>
+
+                        {expenseList.map((item, i) => (
+                            <div key={i} className="flex gap-2 mb-2">
                                 <input
                                     placeholder="Category"
                                     value={item.category}
                                     onChange={(e) => {
                                         const updated = [...expenseList];
-                                        updated[index].category = e.target.value;
+                                        updated[i].category = e.target.value;
                                         setExpenseList(updated);
                                     }}
-                                    className="w-1/2 border px-2 py-1 rounded"
+                                    className="w-1/2 border px-2 py-1"
                                 />
                                 <input
                                     placeholder="Amount"
                                     value={item.amount}
                                     onChange={(e) => {
                                         const updated = [...expenseList];
-                                        updated[index].amount = e.target.value.replace(/[^0-9]/g, "");
+                                        updated[i].amount = e.target.value.replace(/[^0-9]/g, "");
                                         setExpenseList(updated);
                                     }}
-                                    className="w-1/2 border px-2 py-1 rounded"
+                                    className="w-1/2 border px-2 py-1"
                                 />
                             </div>
                         ))}
 
                         <button
                             onClick={() => setExpenseList([...expenseList, { category: "", amount: "" }])}
-                            className="text-xs text-blue-600 mb-3"
+                            className="text-xs text-blue-600"
                         >
                             + Add More
                         </button>
 
-                        <div className="flex justify-between">
-                            <button
-                                onClick={() => setShowExpenseModal(false)}
-                                className="text-sm text-gray-500"
-                            >
+                        <div className="flex justify-between mt-3">
+                            <button onClick={() => setShowExpenseModal(false)}>
                                 Cancel
                             </button>
 

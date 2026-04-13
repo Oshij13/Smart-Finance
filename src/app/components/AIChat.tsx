@@ -24,6 +24,12 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
     const chatRef = useRef<HTMLDivElement>(null);
 
+    // ✅ NEW STATES
+    const [showExpenseModal, setShowExpenseModal] = useState(false);
+    const [expenseList, setExpenseList] = useState([
+        { category: "", amount: "" }
+    ]);
+
     useEffect(() => {
         if (messages.length === 0) {
             setMessages([
@@ -44,7 +50,6 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         if (step === 1 && !value.trim()) return "Occupation required";
         if (step === 2 && !value.trim()) return "City required";
 
-        // Income, Expenses, Investments, Emergency Fund, Insurance should be numbers
         if ([3, 4, 5, 6, 7].includes(step) && isNaN(Number(value))) {
             return "Only numbers allowed";
         }
@@ -66,13 +71,11 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
             if (value === "Salaried") {
                 setMessages(prev => [...prev, { role: "assistant", content: "Are you in a Private or Government job?" }]);
                 setFormData(updated);
-                setStep(1.5); // Sub-step for job type
+                setStep(1.5);
                 return;
             }
         }
-        if (step === 1.5) {
-            updated.jobType = value;
-        }
+        if (step === 1.5) updated.jobType = value;
         if (step === 2) updated.city = value;
         if (step === 3) updated.income = value;
         if (step === 4) updated.expenses = value;
@@ -80,13 +83,9 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         if (step === 6) updated.emergencyFund = value;
         if (step === 7) updated.insurance = value;
 
-
         setFormData(updated);
 
-        // Only add user message if it's not already handled (e.g., by ➕ or 📂 buttons)
-        if (value && !messages.some(m => m.role === "user" && m.content.includes(value))) {
-            setMessages(prev => [...prev, { role: "user", content: value }]);
-        }
+        setMessages(prev => [...prev, { role: "user", content: value }]);
         setInput("");
 
         if (step === 0) {
@@ -95,7 +94,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
         if (step === 1 || step === 1.5) {
             setMessages(prev => [...prev, { role: "assistant", content: "Great! Which city are you currently residing in?" }]);
-            if (step === 1.5) setStep(2); // Jump back to main flow
+            if (step === 1.5) setStep(2);
         }
 
         if (step === 2) {
@@ -145,7 +144,6 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         }, 800);
     };
 
-
     const sendMessage = () => {
         if (!input.trim()) return;
         handleNext(input);
@@ -157,13 +155,9 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
     const handleInputChange = (val: string) => {
         if ([0, 1, 1.5, 2].includes(step)) {
-            // ✅ Strictly alphabets and spaces
             setInput(val.replace(/[^a-zA-Z\s]/g, ""));
-        } else if ([3, 4, 5, 6, 7].includes(step)) {
-            // ✅ Strictly numbers only
-            setInput(val.replace(/[^0-9]/g, ""));
         } else {
-            setInput(val);
+            setInput(val.replace(/[^0-9]/g, ""));
         }
     };
 
@@ -178,7 +172,6 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/20">
-
             <div className="w-96 h-[500px] bg-white shadow-xl rounded-2xl flex flex-col">
 
                 {/* Header */}
@@ -186,17 +179,13 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                     <h2 className="font-semibold">Welcome, Onboarding</h2>
                     <p className="text-sm text-gray-500">Let's build your financial profile</p>
 
-                    {/* Progress */}
                     <div className="mt-3">
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
                             <span>Progress</span>
                             <span>{progress}%</span>
                         </div>
                         <div className="w-full bg-gray-200 h-2 rounded-full">
-                            <div
-                                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${progress}%` }}
-                            />
+                            <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${progress}%` }} />
                         </div>
                     </div>
                 </div>
@@ -204,116 +193,119 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                 {/* Messages */}
                 <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-2">
                     {messages.map((msg, i) => (
-                        <div
-                            key={i}
-                            className={`p-2 rounded-lg text-sm ${msg.role === "user"
-                                ? "bg-blue-100 text-right"
-                                : "bg-gray-100"
-                                }`}
-                        >
+                        <div key={i} className={`p-2 rounded-lg text-sm ${msg.role === "user" ? "bg-blue-100 text-right" : "bg-gray-100"}`}>
                             {msg.content}
                         </div>
                     ))}
                     {error && <div className="text-red-500 text-sm">{error}</div>}
                 </div>
 
-                {/* QUICK BUTTONS */}
+                {/* Quick Options */}
                 {quickOptions.length > 0 && (
                     <div className="px-4 pb-3 flex gap-2 flex-wrap">
                         {quickOptions.map((opt) => (
-                            <button
-                                key={opt}
-                                onClick={() => {
-                                    if (step === 5) {
-                                        // 🔮 Showcase connectivity simulation
-                                        setMessages(prev => [...prev, { role: "assistant", content: `Connecting to ${opt}...` }]);
-                                        setTimeout(() => {
-                                            const mockValue = "250000";
-                                            setMessages(prev => [...prev, { role: "user", content: `Connected via ${opt} (Auto-filled ₹${mockValue})` }]);
-                                            handleNext(mockValue);
-                                        }, 1200);
-                                    } else {
-                                        handleNext(opt);
-                                    }
-                                }}
-                                className="px-3 py-1.5 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-xs font-medium hover:bg-gray-100 hover:border-gray-300 transition-all focus:ring-2 focus:ring-purple-500/50 outline-none"
-                            >
-                                {opt === "Zerodha" ? "🔵 " : opt === "INDmoney" ? "🟢 " : opt === "Groww" ? "💹 " : ""}
+                            <button key={opt} onClick={() => handleNext(opt)} className="px-3 py-1.5 bg-gray-50 rounded-xl text-xs">
                                 {opt}
                             </button>
                         ))}
                     </div>
                 )}
 
-                {/* HELP TEXT & PRIVACY NOTE */}
-                <div className="px-4 py-1 flex flex-col gap-0.5">
-                    {(step === 4 || step === 5) && (
-                        <p className="text-[10px] text-blue-600 font-medium animate-pulse leading-tight">
-                            {step === 4
-                                ? "💡 Tip: Classify your expenses → click ➕ to add categories"
-                                : "💡 Tip: Connect investment apps or input manually"}
+                {/* Tip */}
+                <div className="px-4 py-1">
+                    {step === 4 && (
+                        <p className="text-[10px] text-blue-600">
+                            💡 Tip: Classify your expenses → click ➕ to add categories
                         </p>
                     )}
-                    <p className="text-[9px] text-gray-400 italic leading-tight">
-                        🔒 We ask for connectivity or categorized data solely for calculation purposes.
-                    </p>
                 </div>
 
-                {/* Input */}
-                <div className="p-3 border-t flex flex-col gap-2">
-                    {/* SHOW CATEGORIZED EXPENSES BUTTON ONLY FOR STEP 4 */}
+                {/* Input Area */}
+                <div className="p-3 border-t flex gap-2 items-center">
+
                     {step === 4 && (
                         <button
-                            onClick={() => {
-                                const categories = [
-                                    { name: "Rent", value: 15000 },
-                                    { name: "Groceries", value: 5000 },
-                                    { name: "Dining", value: 2000 },
-                                    { name: "Subscriptions", value: 500 }
-                                ];
-
-                                const total = categories.reduce((sum, c) => sum + c.value, 0);
-
-                                setMessages(prev => [
-                                    ...prev,
-                                    { role: "assistant", content: "Added categorized expenses:" },
-                                    ...categories.map(c => ({
-                                        role: "assistant",
-                                        content: `${c.name}: ₹${c.value}`
-                                    })),
-                                    { role: "user", content: `Total Expenses: ₹${total}` }
-                                ]);
-
-                                handleNext(total.toString());
-                            }}
-                            className="w-full bg-purple-100 text-purple-600 py-2 rounded-lg hover:bg-purple-200 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
-                            title="Add Expenses"
+                            onClick={() => setShowExpenseModal(true)}
+                            className="bg-purple-100 text-purple-600 p-2 rounded-lg text-lg font-bold"
                         >
-                            <span>➕ Add Pre-filled Categories</span>
+                            ➕
                         </button>
                     )}
 
-                    <div className="flex gap-2 items-center">
-                        <input
-                            value={input}
-                            onChange={(e) => handleInputChange(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder={
-                                [0, 1, 1.5, 2].includes(step)
-                                    ? "Enter text only..."
-                                    : "Enter amount..."
-                            }
-                            className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
-                        />
-                        <button
-                            onClick={sendMessage}
-                            className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
-                        >
-                            Send
-                        </button>
-                    </div>
+                    <input
+                        value={input}
+                        onChange={(e) => handleInputChange(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder={[0, 1, 1.5, 2].includes(step) ? "Enter text..." : "Enter amount..."}
+                        className="flex-1 border rounded-lg px-3 py-2 text-sm"
+                    />
+
+                    <button onClick={sendMessage} className="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                        Send
+                    </button>
                 </div>
             </div>
+
+            {/* MODAL */}
+            {showExpenseModal && (
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
+                    <div className="bg-white p-5 rounded-xl w-80">
+
+                        <h3 className="font-semibold mb-3">Add Expenses</h3>
+
+                        {expenseList.map((item, i) => (
+                            <div key={i} className="flex gap-2 mb-2">
+                                <input
+                                    placeholder="Category"
+                                    value={item.category}
+                                    onChange={(e) => {
+                                        const updated = [...expenseList];
+                                        updated[i].category = e.target.value;
+                                        setExpenseList(updated);
+                                    }}
+                                    className="w-1/2 border px-2 py-1"
+                                />
+                                <input
+                                    placeholder="Amount"
+                                    value={item.amount}
+                                    onChange={(e) => {
+                                        const updated = [...expenseList];
+                                        updated[i].amount = e.target.value.replace(/[^0-9]/g, "");
+                                        setExpenseList(updated);
+                                    }}
+                                    className="w-1/2 border px-2 py-1"
+                                />
+                            </div>
+                        ))}
+
+                        <button
+                            onClick={() => setExpenseList([...expenseList, { category: "", amount: "" }])}
+                            className="text-xs text-blue-600"
+                        >
+                            + Add More
+                        </button>
+
+                        <div className="flex justify-between mt-3">
+                            <button onClick={() => setShowExpenseModal(false)}>Cancel</button>
+
+                            <button
+                                onClick={() => {
+                                    const total = expenseList.reduce(
+                                        (sum, item) => sum + Number(item.amount || 0),
+                                        0
+                                    );
+
+                                    setInput(total.toString());
+                                    setShowExpenseModal(false);
+                                }}
+                                className="bg-blue-500 text-white px-3 py-1 rounded"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
