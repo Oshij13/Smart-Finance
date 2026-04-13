@@ -23,7 +23,6 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
     });
 
     const chatRef = useRef<HTMLDivElement>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (messages.length === 0) {
@@ -81,9 +80,13 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         if (step === 6) updated.emergencyFund = value;
         if (step === 7) updated.insurance = value;
 
+
         setFormData(updated);
 
-        setMessages(prev => [...prev, { role: "user", content: value }]);
+        // Only add user message if it's not already handled (e.g., by ➕ or 📂 buttons)
+        if (value && !messages.some(m => m.role === "user" && m.content.includes(value))) {
+            setMessages(prev => [...prev, { role: "user", content: value }]);
+        }
         setInput("");
 
         if (step === 0) {
@@ -104,7 +107,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         }
 
         if (step === 4) {
-            setMessages(prev => [...prev, { role: "assistant", content: `Good. How much have you invested in total? (Expenses set to ₹${Number(value).toLocaleString('en-IN')})` }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Good. How much do you invest monthly? (Expenses set to ₹${Number(value).toLocaleString('en-IN')})` }]);
         }
 
         if (step === 5) {
@@ -142,32 +145,6 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         }, 800);
     };
 
-    // 📂 CSV Upload (Expenses)
-    const handleFileUpload = (e: any) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-
-        reader.onload = (event: any) => {
-            const text = event.target.result;
-            const rows = text.split("\n");
-
-            let debit = 0;
-            rows.forEach((row: string) => {
-                const cols = row.split(",");
-                debit += parseFloat(cols[3]) || 0;
-            });
-
-            const expenses = debit.toFixed(0);
-
-            // Inform user and proceed
-            setMessages(prev => [...prev, { role: "user", content: `Uploaded statement (Calculated Expenses: ₹${Number(expenses).toLocaleString('en-IN')})` }]);
-            handleNext(expenses);
-        };
-
-        reader.readAsText(file);
-    };
 
     const sendMessage = () => {
         if (!input.trim()) return;
@@ -273,54 +250,68 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                     {(step === 4 || step === 5) && (
                         <p className="text-[10px] text-blue-600 font-medium animate-pulse leading-tight">
                             {step === 4
-                                ? "💡 Tip: Upload bank statement or input expenses manually"
+                                ? "💡 Tip: Classify your expenses → click ➕ to add categories"
                                 : "💡 Tip: Connect investment apps or input manually"}
                         </p>
                     )}
                     <p className="text-[9px] text-gray-400 italic leading-tight">
-                        🔒 We ask for statement/connectivity solely for calculation purposes.
+                        🔒 We ask for connectivity or categorized data solely for calculation purposes.
                     </p>
                 </div>
 
                 {/* Input */}
-                <div className="p-3 border-t flex gap-2 items-center">
-                    {/* HIDDEN FILE INPUT */}
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        accept=".csv"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                    />
-
-                    {/* SHOW UPLOAD BUTTON ONLY FOR EXPENSES STEP (Step 4) */}
+                <div className="p-3 border-t flex flex-col gap-2">
+                    {/* SHOW CATEGORIZED EXPENSES BUTTON ONLY FOR STEP 4 */}
                     {step === 4 && (
                         <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="bg-purple-100 text-purple-600 p-2 rounded-lg hover:bg-purple-200 transition-colors"
-                            title="Upload Statement"
+                            onClick={() => {
+                                const categories = [
+                                    { name: "Rent", value: 15000 },
+                                    { name: "Groceries", value: 5000 },
+                                    { name: "Dining", value: 2000 },
+                                    { name: "Subscriptions", value: 500 }
+                                ];
+
+                                const total = categories.reduce((sum, c) => sum + c.value, 0);
+
+                                setMessages(prev => [
+                                    ...prev,
+                                    { role: "assistant", content: "Added categorized expenses:" },
+                                    ...categories.map(c => ({
+                                        role: "assistant",
+                                        content: `${c.name}: ₹${c.value}`
+                                    })),
+                                    { role: "user", content: `Total Expenses: ₹${total}` }
+                                ]);
+
+                                handleNext(total.toString());
+                            }}
+                            className="w-full bg-purple-100 text-purple-600 py-2 rounded-lg hover:bg-purple-200 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
+                            title="Add Expenses"
                         >
-                            📂
+                            <span>➕ Add Pre-filled Categories</span>
                         </button>
                     )}
 
-                    <input
-                        value={input}
-                        onChange={(e) => handleInputChange(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder={
-                            [0, 1, 1.5, 2].includes(step)
-                                ? "Enter text only..."
-                                : "Enter amount..."
-                        }
-                        className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
-                    />
-                    <button
-                        onClick={sendMessage}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
-                    >
-                        Send
-                    </button>
+                    <div className="flex gap-2 items-center">
+                        <input
+                            value={input}
+                            onChange={(e) => handleInputChange(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder={
+                                [0, 1, 1.5, 2].includes(step)
+                                    ? "Enter text only..."
+                                    : "Enter amount..."
+                            }
+                            className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500/50 outline-none text-black"
+                        />
+                        <button
+                            onClick={sendMessage}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                        >
+                            Send
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
