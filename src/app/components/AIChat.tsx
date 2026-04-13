@@ -20,6 +20,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         emergencyFund: "",
         jobType: "",
         insurance: "",
+        expenseBreakdown: [],
     });
 
     const chatRef = useRef<HTMLDivElement>(null);
@@ -69,7 +70,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
         if (step === 1) {
             updated.occupation = value;
             if (value === "Salaried") {
-                setMessages(prev => [...prev, { role: "assistant", content: "Are you in a Private or Government job?" }]);
+                setMessages((prev: any) => [...prev, { role: "assistant", content: "Are you in a Private or Government job?" }]);
                 setFormData(updated);
                 setStep(1.5);
                 return;
@@ -118,7 +119,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                 ...prev,
                 {
                     role: "assistant",
-                    content: `Final step. What's your total insurance coverage? (Recommended: ₹${Number(formData.income * 12).toLocaleString('en-IN')})`
+                    content: `Final step. What's your total insurance coverage? (Recommended: ₹${(Number(formData.income) * 12).toLocaleString('en-IN')})`
                 }
             ]);
         }
@@ -134,7 +135,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
     const finish = (data: any) => {
         setUserData(data);
 
-        setMessages(prev => [
+        setMessages((prev: any) => [
             ...prev,
             { role: "assistant", content: "You're all set. Redirecting to dashboard..." }
         ]);
@@ -305,8 +306,20 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                                         0
                                     );
 
+                                    // ✅ store breakdown in formData
+                                    setFormData((prev: any) => ({
+                                        ...prev,
+                                        expenseBreakdown: expenseList.map(item => ({
+                                            category: item.category,
+                                            amount: Number(item.amount)
+                                        }))
+                                    }));
+
                                     setInput(total.toString());
                                     setShowExpenseModal(false);
+
+                                    // ✅ reset modal for next use
+                                    setExpenseList([{ category: "", amount: "" }]);
                                 }}
                                 className="bg-blue-500 text-white px-3 py-1 rounded"
                             >

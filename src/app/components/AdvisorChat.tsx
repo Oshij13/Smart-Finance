@@ -216,6 +216,15 @@ export default function AdvisorChat() {
             const currentSessionId = sessionId || sessionStorage.getItem("sessionId");
             const user = getUserData();
 
+            const expenseBreakdown = user?.expenseBreakdown || [];
+
+            const topCategory =
+                expenseBreakdown.length > 0
+                    ? expenseBreakdown.reduce((max: any, item: any) =>
+                        Number(item.amount) > Number(max.amount) ? item : max
+                    )
+                    : null;
+
             const res = await fetch("https://smart-finance-backend-w4ou.onrender.com/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -228,7 +237,17 @@ User Financial Context:
 - Investments: ₹${user?.investments || 0}
 - Insurance: ₹${user?.insurance || 0}
 
-Give personalized advice based on this.`,
+${topCategory
+                            ? `Top Expense Category: ${topCategory.category} (₹${topCategory.amount})`
+                            : ""
+                        }
+
+Expense Breakdown:
+${expenseBreakdown
+                            .map((e: any) => `- ${e.category}: ₹${e.amount}`)
+                            .join("\n")}
+
+Give personalized advice based on this. Focus on reducing unnecessary expenses if possible.`,
                     userData: {
                         ...user,
                         insurance: user?.insurance || 0,
@@ -314,20 +333,92 @@ Give personalized advice based on this.`,
 
                         {/* AI */}
                         {msg.role === "assistant" && (
-                            <div className="max-w-[85%] space-y-4">
+                            <div className="max-w-[90%] space-y-3 animate-in fade-in slide-in-from-left-2 duration-300">
+                                <div className="bg-white border shadow-sm rounded-2xl overflow-hidden">
+                                    {/* Text Content */}
+                                    {(msg.message ?? msg.content) && (
+                                        <div className="px-5 py-4 text-gray-800 leading-relaxed border-b border-gray-50 last:border-b-0">
+                                            {(msg.message ?? msg.content)
+                                                .replace(/\*\*/g, "")
+                                                .replace(/###/g, "")
+                                                .split("\n")
+                                                .map((p: string, i: number) =>
+                                                    p.trim() ? <p key={i} className="mb-2 last:mb-0">{p}</p> : null
+                                                )
+                                            }
+                                        </div>
+                                    )}
 
-                                {(msg.message ?? msg.content) && (
-                                    <div className="bg-white border shadow px-5 py-4 rounded-xl">
-                                        {(msg.message ?? msg.content)
-                                            .replace(/\*\*/g, "") // Strip bolding
-                                            .replace(/###/g, "") // Strip headers
-                                            .split("\n")
-                                            .map((p: string, i: number) =>
-                                                p.trim() ? <p key={i}>{p}</p> : null
-                                            )
-                                        }
-                                    </div>
-                                )}
+                                    {/* STRUCTURED DATA INSIDE SAME CARD */}
+                                    {msg.data && msg.mode === "structured" && (
+                                        <div className="p-5 bg-gray-50/50 space-y-5 border-t border-gray-100">
+
+                                            {/* Insights */}
+                                            {msg.data.insights && Array.isArray(msg.data.insights) && (
+                                                <div className="bg-purple-50/50 p-4 rounded-xl border border-purple-100/50">
+                                                    <p className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+                                                        <span>💡</span> AI Insights
+                                                    </p>
+                                                    <ul className="space-y-2">
+                                                        {msg.data.insights.map((ins: string, idx: number) => (
+                                                            <li key={idx} className="text-sm text-purple-800 flex gap-2">
+                                                                <span className="text-purple-400">•</span>
+                                                                {ins}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {/* Chart - Contained & Scrollable if needed */}
+                                            {msg.data?.chartConfig && (
+                                                <div className="bg-white p-4 rounded-xl border border-gray-200">
+                                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-1">Visual Analysis</p>
+                                                    <div className="max-h-[300px] overflow-hidden" data-chart-id={i}>
+                                                        <SmartChart config={msg.data.chartConfig} />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Table */}
+                                            {msg.data.table && (
+                                                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                                    <div className="overflow-x-auto">
+                                                        <table className="w-full text-sm text-left">
+                                                            <thead className="bg-gray-50 border-b border-gray-200">
+                                                                <tr>
+                                                                    {(msg.data.table.headers || []).map((h: string, i: number) => (
+                                                                        <th key={i} className="px-4 py-3 font-semibold text-gray-700">{h}</th>
+                                                                    ))}
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-gray-100">
+                                                                {(msg.data.table.rows || []).map((row: any[], i: number) => (
+                                                                    <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                                                                        {(row || []).map((cell, j) => (
+                                                                            <td key={j} className="px-4 py-3 text-gray-600">{cell}</td>
+                                                                        ))}
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Recommendation */}
+                                            {msg.data.recommendation && (
+                                                <div className="bg-green-50 p-4 rounded-xl border border-green-100 flex items-start gap-3">
+                                                    <span className="text-lg">⚡</span>
+                                                    <div>
+                                                        <p className="font-semibold text-green-900">Recommendation</p>
+                                                        <p className="text-sm text-green-800">{msg.data.recommendation}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
 
                                  {/* FEEDBACK */}
                                 {!feedbackGiven[i] && msg.role === "assistant" && msg.content !== undefined && i > 0 && (
@@ -360,63 +451,6 @@ Give personalized advice based on this.`,
                                 {/* AFTER FEEDBACK */}
                                 {feedbackGiven[i] && msg.role === "assistant" && (
                                     <p className="text-xs text-green-600 mt-2">✅ Feedback received</p>
-                                )}
-
-                                {/* STRUCTURED */}
-                                {msg.data && msg.mode === "structured" && (
-
-                                    <div className="space-y-4">
-
-                                        {/* Insights */}
-                                        {msg.data.insights && Array.isArray(msg.data.insights) && (
-                                            <div className="bg-purple-50 p-4 rounded-xl">
-                                                <p className="font-semibold mb-2">💡 Insights</p>
-                                                <ul className="list-disc ml-4 text-sm">
-                                                    {msg.data.insights.map((i: string, idx: number) => (
-                                                        <li key={idx}>{i}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-
-                                        {/* Chart */}
-                                        {msg.data?.chartConfig && (
-                                            <div data-chart-id={i}>
-                                                <SmartChart config={msg.data.chartConfig} />
-                                            </div>
-                                        )}
-
-                                        {/* Table */}
-                                        {msg.data.table && (
-                                            <div className="border rounded-xl overflow-hidden">
-                                                <table className="w-full text-sm">
-                                                    <thead className="bg-gray-100">
-                                                        <tr>
-                                                            {(msg.data.table.headers || []).map((h: string, i: number) => (
-                                                                <th key={i} className="p-2">{h}</th>
-                                                            ))}
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {(msg.data.table.rows || []).map((row: any[], i: number) => (
-                                                            <tr key={i}>
-                                                                {(row || []).map((cell, j) => (
-                                                                    <td key={j} className="p-2">{cell}</td>
-                                                                ))}
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-
-                                        {/* Recommendation */}
-                                        {msg.data.recommendation && (
-                                            <div className="bg-green-100 p-4 rounded-xl">
-                                                ⚡ {msg.data.recommendation}
-                                            </div>
-                                        )}
-                                    </div>
                                 )}
 
                                 {/* ACTIONS */}

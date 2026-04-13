@@ -31,6 +31,7 @@ export default function Onboarding() {
         city: "",
         income: "",
         expenses: "",
+        expenseBreakdown: [], // ✅ ADD THIS 
         investments: "",
         emergencyFund: "",
         insurance: 0
@@ -212,8 +213,19 @@ export default function Onboarding() {
                                         0
                                     );
 
+                                    // ✅ store breakdown in formData
+                                    setFormData((prev: any) => ({
+                                        ...prev,
+                                        expenseBreakdown: expenseList.map(item => ({
+                                            category: item.category,
+                                            amount: Number(item.amount)
+                                        }))
+                                    }));
+
                                     setInput(total.toString());
                                     setShowExpenseModal(false);
+                                    // ✅ reset modal (IMPORTANT)
+                                    setExpenseList([{ category: "", amount: "" }]);
                                 }}
                                 className="bg-blue-500 text-white px-3 py-1 rounded"
                             >

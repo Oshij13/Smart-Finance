@@ -1,4 +1,4 @@
-let userData: any = JSON.parse(localStorage.getItem("userData") || "null");
+let userData: any = JSON.parse(localStorage.getItem("userData") || "{}");
 
 export const setUserData = (data: any) => {
     console.log("STORE SAVED:", data);
@@ -7,6 +7,7 @@ export const setUserData = (data: any) => {
 };
 
 export const getUserData = () => {
-    console.log("STORE READ:", userData);
-    return userData;
+    const data = userData || {};
+    console.log("STORE READ:", data);
+    return data;
 };

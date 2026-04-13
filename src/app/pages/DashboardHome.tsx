@@ -204,6 +204,19 @@ export default function DashboardHome() {
   const investmentRate = income > 0 ? (investments / income) * 100 : 0;
   const insurance = Number(userData?.insurance || 0);
 
+  const expenseBreakdown = userData?.expenseBreakdown || [];
+
+  let topCategory: any = null;
+  let topPercentage = 0;
+
+  if (expenseBreakdown.length > 0 && expenses > 0) {
+    topCategory = expenseBreakdown.reduce((max: any, item: any) =>
+      item.amount > max.amount ? item : max
+    );
+
+    topPercentage = Math.round((topCategory.amount / expenses) * 100);
+  }
+
   let score = 0;
 
   // Savings Score (30)
@@ -565,6 +578,24 @@ export default function DashboardHome() {
             </div>
           ))}
         </div>
+
+        {/* TOP CATEGORY INSIGHT */}
+        {topCategory && (
+          <div className="bg-yellow-50 p-6 rounded-2xl shadow-sm border border-yellow-100">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">💡</span>
+              <div>
+                <p className="text-sm text-gray-600">
+                  You spend most on <span className="font-semibold">{topCategory.category}</span>
+                </p>
+                <p className="text-xl font-bold text-yellow-700">
+                  ₹{Number(topCategory.amount).toLocaleString('en-IN')}
+                  <span className="text-sm font-medium ml-2 opacity-80">({topPercentage}% of total expenses)</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* CHARTS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
