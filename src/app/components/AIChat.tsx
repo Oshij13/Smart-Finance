@@ -211,14 +211,17 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                     </div>
                 )}
 
-                {/* Tip */}
-                <div className="px-4 py-1">
-                    {step === 4 && (
-                        <p className="text-[10px] text-blue-600">
-                            💡 Tip: Classify your expenses → click ➕ to add categories
-                        </p>
-                    )}
-                </div>
+                {step === 4 && (
+                    <p className="text-[10px] text-blue-600">
+                        💡 Tip: Classify your expenses → click ➕ to add categories
+                    </p>
+                )}
+
+                {step === 5 && (
+                    <p className="text-[10px] text-blue-600">
+                        💡 Tip: Connect investment apps or input manually
+                    </p>
+                )}
 
                 {/* Input Area */}
                 <div className="p-3 border-t flex gap-2 items-center">
