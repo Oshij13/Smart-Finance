@@ -16,9 +16,12 @@ export function SipSwpCalculator() {
     const [withdrawalRate, setWithdrawalRate] = useState("");
     const [swpTime, setSwpTime] = useState("");
     const [inflation, setInflation] = useState("");
+    const [monthlyWithdrawal, setMonthlyWithdrawal] = useState("");
 
     const [result, setResult] = useState<number | null>(null);
     const [totalInvested, setTotalInvested] = useState<number | null>(null);
+    const [swpResult, setSwpResult] = useState<any>(null);
+    const [sustainableWithdrawal, setSustainableWithdrawal] = useState<number | null>(null);
     const [chartData, setChartData] = useState<any[]>([]);
 
     const userData = getUserData();
@@ -55,62 +58,108 @@ export function SipSwpCalculator() {
         }
 
         if (mode === "swp") {
-            const P = parseFloat(corpus) || 0; // initial corpus
+            const P = parseFloat(corpus) || 0;
             const annualRate = (parseFloat(withdrawalRate) || 0) / 100;
             const years = parseFloat(swpTime) || 0;
-            const inflationRate = (parseFloat(inflation) || 6) / 100;
 
             const r = annualRate / 12;
             const n = years * 12;
 
-            let withdrawal = 0;
+            const inflationRate = (parseFloat(inflation) || 6) / 100;
+
+            // -----------------------------
+            // ✅ 1. Sustainable Withdrawal (binary search)
+            // -----------------------------
             let low = 0;
             let high = P;
+            let sustainable = 0;
 
-            // Binary search to find sustainable withdrawal
-            for (let iter = 0; iter < 50; iter++) {
+            for (let iter = 0; iter < 40; iter++) {
                 let mid = (low + high) / 2;
                 let value = P;
-                let currentWithdrawal = mid;
+                let w = mid;
 
                 for (let i = 0; i < n; i++) {
                     value = value * (1 + r);
-                    value -= currentWithdrawal;
+                    value -= w;
 
-                    // increase withdrawal yearly (inflation adjusted)
                     if ((i + 1) % 12 === 0) {
-                        currentWithdrawal *= (1 + inflationRate);
+                        w *= (1 + inflationRate);
                     }
 
                     if (value < 0) break;
                 }
 
                 if (value >= 0) {
-                    withdrawal = mid;
+                    sustainable = mid;
                     low = mid;
                 } else {
                     high = mid;
                 }
             }
 
-            // Build chart data using the optimal withdrawal we found
-            let finalValue = P;
-            let currentW = withdrawal;
-            for (let i = 0; i < n; i++) {
-                finalValue = finalValue * (1 + r);
-                finalValue -= currentW;
+            setSustainableWithdrawal(Math.round(sustainable));
 
-                if ((i + 1) % 12 === 0) {
-                    data.push({
-                        year: (i + 1) / 12,
-                        corpus: Math.max(0, Math.round(finalValue)),
-                        withdrawal: Math.round(currentW),
-                    });
-                    currentW *= (1 + inflationRate);
+            // -----------------------------
+            // ✅ 2. User Withdrawal Simulation (if provided)
+            // -----------------------------
+            if (monthlyWithdrawal) {
+                let value = P;
+                let w = parseFloat(monthlyWithdrawal);
+                let totalWithdrawn = 0;
+                let monthsLasted = 0;
+
+                for (let i = 0; i < n; i++) {
+                    value = value * (1 + r);
+                    value -= w;
+
+                    if (value <= 0) {
+                        monthsLasted = i;
+                        totalWithdrawn += w;
+                        value = 0;
+                        break;
+                    }
+
+                    totalWithdrawn += w;
+
+                    if ((i + 1) % 12 === 0) {
+                        data.push({
+                            year: (i + 1) / 12,
+                            corpus: Math.max(0, Math.round(value)),
+                            withdrawal: Math.round(w),
+                        });
+                        w *= (1 + inflationRate);
+                    }
+
+                    monthsLasted = i;
+                }
+
+                setSwpResult({
+                    finalCorpus: Math.round(value),
+                    totalWithdrawn: Math.round(totalWithdrawn),
+                    years: Math.floor(monthsLasted / 12),
+                    months: monthsLasted % 12,
+                });
+            } else {
+                setSwpResult(null);
+
+                // Build chart safely using sustainable so chart works when user withdrawal is empty
+                let value = P;
+                let w = sustainable;
+                for (let i = 0; i < n; i++) {
+                    value = value * (1 + r);
+                    value -= w;
+                    if ((i + 1) % 12 === 0) {
+                        data.push({
+                            year: (i + 1) / 12,
+                            corpus: Math.max(0, Math.round(value)),
+                            withdrawal: Math.round(w),
+                        });
+                        w *= (1 + inflationRate);
+                    }
                 }
             }
 
-            setResult(Math.round(withdrawal));
             setChartData(data);
         }
     };
@@ -239,7 +288,7 @@ export function SipSwpCalculator() {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                             {/* Corpus */}
                             <div className="space-y-2">
@@ -283,11 +332,18 @@ export function SipSwpCalculator() {
                                 />
                             </div>
 
-                        </div>
-                        <div className="bg-gray-50 rounded-xl p-3 text-xs text-gray-600">
-                            Default inflation is set to <strong>6%</strong> annually.  
-                            This is used to increase your withdrawals over time.  
-                            You can adjust it if needed.
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">
+                                    Monthly Withdrawal (₹) (Optional)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={monthlyWithdrawal}
+                                    onChange={(e) => setMonthlyWithdrawal(e.target.value)}
+                                    placeholder="e.g. 50000"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                />
+                            </div>
                         </div>
                     </>
                 )}
@@ -328,20 +384,49 @@ export function SipSwpCalculator() {
                 )}
 
                 {/* SWP RESULT */}
-                {mode === "swp" && result !== null && (
-                    <>
-                        <div className="bg-green-50 rounded-xl p-4 mt-4 text-center">
-                            <p className="text-sm text-gray-600">
-                                Sustainable Monthly Withdrawal
-                            </p>
-                            <h3 className="text-2xl font-semibold text-green-700">
-                                ₹ {result.toLocaleString()}
-                            </h3>
-                        </div>
-                        <p className="text-sm text-gray-500 mt-2 text-center">
-                            This withdrawal increases annually with inflation (default 6%)
-                        </p>
-                    </>
+                {mode === "swp" && (
+                    <div className="space-y-4 pt-4">
+                        {/* Always show sustainable */}
+                        {sustainableWithdrawal !== null && (
+                            <div className="bg-green-50 rounded-xl p-4 text-center">
+                                <p className="text-sm text-gray-600">
+                                    Sustainable Monthly Withdrawal
+                                </p>
+                                <h3 className="text-2xl font-semibold text-green-700">
+                                    ₹ {sustainableWithdrawal.toLocaleString()}
+                                </h3>
+                                <p className="text-sm text-gray-500 mt-2">
+                                    This withdrawal increases annually with inflation (default 6%)
+                                </p>
+                            </div>
+                        )}
+
+                        {/* User scenario if entered */}
+                        {swpResult && (
+                            <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                                <p className="text-sm text-gray-600">
+                                    Your withdrawal lasts for
+                                </p>
+                                <h3 className="text-lg font-semibold">
+                                    {swpResult.years} years {swpResult.months} months
+                                </h3>
+
+                                <p className="text-sm text-gray-600">
+                                    Total Withdrawn
+                                </p>
+                                <h3 className="text-lg font-semibold">
+                                    ₹ {swpResult.totalWithdrawn.toLocaleString()}
+                                </h3>
+
+                                <p className="text-sm text-gray-600">
+                                    Final Corpus
+                                </p>
+                                <h3 className="text-lg font-semibold">
+                                    ₹ {swpResult.finalCorpus.toLocaleString()}
+                                </h3>
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
 
