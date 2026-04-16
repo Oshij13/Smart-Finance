@@ -388,20 +388,20 @@ export function SipSwpCalculator() {
 
                 {/* SWP RESULT */}
                 {mode === "swp" && (swpResult || sustainableWithdrawal !== null) && (
-                    <div className="bg-gray-50 rounded-xl p-4 mt-4">
+                    <div className="bg-green-50 rounded-xl p-4 mt-4">
                         <div className="grid grid-cols-2 gap-4 text-center">
                             {/* Duration */}
                             <div>
-                                <p className="text-xs text-gray-500">Your Withdrawal Lasts</p>
-                                <h3 className="font-semibold text-lg">
+                                <p className="text-xs text-green-800/70 font-medium">Your Withdrawal Lasts</p>
+                                <h3 className="font-semibold text-lg text-green-700">
                                     {swpResult ? `${swpResult.years}y ${swpResult.months}m` : "-"}
                                 </h3>
                             </div>
 
                             {/* Total Withdrawn */}
                             <div>
-                                <p className="text-xs text-gray-500">Total Withdrawn</p>
-                                <h3 className="font-semibold text-lg">
+                                <p className="text-xs text-green-800/70 font-medium">Total Withdrawn</p>
+                                <h3 className="font-semibold text-lg text-green-700">
                                     {swpResult
                                         ? `₹ ${swpResult.totalWithdrawn.toLocaleString()}`
                                         : "-"}
@@ -410,8 +410,8 @@ export function SipSwpCalculator() {
 
                             {/* Final Corpus */}
                             <div>
-                                <p className="text-xs text-gray-500">Final Corpus</p>
-                                <h3 className="font-semibold text-lg">
+                                <p className="text-xs text-green-800/70 font-medium">Final Corpus</p>
+                                <h3 className="font-semibold text-lg text-green-700">
                                     {swpResult
                                         ? `₹ ${swpResult.finalCorpus.toLocaleString()}`
                                         : "-"}
@@ -420,8 +420,8 @@ export function SipSwpCalculator() {
 
                             {/* Sustainable Withdrawal */}
                             <div>
-                                <p className="text-xs text-gray-500">
-                                    Sustainable Monthly Withdrawal
+                                <p className="text-xs text-green-800/70 font-medium">
+                                    Sustainable Monthly
                                 </p>
                                 <h3 className="font-semibold text-lg text-green-700">
                                     {sustainableWithdrawal !== null
