@@ -283,28 +283,30 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
                         <h3 className="font-semibold mb-3">Add Expenses</h3>
 
-                        {expenses.map((exp, index) => (
-                            <div key={index} className="flex gap-2 mb-2 flex-col">
-                                <select
-                                    value={exp.category}
-                                    onChange={(e) => handleChange(index, "category", e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
-                                >
-                                    <option value="">Select Category</option>
-                                    {expenseCategories.map((cat, i) => (
-                                        <option key={i} value={cat}>
-                                            {cat}
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    placeholder="Amount"
-                                    value={exp.amount}
-                                    onChange={(e) => handleChange(index, "amount", e.target.value.replace(/[^0-9]/g, ""))}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                                />
-                            </div>
-                        ))}
+                        <div className="max-h-[350px] overflow-y-auto pr-1 -mr-1 custom-scrollbar">
+                            {expenses.map((exp, index) => (
+                                <div key={index} className="flex gap-2 mb-4 flex-col border-b border-gray-100 pb-3 last:border-0">
+                                    <select
+                                        value={exp.category}
+                                        onChange={(e) => handleChange(index, "category", e.target.value)}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+                                    >
+                                        <option value="">Select Category</option>
+                                        {expenseCategories.map((cat, i) => (
+                                            <option key={i} value={cat}>
+                                                {cat}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        placeholder="Amount"
+                                        value={exp.amount}
+                                        onChange={(e) => handleChange(index, "amount", e.target.value.replace(/[^0-9]/g, ""))}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    />
+                                </div>
+                            ))}
+                        </div>
 
                         <button
                             onClick={() => setExpenses([...expenses, { category: "", amount: "" }])}

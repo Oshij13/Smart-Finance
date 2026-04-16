@@ -21,7 +21,7 @@ export default function Onboarding() {
 
     // ✅ NEW STATES
     const [showExpenseModal, setShowExpenseModal] = useState(false);
-    const [expenseList, setExpenseList] = useState([
+    const [expenses, setExpenses] = useState([
         { category: "", amount: "" }
     ]);
 
@@ -40,10 +40,10 @@ export default function Onboarding() {
         "Other"
     ];
 
-    const handleExpenseChange = (index: number, field: "category" | "amount", value: string) => {
-        const updated = [...expenseList];
-        updated[index] = { ...updated[index], [field]: value };
-        setExpenseList(updated);
+    const handleChange = (index: number, field: string, value: string) => {
+        const updated = [...expenses];
+        (updated[index] as any)[field] = value;
+        setExpenses(updated);
     };
 
     const [formData, setFormData] = useState<any>({
@@ -190,29 +190,31 @@ export default function Onboarding() {
 
                         <h3 className="font-semibold mb-3">Add Expenses</h3>
 
-                        {expenseList.map((item, i) => (
-                            <div key={i} className="flex gap-2 mb-2">
-                                <select
-                                    value={item.category}
-                                    onChange={(e) => handleExpenseChange(i, "category", e.target.value)}
-                                    className="w-1/2 border px-2 py-1 rounded bg-white text-sm"
-                                >
-                                    <option value="" disabled>Select Category</option>
-                                    {EXPENSE_CATEGORIES.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                                <input
-                                    placeholder="Amount"
-                                    value={item.amount}
-                                    onChange={(e) => handleExpenseChange(i, "amount", e.target.value.replace(/[^0-9]/g, ""))}
-                                    className="w-1/2 border px-2 py-1 rounded text-sm"
-                                />
-                            </div>
-                        ))}
+                        <div className="max-h-[350px] overflow-y-auto pr-1 -mr-1 custom-scrollbar">
+                            {expenses.map((exp, index) => (
+                                <div key={index} className="flex gap-2 mb-4 flex-col border-b border-gray-100 pb-3 last:border-0">
+                                    <select
+                                        value={exp.category}
+                                        onChange={(e) => handleChange(index, "category", e.target.value)}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+                                    >
+                                        <option value="">Select Category</option>
+                                        {EXPENSE_CATEGORIES.map(cat => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        placeholder="Amount"
+                                        value={exp.amount}
+                                        onChange={(e) => handleChange(index, "amount", e.target.value.replace(/[^0-9]/g, ""))}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    />
+                                </div>
+                            ))}
+                        </div>
 
                         <button
-                            onClick={() => setExpenseList([...expenseList, { category: "", amount: "" }])}
+                            onClick={() => setExpenses([...expenses, { category: "", amount: "" }])}
                             className="text-xs text-blue-600"
                         >
                             + Add More
@@ -226,29 +228,29 @@ export default function Onboarding() {
                             <button
                                 onClick={() => {
                                     // Prevent empty categories explicitly
-                                    const hasMissingValues = expenseList.some(item => !item.category || !item.amount);
+                                    const hasMissingValues = expenses.some(exp => !exp.category || !exp.amount);
                                     if (hasMissingValues) {
                                         return alert("Please select a category and enter an amount for all inputs.");
                                     }
 
-                                    const total = expenseList.reduce(
-                                        (sum, item) => sum + Number(item.amount || 0),
+                                    const total = expenses.reduce(
+                                        (sum, exp) => sum + Number(exp.amount || 0),
                                         0
                                     );
 
                                     // ✅ store breakdown in formData
                                     setFormData((prev: any) => ({
                                         ...prev,
-                                        expenseBreakdown: expenseList.map(item => ({
-                                            category: item.category,
-                                            amount: Number(item.amount)
+                                        expenseBreakdown: expenses.map(exp => ({
+                                            category: exp.category,
+                                            amount: Number(exp.amount)
                                         }))
                                     }));
 
                                     setInput(total.toString());
                                     setShowExpenseModal(false);
                                     // ✅ reset modal (IMPORTANT)
-                                    setExpenseList([{ category: "", amount: "" }]);
+                                    setExpenses([{ category: "", amount: "" }]);
                                 }}
                                 className="bg-blue-500 text-white px-3 py-1 rounded"
                             >
