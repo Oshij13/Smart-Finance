@@ -109,78 +109,69 @@ export function GoalPlanning() {
       </div>
 
       {/* Input Form */}
-      <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-        <CardHeader>
-          <CardTitle>Goal Details</CardTitle>
-          <CardDescription>Tell us about your financial goal and timeline</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="target-amount">Target Amount (₹)</Label>
-              <Input
-                id="target-amount"
-                type="number"
-                placeholder="e.g., 2000000"
-                value={targetAmount}
-                onChange={(e) => setTargetAmount(e.target.value)}
-                className="text-lg"
-              />
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Target Amount (₹)</label>
+          <input
+            type="number"
+            placeholder="e.g. 2000000"
+            value={targetAmount}
+            onChange={(e) => setTargetAmount(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="timeframe">Timeframe (Years)</Label>
-              <Input
-                id="timeframe"
-                type="number"
-                placeholder="e.g., 5"
-                value={timeframe}
-                onChange={(e) => setTimeframe(e.target.value)}
-                className="text-lg"
-              />
-            </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Timeframe (Years)</label>
+          <input
+            type="number"
+            placeholder="e.g. 5"
+            value={timeframe}
+            onChange={(e) => setTimeframe(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="current-savings">Current Savings (₹)</Label>
-              <Input
-                id="current-savings"
-                type="number"
-                placeholder="e.g., 100000"
-                value={currentSavings}
-                onChange={(e) => setCurrentSavings(e.target.value)}
-                className="text-lg"
-              />
-            </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Current Savings (₹)</label>
+          <input
+            type="number"
+            placeholder="e.g. 100000"
+            value={currentSavings}
+            onChange={(e) => setCurrentSavings(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="monthly-income">Monthly Income (₹)</Label>
-              <Input
-                id="monthly-income"
-                type="number"
-                placeholder="e.g., 50000"
-                value={monthlyIncome}
-                onChange={(e) => setMonthlyIncome(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-          </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Monthly Income (₹)</label>
+          <input
+            type="number"
+            placeholder="e.g. 50000"
+            value={monthlyIncome}
+            onChange={(e) => setMonthlyIncome(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+        </div>
+      </div>
 
-          <Button onClick={calculateGoal} className="w-full bg-gradient-to-r from-amber-500 to-orange-600">
-            Create My Goal Plan
-          </Button>
-        </CardContent>
-      </Card>
+      <button
+        onClick={calculateGoal}
+        className="px-6 py-2.5 rounded-lg bg-amber-600 text-white font-medium hover:opacity-90 transition mx-auto block mt-4"
+      >
+        Calculate
+      </button>
 
       {/* Results */}
       {showResults && target > 0 && (
         <>
           {/* Current Progress */}
-          <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-            <CardHeader>
-              <CardTitle>Current Progress</CardTitle>
-              <CardDescription>You've saved ₹{current.toLocaleString()} towards your goal</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 mt-4">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Current Progress</h2>
+              <p className="text-sm text-gray-600">You've saved ₹{current.toLocaleString('en-IN')} towards your goal</p>
+            </div>
+            <div className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Progress</span>
@@ -208,41 +199,37 @@ export function GoalPlanning() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Required Investment */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Required Monthly SIP</p>
-                <p className="text-3xl font-bold text-amber-600">₹{requiredMonthly.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">Assuming 12% annual returns</p>
-              </CardContent>
-            </Card>
+          <div className="bg-amber-50 rounded-xl p-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-sm text-amber-900/70 font-medium">Required Monthly SIP</p>
+                <h3 className="text-2xl font-bold text-amber-700">₹{requiredMonthly.toLocaleString('en-IN')}</h3>
+                <p className="text-xs text-amber-800/60 mt-1">Assuming 12% annual returns</p>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">As % of Income</p>
-                <p className="text-3xl font-bold text-gray-900">{percentageOfIncome}%</p>
-                <p className="text-xs text-gray-500 mt-1">
+              <div>
+                <p className="text-sm text-amber-900/70 font-medium">As % of Income</p>
+                <h3 className="text-2xl font-bold text-amber-900">{percentageOfIncome}%</h3>
+                <p className="text-xs text-amber-800/60 mt-1">
                   {parseFloat(percentageOfIncome) <= 20 ? 'Easily achievable' : 
                    parseFloat(percentageOfIncome) <= 35 ? 'Requires discipline' : 'Consider extending timeline'}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Total Investment</p>
-                <p className="text-3xl font-bold text-gray-900">₹{(requiredMonthly * months + current).toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">Over {years} years</p>
-              </CardContent>
-            </Card>
+              <div>
+                <p className="text-sm text-amber-900/70 font-medium">Total Investment</p>
+                <h3 className="text-2xl font-bold text-amber-900">₹{(requiredMonthly * months + current).toLocaleString('en-IN')}</h3>
+                <p className="text-xs text-amber-800/60 mt-1">Over {years} years</p>
+              </div>
+            </div>
           </div>
 
           {/* Growth Projection */}
-          <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
+          <Card className="border-none shadow-md bg-white mt-4">
             <CardHeader>
               <CardTitle>Goal Achievement Projection</CardTitle>
               <CardDescription>How your savings will grow over time to reach your target</CardDescription>
@@ -258,7 +245,8 @@ export function GoalPlanning() {
                   />
                   <YAxis stroke="#6b7280" />
                   <Tooltip 
-                    formatter={(value: number) => `₹${value.toLocaleString()}`}
+                    formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
+
                     contentStyle={{ 
                       backgroundColor: 'rgba(255, 255, 255, 0.95)', 
                       border: 'none', 
@@ -287,37 +275,35 @@ export function GoalPlanning() {
           </Card>
 
           {/* Action Steps */}
-          <Card className="border-none shadow-lg bg-gradient-to-br from-amber-50 to-orange-50">
-            <CardHeader>
-              <CardTitle>Action Steps to Achieve Your Goal</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-4 bg-white rounded-lg">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 mt-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Action Steps to Achieve Your Goal</h2>
+            <div className="space-y-3">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-amber-900 mb-1">1. Set Up Automatic SIP</h3>
                 <p className="text-sm text-gray-600">
-                  Start a monthly SIP of ₹{requiredMonthly.toLocaleString()} in index funds or equity mutual funds.
+                  Start a monthly SIP of ₹{requiredMonthly.toLocaleString('en-IN')} in index funds or equity mutual funds.
                 </p>
               </div>
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-amber-900 mb-1">2. Review Quarterly</h3>
                 <p className="text-sm text-gray-600">
                   Check your progress every 3 months and increase SIP with salary increments.
                 </p>
               </div>
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-amber-900 mb-1">3. Stay Invested</h3>
                 <p className="text-sm text-gray-600">
                   Don't panic during market corrections. Stay focused on your long-term goal.
                 </p>
               </div>
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-amber-900 mb-1">4. Bonus Investments</h3>
                 <p className="text-sm text-gray-600">
                   Use bonuses, tax refunds, or windfall gains to make lump sum investments toward your goal.
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </>
       )}
     </div>
