@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Calculator, FileText, DollarSign } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Calculator, FileText } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export function TaxCalculator() {
@@ -17,7 +13,7 @@ export function TaxCalculator() {
   };
 
   const annualIncome = parseInt(income) || 0;
-  
+
   // New Tax Regime Calculation (2024-25)
   let taxAmount = 0;
   if (annualIncome <= 300000) {
@@ -72,83 +68,75 @@ export function TaxCalculator() {
       </div>
 
       {/* Input Form */}
-      <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-        <CardHeader>
-          <CardTitle>Income Details</CardTitle>
-          <CardDescription>Enter your gross annual income to calculate tax</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="space-y-4 max-w-2xl mx-auto py-2 mt-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Income Details</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="gross-income">Gross Annual Income (₹)</Label>
-            <Input
-              id="gross-income"
+            <label className="text-sm font-medium text-gray-700">Gross Annual Income (₹)</label>
+            <input
               type="number"
-              placeholder="e.g., 1200000"
+              placeholder="e.g. 1200000"
               value={income}
               onChange={(e) => setIncome(e.target.value)}
-              className="text-lg"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="regime">Tax Regime</Label>
-            <Select value={regime} onValueChange={setRegime}>
-              <SelectTrigger id="regime">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="new">New Regime (2024-25)</SelectItem>
-                <SelectItem value="old" disabled>Old Regime (Coming Soon)</SelectItem>
-              </SelectContent>
-            </Select>
+            <label className="text-sm font-medium text-gray-700">Tax Regime</label>
+            <select
+              value={regime}
+              onChange={(e) => setRegime(e.target.value)}
+              className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white transition"
+            >
+              <option value="new">New Regime (2024-25)</option>
+              <option value="old" disabled>Old Regime (Coming Soon)</option>
+            </select>
           </div>
+        </div>
 
-          <Button onClick={calculateTax} className="w-full bg-gradient-to-r from-rose-500 to-pink-600">
-            Calculate Tax
-          </Button>
-        </CardContent>
-      </Card>
+        <button
+          onClick={calculateTax}
+          className="px-6 py-2.5 rounded-lg bg-rose-600 text-white font-medium hover:opacity-90 transition mx-auto block mt-6"
+        >
+          Calculate Tax
+        </button>
+      </div>
 
       {/* Results */}
       {showResults && annualIncome > 0 && (
         <>
           {/* Key Results */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Total Tax + Cess</p>
-                <p className="text-3xl font-bold text-rose-600">₹{totalTax.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">Including 4% cess</p>
-              </CardContent>
-            </Card>
+          <div className="bg-rose-50 rounded-xl p-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+              <div>
+                <p className="text-sm text-rose-900/70 font-medium">Total Tax + Cess</p>
+                <p className="text-2xl font-bold text-rose-700 mt-1">₹{totalTax.toLocaleString('en-IN')}</p>
+                <p className="text-xs text-rose-800/60 mt-1">Including 4% cess</p>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Effective Tax Rate</p>
-                <p className="text-3xl font-bold text-gray-900">{effectiveTaxRate.toFixed(2)}%</p>
-                <p className="text-xs text-gray-500 mt-1">Of gross income</p>
-              </CardContent>
-            </Card>
+              <div>
+                <p className="text-sm text-rose-900/70 font-medium">Effective Tax Rate</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{effectiveTaxRate.toFixed(2)}%</p>
+                <p className="text-xs text-rose-800/60 mt-1">Of gross income</p>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Monthly TDS</p>
-                <p className="text-3xl font-bold text-orange-600">₹{monthlyTDS.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">Deducted monthly</p>
-              </CardContent>
-            </Card>
+              <div>
+                <p className="text-sm text-rose-900/70 font-medium">Monthly TDS</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">₹{monthlyTDS.toLocaleString('en-IN')}</p>
+                <p className="text-xs text-rose-800/60 mt-1">Deducted monthly</p>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Monthly In-Hand</p>
-                <p className="text-3xl font-bold text-emerald-600">₹{monthlyInHand.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">After tax deduction</p>
-              </CardContent>
-            </Card>
+              <div>
+                <p className="text-sm text-rose-900/70 font-medium">Monthly In-Hand</p>
+                <p className="text-2xl font-bold text-emerald-600 mt-1">₹{monthlyInHand.toLocaleString('en-IN')}</p>
+                <p className="text-xs text-rose-800/60 mt-1">After tax deduction</p>
+              </div>
+            </div>
           </div>
 
           {/* Income Breakdown Chart */}
-          <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
+          <Card className="border-none shadow-md bg-white mt-4">
             <CardHeader>
               <CardTitle>Income Breakdown</CardTitle>
               <CardDescription>Visual representation of your tax and take-home</CardDescription>
@@ -159,11 +147,11 @@ export function TaxCalculator() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="label" stroke="#6b7280" />
                   <YAxis stroke="#6b7280" />
-                  <Tooltip 
-                    formatter={(value: number) => `₹${value.toLocaleString()}`}
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                      border: 'none', 
+                  <Tooltip
+                    formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      border: 'none',
                       borderRadius: '8px',
                       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                     }}
@@ -179,54 +167,47 @@ export function TaxCalculator() {
           </Card>
 
           {/* Tax Slab Breakdown */}
-          <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-            <CardHeader>
-              <CardTitle>Tax Slab Breakdown</CardTitle>
-              <CardDescription>How your income is taxed across different slabs</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {taxSlabs.map((slab, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
-                    <div>
-                      <p className="font-semibold text-gray-900">{slab.slab}</p>
-                      <p className="text-sm text-gray-600">Rate: {slab.rate}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-gray-900">
-                        ₹{slab.tax.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-gray-600">Tax from this slab</p>
-                    </div>
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Tax Slab Breakdown</h2>
+            <div className="space-y-3">
+              {taxSlabs.map((slab, index) => (
+                <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{slab.slab}</h3>
+                    <p className="text-sm text-gray-600 mt-1">Rate: {slab.rate}</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="text-right">
+                    <p className="text-xl font-bold text-rose-600">
+                      ₹{slab.tax.toLocaleString('en-IN')}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1 uppercase font-semibold tracking-wider">Tax from slab</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Tax Saving Tips */}
-          <Card className="border-none shadow-lg bg-gradient-to-br from-rose-50 to-pink-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-rose-600" />
-                Tax Saving Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-4 bg-white rounded-lg">
+          <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl p-6 mt-8">
+            <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900 mb-4">
+              <FileText className="w-5 h-5 text-rose-600" />
+              Tax Saving Insights
+            </h2>
+            <div className="space-y-3">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-rose-900 mb-1">Standard Deduction</h3>
                 <p className="text-sm text-gray-600">₹50,000 standard deduction is available in the new regime (already factored in above slabs).</p>
               </div>
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-rose-900 mb-1">NPS Contribution</h3>
                 <p className="text-sm text-gray-600">Contribute to NPS for additional ₹50,000 deduction under Section 80CCD(1B).</p>
               </div>
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-rose-900 mb-1">HRA & LTA</h3>
                 <p className="text-sm text-gray-600">New regime doesn't allow HRA or LTA exemptions. Compare with old regime if you have these.</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </>
       )}
     </div>

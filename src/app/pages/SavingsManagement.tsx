@@ -84,91 +84,80 @@ export function SavingsManagement() {
       </div>
 
       {/* Input Form */}
-      <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-        <CardHeader>
-          <CardTitle>Your Savings Profile</CardTitle>
-          <CardDescription>Tell us about your income and savings goals</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* ✅ Label fixed (Monthly) */}
+      <div className="space-y-4 max-w-2xl mx-auto py-2 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="annual-income">Monthly Income (₹)</Label>
-            <Input
-              id="annual-income"
+            <label className="text-sm font-medium text-gray-700">Monthly Income (₹)</label>
+            <input
               type="number"
-              placeholder="e.g., 50000"
+              placeholder="e.g. 50000"
               value={income}
               onChange={(e) => setIncome(e.target.value)}
-              className="text-lg"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="current-savings">Current Savings (₹)</Label>
-            <Input
-              id="current-savings"
+            <label className="text-sm font-medium text-gray-700">Current Savings (₹)</label>
+            <input
               type="number"
-              placeholder="e.g., 20000"
+              placeholder="e.g. 20000"
               value={currentSavings}
               onChange={(e) => setCurrentSavings(e.target.value)}
-              className="text-lg"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
+        </div>
 
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label>Select Your Risk Profile</Label>
-              <span className="text-sm font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">
-                {riskLevel}
-              </span>
-            </div>
-            <RiskProfileSelector
-              selectedRisk={riskAppetite}
-              onSelect={setRiskAppetite}
-            />
+        <div className="space-y-3 pt-2">
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-medium text-gray-700">Select Your Risk Profile</label>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">
+              {riskLevel}
+            </span>
           </div>
+          <RiskProfileSelector
+            selectedRisk={riskAppetite}
+            onSelect={setRiskAppetite}
+          />
+        </div>
 
-          <Button
-            onClick={handleCalculate}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600"
-          >
-            Generate Savings Plan
-          </Button>
-        </CardContent>
-      </Card>
+        <button
+          onClick={handleCalculate}
+          className="px-6 py-2.5 rounded-lg bg-emerald-600 text-white font-medium hover:opacity-90 transition mx-auto block mt-6"
+        >
+          Generate Savings Plan
+        </button>
+      </div>
 
       {/* Results */}
       {showResults && (
         <>
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600">Recommended Monthly Savings</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  ₹{recommendedSavings.toLocaleString()}
+          <div className="bg-emerald-50 rounded-xl p-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-sm text-emerald-900/70 font-medium">Recommended Monthly Savings</p>
+                <p className="text-2xl font-bold text-emerald-700 mt-1">
+                  ₹{recommendedSavings.toLocaleString('en-IN')}
                 </p>
-                <p className="text-sm text-gray-600 mt-1">20% of monthly income</p>
-              </CardContent>
-            </Card>
+                <p className="text-xs text-emerald-800/60 mt-1">20% of monthly income</p>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600">Emergency Fund Target</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  ₹{emergencyFund.toLocaleString()}
+              <div>
+                <p className="text-sm text-emerald-900/70 font-medium">Emergency Fund Target</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  ₹{emergencyFund.toLocaleString('en-IN')}
                 </p>
-                <p className="text-sm text-gray-600 mt-1">6 months of income</p>
-              </CardContent>
-            </Card>
+                <p className="text-xs text-emerald-800/60 mt-1">6 months of income</p>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600">Current Savings</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  ₹{(parseInt(currentSavings) || 0).toLocaleString()}
+              <div>
+                <p className="text-sm text-emerald-900/70 font-medium">Current Savings</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  ₹{(parseInt(currentSavings) || 0).toLocaleString('en-IN')}
                 </p>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-xs text-emerald-800/60 mt-1">
                   {emergencyFund > 0
                     ? Math.round(
                       ((parseInt(currentSavings) || 0) / emergencyFund) * 100
@@ -176,12 +165,12 @@ export function SavingsManagement() {
                     : 0}
                   % of target
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Allocation Chart */}
-          <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
+          <Card className="border-none shadow-md bg-white mt-4">
             <CardHeader>
               <CardTitle>Recommended Savings Allocation</CardTitle>
               <CardDescription>
@@ -189,14 +178,14 @@ export function SavingsManagement() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
                       data={savingsAllocation}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
+                      innerRadius={70}
                       outerRadius={100}
                       paddingAngle={5}
                       dataKey="value"
@@ -209,20 +198,20 @@ export function SavingsManagement() {
                   </PieChart>
                 </ResponsiveContainer>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {savingsAllocation.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-3 rounded-lg border border-gray-200"
+                      className="flex items-center justify-between p-4 rounded-xl bg-gray-50 text-sm"
                     >
-                      <span>{item.name}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                        <span className="font-semibold text-gray-700">{item.name}</span>
+                      </div>
                       <div className="text-right">
-                        <p className="font-bold">{item.value}%</p>
-                        <p className="text-sm text-gray-600">
-                          ₹{(
-                            (recommendedSavings * item.value) /
-                            100
-                          ).toLocaleString()}
+                        <p className="font-bold text-gray-900" style={{ color: item.color }}>{item.value}%</p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          ₹{((recommendedSavings * item.value) / 100).toLocaleString('en-IN')}
                         </p>
                       </div>
                     </div>

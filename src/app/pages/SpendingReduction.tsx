@@ -115,107 +115,100 @@ export function SpendingReduction() {
       </div>
 
       {/* Input Form */}
-      <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-        <CardHeader>
-          <CardTitle>Track Your Monthly Expenses</CardTitle>
-          <CardDescription>Enter your typical monthly spending in each category</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="monthly-income">Monthly Income (₹)</Label>
-            <Input
-              id="monthly-income"
-              type="number"
-              placeholder="e.g., 50000"
-              value={monthlyIncome}
-              onChange={(e) => setMonthlyIncome(e.target.value)}
-              className="text-lg"
-            />
-          </div>
+      <div className="space-y-4 max-w-2xl mx-auto py-2 mt-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Track Your Monthly Expenses</h2>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Monthly Income (₹)</label>
+          <input
+            type="number"
+            placeholder="e.g. 50000"
+            value={monthlyIncome}
+            onChange={(e) => setMonthlyIncome(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {expenseCategories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <div key={category.key} className="space-y-2">
-                  <Label htmlFor={category.key} className="flex items-center gap-2">
-                    <Icon className="w-4 h-4" style={{ color: category.color }} />
-                    {category.label}
-                  </Label>
-                  <Input
-                    id={category.key}
-                    type="number"
-                    placeholder="₹"
-                    value={expenses[category.key as keyof typeof expenses]}
-                    onChange={(e) => handleExpenseChange(category.key, e.target.value)}
-                  />
-                </div>
-              );
-            })}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          {expenseCategories.map((category) => {
+            const Icon = category.icon;
+            return (
+              <div key={category.key} className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Icon className="w-4 h-4" style={{ color: category.color }} />
+                  {category.label}
+                </label>
+                <input
+                  type="number"
+                  placeholder="₹"
+                  value={expenses[category.key as keyof typeof expenses]}
+                  onChange={(e) => handleExpenseChange(category.key, e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            );
+          })}
+        </div>
 
-          <Button onClick={analyzeSpending} className="w-full bg-gradient-to-r from-indigo-500 to-blue-600">
-            Analyze My Spending
-          </Button>
-        </CardContent>
-      </Card>
+        <button
+          onClick={analyzeSpending}
+          className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:opacity-90 transition mx-auto block mt-6"
+        >
+          Analyze My Spending
+        </button>
+      </div>
 
       {/* Results */}
       {showResults && income > 0 && (
         <>
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Total Monthly Expenses</p>
-                <p className="text-3xl font-bold text-gray-900">₹{totalExpenses.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">
+          <div className="bg-indigo-50 rounded-xl p-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-sm text-indigo-900/70 font-medium">Total Monthly Expenses</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">₹{totalExpenses.toLocaleString('en-IN')}</p>
+                <p className="text-xs text-indigo-800/60 mt-1">
                   {((totalExpenses / income) * 100).toFixed(0)}% of income
                 </p>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Current Savings Rate</p>
-                <p className={`text-3xl font-bold ${
+              <div>
+                <p className="text-sm text-indigo-900/70 font-medium">Current Savings Rate</p>
+                <p className={`text-2xl font-bold mt-1 ${
                   parseFloat(savingsRate) >= 20 ? 'text-emerald-600' : 
                   parseFloat(savingsRate) >= 10 ? 'text-amber-600' : 'text-rose-600'
                 }`}>
                   {savingsRate}%
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-indigo-800/60 mt-1">
                   {parseFloat(savingsRate) >= 20 ? 'Excellent!' : 
                    parseFloat(savingsRate) >= 10 ? 'Good, can improve' : 'Needs attention'}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
-              <CardContent className="p-6">
-                <p className="text-sm text-gray-600 mb-1">Potential Monthly Savings</p>
-                <p className="text-3xl font-bold text-emerald-600">₹{Math.round(totalPotentialSavings).toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">With smart cutbacks</p>
-              </CardContent>
-            </Card>
+              <div>
+                <p className="text-sm text-indigo-900/70 font-medium">Potential Monthly Savings</p>
+                <p className="text-2xl font-bold text-emerald-600 mt-1">₹{Math.round(totalPotentialSavings).toLocaleString('en-IN')}</p>
+                <p className="text-xs text-indigo-800/60 mt-1">With smart cutbacks</p>
+              </div>
+            </div>
           </div>
 
           {/* Expense Breakdown */}
           {expenseData.length > 0 && (
-            <Card className="border-none shadow-lg bg-white/80 backdrop-blur">
+            <Card className="border-none shadow-md bg-white mt-4">
               <CardHeader>
                 <CardTitle>Spending Breakdown</CardTitle>
                 <CardDescription>Where your money is going each month</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
                         data={expenseData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
+                        innerRadius={70}
                         outerRadius={100}
                         paddingAngle={5}
                         dataKey="value"
@@ -225,7 +218,7 @@ export function SpendingReduction() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        formatter={(value: number) => `₹${value.toLocaleString()}`}
+                        formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
                         contentStyle={{ 
                           backgroundColor: 'rgba(255, 255, 255, 0.95)', 
                           border: 'none', 
@@ -238,14 +231,14 @@ export function SpendingReduction() {
 
                   <div className="space-y-3">
                     {expenseData.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                      <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 text-sm">
                         <div className="flex items-center gap-3">
-                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }}></div>
-                          <span className="font-medium text-gray-900">{item.name}</span>
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                          <span className="font-semibold text-gray-700">{item.name}</span>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-gray-900">₹{item.value.toLocaleString()}</p>
-                          <p className="text-xs text-gray-600">
+                          <p className="font-bold text-gray-900" style={{ color: item.color }}>₹{item.value.toLocaleString('en-IN')}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">
                             {((item.value / totalExpenses) * 100).toFixed(0)}%
                           </p>
                         </div>
@@ -258,75 +251,69 @@ export function SpendingReduction() {
           )}
 
           {/* Savings Recommendations */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Smart Saving Tips by Category</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Smart Saving Tips by Category</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {potentialSavings.map((item, index) => {
                 const Icon = item.icon;
                 return (
-                  <Card key={index} className="border-none shadow-lg bg-white/80 backdrop-blur">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div 
-                            className="w-10 h-10 rounded-lg flex items-center justify-center"
-                            style={{ backgroundColor: `${item.color}20` }}
-                          >
-                            <Icon className="w-5 h-5" style={{ color: item.color }} />
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg">{item.category}</CardTitle>
-                            <p className="text-sm text-gray-600">₹{item.current.toLocaleString()}/month</p>
-                          </div>
+                  <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                    <div className="flex items-start justify-between border-b border-gray-200 pb-4 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: `${item.color}20` }}
+                        >
+                          <Icon className="w-5 h-5" style={{ color: item.color }} />
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-gray-600">Save up to</p>
-                          <p className="text-xl font-bold text-emerald-600">
-                            ₹{Math.round(item.potential).toLocaleString()}
-                          </p>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">{item.category}</h3>
+                          <p className="text-sm text-gray-600">₹{item.current.toLocaleString('en-IN')}/month</p>
                         </div>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {item.tips.map((tip, tipIndex) => (
-                          <li key={tipIndex} className="flex items-start gap-2 text-sm">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5"></div>
-                            <span className="text-gray-700">{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Save up to</p>
+                        <p className="text-xl font-bold text-emerald-600 mt-1">
+                          ₹{Math.round(item.potential).toLocaleString('en-IN')}
+                        </p>
+                      </div>
+                    </div>
+                    <ul className="space-y-2">
+                      {item.tips.map((tip, tipIndex) => (
+                        <li key={tipIndex} className="flex items-start gap-2 text-sm">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
+                          <span className="text-gray-700">{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 );
               })}
             </div>
           </div>
 
           {/* General Tips */}
-          <Card className="border-none shadow-lg bg-gradient-to-br from-indigo-50 to-blue-50">
-            <CardHeader>
-              <CardTitle>Universal Money-Saving Strategies</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-4 bg-white rounded-lg">
+          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6 mt-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Universal Money-Saving Strategies</h2>
+            <div className="space-y-3">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-indigo-900 mb-1">Track Every Rupee</h3>
                 <p className="text-sm text-gray-600">Use apps like Walnut or Money Manager to automatically track expenses from SMS.</p>
               </div>
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-indigo-900 mb-1">The 24-Hour Rule</h3>
                 <p className="text-sm text-gray-600">Wait 24 hours before making any non-essential purchase above ₹500.</p>
               </div>
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-indigo-900 mb-1">Cashless Challenge</h3>
                 <p className="text-sm text-gray-600">Use UPI/cards for better tracking. Avoid cash for discretionary spending.</p>
               </div>
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white/80 rounded-lg">
                 <h3 className="font-semibold text-indigo-900 mb-1">Zero-Based Budgeting</h3>
                 <p className="text-sm text-gray-600">Allocate every rupee a purpose at month start. Income - Expenses = 0.</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </>
       )}
     </div>
