@@ -1,4 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { BookMarked, Book, Headphones, Mail, Video, ExternalLink } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 
@@ -212,22 +211,20 @@ export function Resources() {
         <TabsContent value="books" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {books.map((book, index) => (
-              <Card key={index} className="border-none shadow-lg bg-white/80 backdrop-blur">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-1">{book.title}</CardTitle>
-                      <p className="text-sm text-gray-600">by {book.author}</p>
+              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 pr-4">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">{book.title}</h3>
+                      <p className="text-sm font-medium text-gray-600">by {book.author}</p>
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 whitespace-nowrap">
+                    <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 whitespace-nowrap font-medium">
                       {book.category}
                     </span>
                   </div>
-                </CardHeader>
-                <CardContent>
                   <p className="text-sm text-gray-700">{book.description}</p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </TabsContent>
@@ -236,22 +233,20 @@ export function Resources() {
         <TabsContent value="podcasts" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {podcasts.map((podcast, index) => (
-              <Card key={index} className="border-none shadow-lg bg-white/80 backdrop-blur">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-1">{podcast.title}</CardTitle>
-                      <p className="text-sm text-gray-600">by {podcast.host}</p>
+              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 pr-4">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">{podcast.title}</h3>
+                      <p className="text-sm font-medium text-gray-600">by {podcast.host}</p>
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap">
+                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap font-medium">
                       {podcast.frequency}
                     </span>
                   </div>
-                </CardHeader>
-                <CardContent>
                   <p className="text-sm text-gray-700">{podcast.description}</p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </TabsContent>
@@ -260,22 +255,20 @@ export function Resources() {
         <TabsContent value="newsletters" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {newsletters.map((newsletter, index) => (
-              <Card key={index} className="border-none shadow-lg bg-white/80 backdrop-blur">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-1">{newsletter.title}</CardTitle>
-                      <p className="text-sm text-blue-600">{newsletter.link}</p>
+              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 pr-4">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">{newsletter.title}</h3>
+                      <p className="text-sm font-medium text-blue-600">{newsletter.link}</p>
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">
+                    <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap font-medium">
                       {newsletter.focus}
                     </span>
                   </div>
-                </CardHeader>
-                <CardContent>
                   <p className="text-sm text-gray-700">{newsletter.description}</p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </TabsContent>
@@ -284,19 +277,17 @@ export function Resources() {
         <TabsContent value="youtube" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {youtubeChannels.map((channel, index) => (
-              <Card key={index} className="border-none shadow-lg bg-white/80 backdrop-blur">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg mb-1">{channel.title}</CardTitle>
-                    <span className="text-xs px-2 py-1 rounded-full bg-rose-100 text-rose-700 whitespace-nowrap">
+              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-lg font-bold text-gray-900 mb-1 flex-1 pr-4">{channel.title}</h3>
+                    <span className="text-xs px-2 py-1 rounded-full bg-rose-100 text-rose-700 whitespace-nowrap font-medium">
                       {channel.focus}
                     </span>
                   </div>
-                </CardHeader>
-                <CardContent>
                   <p className="text-sm text-gray-700">{channel.description}</p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </TabsContent>
@@ -305,34 +296,32 @@ export function Resources() {
         <TabsContent value="platforms" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {platforms.map((platform, index) => (
-              <Card key={index} className="border-none shadow-lg bg-white/80 backdrop-blur">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-1">{platform.title}</CardTitle>
-                      <p className="text-sm text-indigo-600">{platform.link}</p>
+              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 pr-4">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">{platform.title}</h3>
+                      <p className="text-sm font-medium text-indigo-600">{platform.link}</p>
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
+                    <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap font-medium">
                       {platform.type}
                     </span>
                   </div>
-                </CardHeader>
-                <CardContent>
                   <p className="text-sm text-gray-700">{platform.description}</p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </TabsContent>
       </Tabs>
 
       {/* Learning Path Recommendation */}
-      <Card className="border-none shadow-lg bg-gradient-to-br from-purple-50 to-indigo-50">
-        <CardHeader>
-          <CardTitle>Recommended Learning Path</CardTitle>
-          <CardDescription>Start your financial education journey with these steps</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6 mt-8">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-1">Recommended Learning Path</h2>
+          <p className="text-sm text-gray-600">Start your financial education journey with these steps</p>
+        </div>
+        <div className="space-y-4">
           <div className="flex gap-4">
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold">
               1
@@ -372,32 +361,32 @@ export function Resources() {
               <p className="text-sm text-gray-700">Deep dive into "The Intelligent Investor", follow specialized content based on your goals, teach others.</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Pro Tips */}
-      <Card className="border-none shadow-lg bg-gradient-to-br from-amber-50 to-orange-50">
-        <CardHeader>
-          <CardTitle>Pro Tips for Learning</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="p-4 bg-white rounded-lg">
+      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 mt-8">
+        <h2 className="text-xl font-bold flex items-center gap-2 text-amber-900 mb-4">
+          Pro Tips for Learning
+        </h2>
+        <div className="space-y-3">
+          <div className="p-4 bg-white/80 rounded-lg">
             <p className="text-sm text-gray-700">
               <span className="font-semibold text-amber-900">Consistency over Intensity:</span> 15 minutes daily beats 2 hours once a week. Make learning a habit.
             </p>
           </div>
-          <div className="p-4 bg-white rounded-lg">
+          <div className="p-4 bg-white/80 rounded-lg">
             <p className="text-sm text-gray-700">
               <span className="font-semibold text-amber-900">Apply Immediately:</span> Don't just consume. Set up that SIP, create that budget, calculate your tax.
             </p>
           </div>
-          <div className="p-4 bg-white rounded-lg">
+          <div className="p-4 bg-white/80 rounded-lg">
             <p className="text-sm text-gray-700">
               <span className="font-semibold text-amber-900">Avoid Analysis Paralysis:</span> Don't wait to know everything. Start with basics and improve as you learn.
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

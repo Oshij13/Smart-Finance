@@ -25,6 +25,27 @@ export default function Onboarding() {
         { category: "", amount: "" }
     ]);
 
+    const EXPENSE_CATEGORIES = [
+        "Housing",
+        "Food",
+        "Transportation",
+        "Utilities",
+        "Healthcare",
+        "Insurance",
+        "Debt Payments",
+        "Personal Care",
+        "Entertainment",
+        "Education",
+        "Investments",
+        "Other"
+    ];
+
+    const handleExpenseChange = (index: number, field: "category" | "amount", value: string) => {
+        const updated = [...expenseList];
+        updated[index] = { ...updated[index], [field]: value };
+        setExpenseList(updated);
+    };
+
     const [formData, setFormData] = useState<any>({
         name: "",
         occupation: "",
@@ -171,25 +192,21 @@ export default function Onboarding() {
 
                         {expenseList.map((item, i) => (
                             <div key={i} className="flex gap-2 mb-2">
-                                <input
-                                    placeholder="Category"
+                                <select
                                     value={item.category}
-                                    onChange={(e) => {
-                                        const updated = [...expenseList];
-                                        updated[i].category = e.target.value;
-                                        setExpenseList(updated);
-                                    }}
-                                    className="w-1/2 border px-2 py-1"
-                                />
+                                    onChange={(e) => handleExpenseChange(i, "category", e.target.value)}
+                                    className="w-1/2 border px-2 py-1 rounded bg-white text-sm"
+                                >
+                                    <option value="" disabled>Select Category</option>
+                                    {EXPENSE_CATEGORIES.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
                                 <input
                                     placeholder="Amount"
                                     value={item.amount}
-                                    onChange={(e) => {
-                                        const updated = [...expenseList];
-                                        updated[i].amount = e.target.value.replace(/[^0-9]/g, "");
-                                        setExpenseList(updated);
-                                    }}
-                                    className="w-1/2 border px-2 py-1"
+                                    onChange={(e) => handleExpenseChange(i, "amount", e.target.value.replace(/[^0-9]/g, ""))}
+                                    className="w-1/2 border px-2 py-1 rounded text-sm"
                                 />
                             </div>
                         ))}
@@ -208,6 +225,12 @@ export default function Onboarding() {
 
                             <button
                                 onClick={() => {
+                                    // Prevent empty categories explicitly
+                                    const hasMissingValues = expenseList.some(item => !item.category || !item.amount);
+                                    if (hasMissingValues) {
+                                        return alert("Please select a category and enter an amount for all inputs.");
+                                    }
+
                                     const total = expenseList.reduce(
                                         (sum, item) => sum + Number(item.amount || 0),
                                         0

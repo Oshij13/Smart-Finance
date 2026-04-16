@@ -27,9 +27,28 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
     // ✅ NEW STATES
     const [showExpenseModal, setShowExpenseModal] = useState(false);
-    const [expenseList, setExpenseList] = useState([
+    const [expenses, setExpenses] = useState([
         { category: "", amount: "" }
     ]);
+
+    const expenseCategories = [
+        "Rent",
+        "Food",
+        "Groceries",
+        "Transport",
+        "Utilities",
+        "Entertainment",
+        "Shopping",
+        "Healthcare",
+        "Education",
+        "Other"
+    ];
+
+    const handleChange = (index: number, field: string, value: string) => {
+        const updated = [...expenses];
+        (updated[index] as any)[field] = value;
+        setExpenses(updated);
+    };
 
     useEffect(() => {
         if (messages.length === 0) {
@@ -264,33 +283,31 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
                         <h3 className="font-semibold mb-3">Add Expenses</h3>
 
-                        {expenseList.map((item, i) => (
-                            <div key={i} className="flex gap-2 mb-2">
-                                <input
-                                    placeholder="Category"
-                                    value={item.category}
-                                    onChange={(e) => {
-                                        const updated = [...expenseList];
-                                        updated[i].category = e.target.value;
-                                        setExpenseList(updated);
-                                    }}
-                                    className="w-1/2 border px-2 py-1"
-                                />
+                        {expenses.map((exp, index) => (
+                            <div key={index} className="flex gap-2 mb-2 flex-col">
+                                <select
+                                    value={exp.category}
+                                    onChange={(e) => handleChange(index, "category", e.target.value)}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+                                >
+                                    <option value="">Select Category</option>
+                                    {expenseCategories.map((cat, i) => (
+                                        <option key={i} value={cat}>
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </select>
                                 <input
                                     placeholder="Amount"
-                                    value={item.amount}
-                                    onChange={(e) => {
-                                        const updated = [...expenseList];
-                                        updated[i].amount = e.target.value.replace(/[^0-9]/g, "");
-                                        setExpenseList(updated);
-                                    }}
-                                    className="w-1/2 border px-2 py-1"
+                                    value={exp.amount}
+                                    onChange={(e) => handleChange(index, "amount", e.target.value.replace(/[^0-9]/g, ""))}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 />
                             </div>
                         ))}
 
                         <button
-                            onClick={() => setExpenseList([...expenseList, { category: "", amount: "" }])}
+                            onClick={() => setExpenses([...expenses, { category: "", amount: "" }])}
                             className="text-xs text-blue-600"
                         >
                             + Add More
@@ -301,17 +318,23 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
 
                             <button
                                 onClick={() => {
-                                    const total = expenseList.reduce(
-                                        (sum, item) => sum + Number(item.amount || 0),
+                                    // Prevent empty categories explicitly
+                                    const hasMissingValues = expenses.some(exp => !exp.category || !exp.amount);
+                                    if (hasMissingValues) {
+                                        return alert("Please select a category and enter an amount for all inputs.");
+                                    }
+
+                                    const total = expenses.reduce(
+                                        (sum, exp) => sum + Number(exp.amount || 0),
                                         0
                                     );
 
                                     // ✅ store breakdown in formData
                                     setFormData((prev: any) => ({
                                         ...prev,
-                                        expenseBreakdown: expenseList.map(item => ({
-                                            category: item.category,
-                                            amount: Number(item.amount)
+                                        expenseBreakdown: expenses.map(exp => ({
+                                            category: exp.category,
+                                            amount: Number(exp.amount)
                                         }))
                                     }));
 
@@ -319,7 +342,7 @@ export default function AIChat({ onComplete }: { onComplete: (data: any) => void
                                     setShowExpenseModal(false);
 
                                     // ✅ reset modal for next use
-                                    setExpenseList([{ category: "", amount: "" }]);
+                                    setExpenses([{ category: "", amount: "" }]);
                                 }}
                                 className="bg-blue-500 text-white px-3 py-1 rounded"
                             >
