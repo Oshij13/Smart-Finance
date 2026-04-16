@@ -6,7 +6,13 @@ import { generateFinancePDF } from "../../utils/generatePDF";
 import SmartChart from "./SmartChart";
 
 export default function AdvisorChat() {
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<any[]>(() => {
+        if (typeof window !== "undefined") {
+            const saved = localStorage.getItem("advisorChat");
+            return saved ? JSON.parse(saved) : [];
+        }
+        return [];
+    });
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState("");
     const [sessionId, setSessionId] = useState<string>("");
@@ -50,11 +56,11 @@ export default function AdvisorChat() {
         const isReload = navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === "reload";
 
         if (isReload) {
-            sessionStorage.removeItem("sf_chat");
+            localStorage.removeItem("advisorChat");
             setResetBackend(true);
         }
 
-        const saved = sessionStorage.getItem("sf_chat");
+        const saved = localStorage.getItem("advisorChat");
 
         if (!saved || JSON.parse(saved).length === 0) {
             setMessages([
@@ -71,7 +77,7 @@ export default function AdvisorChat() {
     }, []);
 
     useEffect(() => {
-        sessionStorage.setItem("sf_chat", JSON.stringify(messages));
+        localStorage.setItem("advisorChat", JSON.stringify(messages));
     }, [messages]);
 
     // Timer Logic
