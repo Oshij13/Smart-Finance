@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Finance — Wireframes</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --border: #C8C8C8;
+      --bg: #F0F0F0;
+      --white: #FFFFFF;
+      --dark: #1A1A1A;
+      --mid: #6B6B6B;
+      --light: #D8D8D8;
+      --placeholder: #E2E2E2;
+      --accent: #3A3A3A;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #E8E8E8;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* ── TOP NAV ── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #1A1A1A;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 24px;
+      height: 52px;
+      border-bottom: 2px solid #333;
+    }
+    .top-nav h1 { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-right: 32px; font-weight: 700; }
+    .top-nav a {
+      padding: 0 16px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #aaa;
+      text-decoration: none;
+      transition: background 0.15s;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .top-nav a:hover, .top-nav a.active { background: #333; color: #fff; }
+    .badge {
+      font-size: 9px;
+      background: #444;
+      color: #ccc;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: 6px;
+      letter-spacing: 0;
+    }
+
+    /* ── SCREEN WRAPPER ── */
+    .screens-container { padding: 24px; }
+    .screen {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .screen-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 6px;
+    }
+    .screen-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+    .screen-route {
+      font-size: 11px;
+      color: var(--mid);
+      background: #fff;
+      border: 1px solid var(--border);
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+    }
+    .divider { border: none; border-top: 1px dashed var(--border); margin: 20px 0; }
+
+    /* ── WIREFRAME DEVICE FRAME ── */
+    .device-frame {
+      background: #fff;
+      border: 2px solid #1A1A1A;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 4px 4px 0 #1A1A1A;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── SIDEBAR + MAIN LAYOUT ── */
+    .app-shell { display: flex; min-height: 680px; }
+    .sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .sidebar-logo {
+      padding: 0 16px 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .sidebar-logo .logo-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-icon {
+      width: 28px; height: 28px;
+      background: var(--placeholder);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .logo-text { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      font-size: 11px;
+      color: var(--mid);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.1s;
+    }
+    .sidebar-item:hover, .sidebar-item.active {
+      background: var(--bg);
+      color: var(--dark);
+      border-left-color: var(--dark);
+    }
+    .sidebar-item .s-icon {
+      width: 16px; height: 16px;
+      background: var(--placeholder);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .main-content { flex: 1; background: var(--bg); padding: 20px; overflow-y: auto; }
+
+    /* ── WF ELEMENTS ── */
+    .wf-bar {
+      background: var(--placeholder);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 11px;
+      color: var(--mid);
+    }
+    .wf-header {
+      background: var(--placeholder);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .wf-header-left h2 { font-size: 16px; font-weight: 700; }
+    .wf-header-left p { font-size: 10px; color: var(--mid); margin-top: 2px; }
+    .wf-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+    }
+    .wf-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--bg);
+      padding-bottom: 6px;
+    }
+    .wf-grid { display: grid; gap: 12px; margin-bottom: 12px; }
+    .wf-grid-2 { grid-template-columns: 1fr 1fr; }
+    .wf-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .wf-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .wf-grid-5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+    .wf-input {
+      border: 1px dashed var(--border);
+      background: var(--bg);
+      border-radius: 4px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 10px;
+      color: #aaa;
+    }
+    .wf-btn {
+      border: 1.5px solid var(--dark);
+      background: var(--placeholder);
+      border-radius: 4px;
+      padding: 7px 14px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: default;
+    }
+    .wf-btn.primary { background: var(--dark); color: #fff; }
+    .wf-btn.sm { padding: 4px 10px; font-size: 9px; }
+    .wf-progress {
+      height: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .wf-progress-fill {
+      height: 100%;
+      background: repeating-linear-gradient(45deg, #C8C8C8, #C8C8C8 3px, #D8D8D8 3px, #D8D8D8 6px);
+    }
+    .wf-chart-area {
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      height: 140px;
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      padding: 10px 12px 20px;
+      position: relative;
+    }
+    .wf-chart-area .chart-label {
+      position: absolute;
+      top: 8px; left: 10px;
+      font-size: 9px;
+      color: var(--mid);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .wf-bar-item { flex: 1; border-radius: 2px 2px 0 0; border: 1px solid var(--border); }
+    .wf-line-chart {
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .wf-line-chart .chart-label {
+      position: absolute;
+      top: 8px; left: 10px;
+      font-size: 9px;
+      color: var(--mid);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .wf-line-chart svg { width: 100%; height: 100%; }
+    .wf-metric-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .wf-metric-label { font-size: 9px; color: var(--mid); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .wf-metric-value { font-size: 18px; font-weight: 700; }
+    .wf-metric-sub { font-size: 9px; color: var(--mid); margin-top: 2px; }
+    .wf-tag {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--white);
+      cursor: default;
+    }
+    .wf-tag.active { background: var(--dark); color: #fff; border-color: var(--dark); }
+    .wf-bubble {
+      max-width: 70%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 10px;
+      line-height: 1.6;
+      border: 1px solid var(--border);
+    }
+    .wf-bubble.user { background: var(--placeholder); align-self: flex-end; }
+    .wf-bubble.ai { background: var(--white); }
+    .chat-thread { display: flex; flex-direction: column; gap: 10px; }
+    .wf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9px;
+      margin-top: 6px;
+    }
+    .wf-table th { background: var(--bg); border: 1px solid var(--border); padding: 4px 8px; font-weight: 700; }
+    .wf-table td { border: 1px solid var(--border); padding: 4px 8px; color: var(--mid); }
+    .wf-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--white);
+      font-size: 10px;
+      margin-bottom: 6px;
+    }
+    .wf-list-item .li-icon {
+      width: 12px; height: 12px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--placeholder);
+      flex-shrink: 0;
+    }
+    .wf-score-circle {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      border: 4px solid var(--dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .annotation {
+      font-size: 9px;
+      color: var(--mid);
+      border: 1px dashed #aaa;
+      background: #FFFFF0;
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-bottom: 4px;
+    }
+    .steps-row { display: flex; gap: 4px; margin-bottom: 12px; }
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--placeholder);
+    }
+    .step-dot.done { background: var(--dark); border-color: var(--dark); }
+    .step-dot.current { background: var(--white); border-color: var(--dark); box-shadow: 0 0 0 2px #ddd; }
+    .wf-section-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 8px;
+      margin-top: 4px;
+    }
+    .wf-alert {
+      border: 1.5px dashed var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      background: var(--bg);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .wf-alert-icon {
+      width: 20px; height: 20px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--placeholder);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+    .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .action-chip {
+      border: 1px solid var(--dark);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 9px;
+      font-weight: 700;
+      background: var(--dark);
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <h1>Smart Finance / Wireframes</h1>
+  <a class="active" onclick="show('s1')">Onboarding <span class="badge">S1</span></a>
+  <a onclick="show('s2')">Dashboard <span class="badge">S2</span></a>
+  <a onclick="show('s3')">AI Advisor <span class="badge">S3</span></a>
+  <a onclick="show('s4')">Retirement <span class="badge">S4</span></a>
+  <a onclick="show('s5')">SIP / SWP <span class="badge">S5</span></a>
+  <a onclick="show('s6')">Tax Calc <span class="badge">S6</span></a>
+</nav>
+
+<div class="screens-container">
+
+  <!-- ══════════════════════════════════
+       SCREEN 1 — ONBOARDING
+  ══════════════════════════════════ -->
+  <div id="s1" class="screen active">
+    <div class="screen-label">Screen 1 of 6</div>
+    <div class="screen-title">Onboarding Flow</div>
+    <div class="screen-route">Route: / &nbsp;(new user — no localStorage)</div>
+
+    <div class="device-frame">
+      <!-- Full screen centered layout -->
+      <div style="background:var(--placeholder); min-height:680px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px;">
+
+        <!-- Logo banner at top -->
+        <div style="text-align:center; margin-bottom:32px;">
+          <div style="font-size:18px; font-weight:700; letter-spacing:2px;">SMART FINANCE</div>
+          <div style="font-size:10px; color:var(--mid); letter-spacing:1px; margin-top:4px;">YOUR AI FINANCIAL ADVISOR</div>
+        </div>
+
+        <!-- Card -->
+        <div class="wf-card" style="width:100%; max-width:440px;">
+
+          <!-- progress dots -->
+          <div class="steps-row">
+            <div class="step-dot done"></div>
+            <div class="step-dot current"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div style="font-size:9px; color:var(--mid); margin-left:6px; line-height:8px;">Step 2 of 8</div>
+          </div>
+
+          <div style="height:12px;"></div>
+
+          <div class="wf-section-label">Question</div>
+          <div style="font-size:15px; font-weight:700; margin-bottom:12px;">What do you do for a living?</div>
+
+          <div class="annotation">text input — alpha only</div>
+          <div class="wf-input" style="margin-bottom:12px;">Type your occupation…</div>
+
+          <!-- Conditional: shows only on income step -->
+          <div class="annotation">conditional hint — only on insurance step</div>
+          <div style="font-size:9px; color:var(--mid); margin-bottom:12px;">Suggested coverage: ₹ [Income × 12]</div>
+
+          <!-- Investment platform shortcuts — only on investments step -->
+          <div class="annotation">platform chips — only on investments step</div>
+          <div class="chips-row" style="margin-bottom:12px;">
+            <div class="wf-tag">Zerodha</div>
+            <div class="wf-tag">Groww</div>
+            <div class="wf-tag">INDmoney</div>
+          </div>
+
+          <div class="wf-btn primary" style="width:100%; justify-content:center;">Next →</div>
+        </div>
+
+        <!-- Expense category modal overlay -->
+        <div style="margin-top:28px; width:100%; max-width:440px;">
+          <div class="annotation">modal overlay — expense breakdown (optional, step 5)</div>
+          <div class="wf-card" style="border:1.5px dashed var(--dark);">
+            <div class="wf-card-title">➕ Add Expense Categories</div>
+            <div style="display:flex; gap:6px; margin-bottom:6px;">
+              <div class="wf-input" style="flex:1;">Category name</div>
+              <div class="wf-input" style="flex:1;">Amount ₹</div>
+            </div>
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+              <div class="wf-input" style="flex:1;">Category name</div>
+              <div class="wf-input" style="flex:1;">Amount ₹</div>
+            </div>
+            <div style="font-size:9px; color:var(--mid); margin-bottom:10px;">+ Add More</div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+              <div class="wf-btn sm">Cancel</div>
+              <div class="wf-btn sm primary">Save Total</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 2 — DASHBOARD HOME
+  ══════════════════════════════════ -->
+  <div id="s2" class="screen">
+    <div class="screen-label">Screen 2 of 6</div>
+    <div class="screen-title">Dashboard Home</div>
+    <div class="screen-route">Route: /dashboard</div>
+
+    <div class="device-frame">
+      <div class="app-shell">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="sidebar-logo">
+            <div class="logo-box">
+              <div class="logo-icon">$</div>
+              <div class="logo-text">SMART<br>FINANCE</div>
+            </div>
+          </div>
+          <div class="sidebar-item active"><div class="s-icon"></div>Dashboard</div>
+          <div class="sidebar-item"><div class="s-icon"></div>AI Advisor</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Personal Finance</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Savings</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Investments</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Tax Calculator</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Spending</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Goal Planning</div>
+          <div class="sidebar-item"><div class="s-icon"></div>SIP / SWP</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Retirement</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Resources</div>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+
+          <!-- Header -->
+          <div class="wf-header">
+            <div class="wf-header-left">
+              <h2>Hey Rahul 👋&nbsp; <span style="font-size:12px; font-weight:400; color:var(--mid);">Your financial dashboard</span></h2>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <div class="wf-btn sm">✨ AI Advisor</div>
+              <div class="wf-btn sm primary">📄 Download PDF</div>
+            </div>
+          </div>
+
+          <!-- Row 1: Next Move + Future Projection -->
+          <div class="wf-grid wf-grid-2" style="margin-bottom:12px;">
+            <div class="wf-card">
+              <div class="wf-card-title">🚀 Your Next Move</div>
+              <div style="font-size:10px; color:var(--mid); margin-bottom:8px;">Build your emergency fund. Save ₹500 today.</div>
+              <div class="wf-btn sm primary">Save Now</div>
+              <div class="wf-progress" style="margin-top:10px;"><div class="wf-progress-fill" style="width:38%"></div></div>
+              <div style="font-size:9px; color:var(--mid); margin-top:4px;">₹19,000 / ₹50,000</div>
+              <div class="annotation" style="margin-top:6px;">insurance nudge — conditional</div>
+            </div>
+            <div class="wf-card">
+              <div class="wf-card-title">📈 Future Projection</div>
+              <div style="font-size:10px; color:var(--mid); margin-bottom:4px;">At your current pace, your net worth can grow to</div>
+              <div style="font-size:22px; font-weight:700; margin:6px 0;">₹18,43,200</div>
+              <div style="font-size:9px; color:var(--mid);">in the next 5 years @ 12% p.a.</div>
+            </div>
+          </div>
+
+          <!-- Row 2: Health Score + Goal Progress -->
+          <div class="wf-grid wf-grid-2" style="margin-bottom:12px;">
+            <div class="wf-card">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <div class="wf-card-title" style="margin-bottom:0;">💯 Financial Health</div>
+                <div style="font-size:20px; font-weight:700;">72 / 100</div>
+              </div>
+              <div class="wf-progress"><div class="wf-progress-fill" style="width:72%"></div></div>
+              <div class="wf-alert" style="margin-top:8px;">
+                <div class="wf-alert-icon">⚠️</div>
+                <div style="font-size:9px; color:var(--mid); line-height:1.5;">Your insurance coverage is low. Consider increasing it to ₹7,20,000.</div>
+              </div>
+            </div>
+            <div class="wf-card">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                <div class="wf-card-title" style="margin-bottom:0;">🎯 Goal Progress</div>
+                <div style="font-size:11px; font-weight:700;">38%</div>
+              </div>
+              <div style="font-size:10px; color:var(--mid); margin-bottom:6px;">Emergency Fund</div>
+              <div class="wf-progress"><div class="wf-progress-fill" style="width:38%"></div></div>
+            </div>
+          </div>
+
+          <!-- Row 3: 5 Metric Cards -->
+          <div class="annotation">5 financial snapshot cards</div>
+          <div class="wf-grid wf-grid-5" style="margin-bottom:12px;">
+            <div class="wf-metric-card"><div class="wf-metric-label">💰 Income</div><div class="wf-metric-value">₹60k</div><div class="wf-metric-sub">Stable flow</div></div>
+            <div class="wf-metric-card"><div class="wf-metric-label">💸 Expenses</div><div class="wf-metric-value">₹35k</div><div class="wf-metric-sub">Controlled ✅</div></div>
+            <div class="wf-metric-card"><div class="wf-metric-label">📈 Savings</div><div class="wf-metric-value">₹15k</div><div class="wf-metric-sub">Building ⚠️</div></div>
+            <div class="wf-metric-card"><div class="wf-metric-label">💎 Investments</div><div class="wf-metric-value">₹10k</div><div class="wf-metric-sub">More needed</div></div>
+            <div class="wf-metric-card"><div class="wf-metric-label">🛡️ Insurance</div><div class="wf-metric-value">₹2L</div><div class="wf-metric-sub">Low coverage</div></div>
+          </div>
+
+          <!-- Row 4: 2 Charts -->
+          <div class="wf-grid wf-grid-2" style="margin-bottom:12px;">
+            <div class="wf-card">
+              <div class="wf-card-title">⚖️ 50/30/20 Rule Analysis</div>
+              <div class="wf-chart-area">
+                <div class="chart-label">ACTUAL vs TARGET</div>
+                <div class="wf-bar-item" style="height:90%; background:#DDD;"></div>
+                <div class="wf-bar-item" style="height:65%; background:#CCC;"></div>
+                <div class="wf-bar-item" style="height:80%; background:#DDD;"></div>
+                <div class="wf-bar-item" style="height:55%; background:#CCC;"></div>
+                <div class="wf-bar-item" style="height:40%; background:#DDD;"></div>
+                <div class="wf-bar-item" style="height:70%; background:#CCC;"></div>
+              </div>
+              <div style="display:flex; gap:8px; margin-top:6px;">
+                <div style="font-size:9px; color:var(--mid);">■ Target</div>
+                <div style="font-size:9px; color:var(--mid);">■ Actual</div>
+              </div>
+            </div>
+            <div class="wf-card">
+              <div class="wf-card-title">📊 Monthly Overview</div>
+              <div class="wf-chart-area">
+                <div class="chart-label">Income | Expenses | Savings</div>
+                <div class="wf-bar-item" style="height:100%; background:#C8C8C8;"></div>
+                <div class="wf-bar-item" style="height:60%; background:#DDD;"></div>
+                <div class="wf-bar-item" style="height:30%; background:#E2E2E2;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 5: Next Actions + Smart Insight -->
+          <div class="wf-grid wf-grid-2">
+            <div class="wf-card">
+              <div class="wf-card-title">⚡ What Should You Do Next?</div>
+              <div class="wf-list-item"><div class="li-icon"></div>Increase savings rate → click to chat</div>
+              <div class="wf-list-item"><div class="li-icon"></div>Build emergency fund → click to chat</div>
+              <div class="wf-list-item"><div class="li-icon"></div>Start investing more → click to chat</div>
+            </div>
+            <div class="wf-card">
+              <div class="wf-card-title">💡 AI Smart Insights</div>
+              <div class="wf-list-item"><div class="li-icon"></div>You spend 58% on needs — within target.</div>
+              <div class="wf-list-item"><div class="li-icon"></div>Emergency fund covers 1.8 months.</div>
+              <div class="wf-list-item"><div class="li-icon"></div>Insurance covers only 28% of ideal.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 3 — AI ADVISOR
+  ══════════════════════════════════ -->
+  <div id="s3" class="screen">
+    <div class="screen-label">Screen 3 of 6</div>
+    <div class="screen-title">AI Advisor Chat</div>
+    <div class="screen-route">Route: /ai-advisor</div>
+
+    <div class="device-frame">
+      <div class="app-shell">
+
+        <div class="sidebar">
+          <div class="sidebar-logo">
+            <div class="logo-box">
+              <div class="logo-icon">$</div>
+              <div class="logo-text">SMART<br>FINANCE</div>
+            </div>
+          </div>
+          <div class="sidebar-item"><div class="s-icon"></div>Dashboard</div>
+          <div class="sidebar-item active"><div class="s-icon"></div>AI Advisor</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Personal Finance</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Savings</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Investments</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Tax Calculator</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Spending</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Goal Planning</div>
+          <div class="sidebar-item"><div class="s-icon"></div>SIP / SWP</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Retirement</div>
+        </div>
+
+        <div class="main-content" style="display:flex; flex-direction:column; padding:16px; gap:12px;">
+
+          <!-- Header -->
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:14px; font-weight:700;">✨ AI Financial Advisor</div>
+              <div style="font-size:9px; color:var(--mid);">Powered by GPT-4o-mini &nbsp;|&nbsp; Session memory active</div>
+            </div>
+            <div style="font-size:9px; color:var(--mid); border:1px solid var(--border); padding:3px 8px; border-radius:4px;">⏱ 2.4s response time</div>
+          </div>
+
+          <!-- Topic chips -->
+          <div>
+            <div class="annotation">Quick-start topic chips</div>
+            <div class="chips-row">
+              <div class="wf-tag">📊 Budgeting</div>
+              <div class="wf-tag active">💰 Savings</div>
+              <div class="wf-tag">📈 SIP</div>
+              <div class="wf-tag">🧾 Tax</div>
+              <div class="wf-tag">🎯 Goals</div>
+              <div class="wf-tag">🏖️ Retirement</div>
+              <div class="wf-tag">💸 Spending</div>
+              <div class="wf-tag">❓ Others</div>
+            </div>
+          </div>
+
+          <!-- Chat thread -->
+          <div class="chat-thread" style="flex:1; overflow-y:auto;">
+
+            <!-- User message -->
+            <div style="display:flex; justify-content:flex-end;">
+              <div class="wf-bubble user">How much should I be saving every month?</div>
+            </div>
+
+            <!-- AI response -->
+            <div style="display:flex; justify-content:flex-start; flex-direction:column; gap:6px;">
+              <div class="wf-bubble ai">
+                Based on your monthly income of ₹60,000, you should aim to save at least ₹12,000 (20%) every month. Currently, you're saving ₹15,000 which is great! Here's a breakdown of how I'd recommend splitting it…
+              </div>
+
+              <!-- Inline chart -->
+              <div class="wf-card" style="max-width:70%;">
+                <div class="annotation">inline pie chart — budget allocation</div>
+                <div class="wf-chart-area" style="height:100px; justify-content:center; align-items:center;">
+                  <div class="chart-label">PIE — Monthly Allocation</div>
+                  <div style="width:70px; height:70px; border-radius:50%; border:12px solid var(--border); border-top-color:#888; border-right-color:#aaa;"></div>
+                </div>
+              </div>
+
+              <!-- Inline table -->
+              <div class="wf-card" style="max-width:70%;">
+                <div class="annotation">structured table</div>
+                <table class="wf-table">
+                  <tr><th>Category</th><th>Amount</th><th>% of Income</th></tr>
+                  <tr><td>Needs</td><td>₹30,000</td><td>50%</td></tr>
+                  <tr><td>Wants</td><td>₹18,000</td><td>30%</td></tr>
+                  <tr><td>Savings</td><td>₹12,000</td><td>20%</td></tr>
+                </table>
+              </div>
+
+              <!-- Action chips -->
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <div class="annotation">action chips from AI</div>
+                <div class="action-chip">💾 Save ₹500 Now</div>
+                <div class="action-chip">📈 Start SIP ₹1000</div>
+              </div>
+
+              <!-- Insurance nudge -->
+              <div class="wf-alert" style="max-width:70%;">
+                <div class="wf-alert-icon">🛡️</div>
+                <div style="font-size:9px; line-height:1.5; color:var(--mid);">Insurance insight (always injected): Your coverage is ₹2L — ideally should be ₹7.2L (10–12× income).</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input bar -->
+          <div style="display:flex; gap:8px; border-top:1px solid var(--border); padding-top:12px;">
+            <div class="wf-input" style="flex:1; height:36px;">Ask anything about your finances…</div>
+            <div class="wf-btn primary sm">Send ↑</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 4 — RETIREMENT PLANNING
+  ══════════════════════════════════ -->
+  <div id="s4" class="screen">
+    <div class="screen-label">Screen 4 of 6</div>
+    <div class="screen-title">Retirement Planning Calculator</div>
+    <div class="screen-route">Route: /retirement</div>
+
+    <div class="device-frame">
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="sidebar-logo">
+            <div class="logo-box"><div class="logo-icon">$</div><div class="logo-text">SMART<br>FINANCE</div></div>
+          </div>
+          <div class="sidebar-item"><div class="s-icon"></div>Dashboard</div>
+          <div class="sidebar-item"><div class="s-icon"></div>AI Advisor</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Personal Finance</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Savings</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Investments</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Tax Calculator</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Spending</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Goal Planning</div>
+          <div class="sidebar-item"><div class="s-icon"></div>SIP / SWP</div>
+          <div class="sidebar-item active"><div class="s-icon"></div>Retirement</div>
+        </div>
+
+        <div class="main-content">
+
+          <div class="wf-header">
+            <div class="wf-header-left">
+              <h2>🌿 Retirement Planning</h2>
+              <p>Plan for a financially secure retirement and maintain your lifestyle.</p>
+            </div>
+          </div>
+
+          <!-- Input calculator -->
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="wf-card-title">Retirement Calculator</div>
+            <div class="annotation">2-column input grid</div>
+            <div class="wf-grid wf-grid-2" style="margin-bottom:8px;">
+              <div><div style="font-size:9px; margin-bottom:4px;">Current Age</div><div class="wf-input">e.g. 30</div></div>
+              <div><div style="font-size:9px; margin-bottom:4px;">Planned Retirement Age</div><div class="wf-input">e.g. 60</div></div>
+              <div><div style="font-size:9px; margin-bottom:4px;">Monthly Expenses (₹)</div><div class="wf-input">e.g. 40,000</div></div>
+              <div><div style="font-size:9px; margin-bottom:4px;">Current Retirement Savings (₹)</div><div class="wf-input">e.g. 5,00,000</div></div>
+            </div>
+            <div style="margin-bottom:10px;"><div style="font-size:9px; margin-bottom:4px;">Monthly Retirement SIP (₹)</div><div class="wf-input">e.g. 10,000</div></div>
+            <div class="wf-btn primary" style="width:100%; justify-content:center;">Calculate Retirement Plan</div>
+          </div>
+
+          <!-- Result metrics -->
+          <div class="annotation">result cards — shown after calculate</div>
+          <div class="wf-grid wf-grid-4" style="margin-bottom:12px;">
+            <div class="wf-metric-card"><div class="wf-metric-label">Corpus Needed</div><div class="wf-metric-value">₹3.2Cr</div><div class="wf-metric-sub">At retirement</div></div>
+            <div class="wf-metric-card"><div class="wf-metric-label">Projected Corpus</div><div class="wf-metric-value">₹2.1Cr</div><div class="wf-metric-sub">Current plan</div></div>
+            <div class="wf-metric-card"><div class="wf-metric-label">Shortfall</div><div class="wf-metric-value" style="font-size:14px;">₹1.1Cr</div><div class="wf-metric-sub">Save more ⚠️</div></div>
+            <div class="wf-metric-card"><div class="wf-metric-label">Years to Retire</div><div class="wf-metric-value">28</div><div class="wf-metric-sub">Time to build corpus</div></div>
+          </div>
+
+          <!-- Corpus growth chart -->
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="wf-card-title">📈 Retirement Corpus Growth Projection</div>
+            <div class="wf-line-chart" style="height:120px;">
+              <div class="chart-label">PROJECTED CORPUS (AGE-WISE LINE CHART)</div>
+              <svg viewBox="0 0 400 80" preserveAspectRatio="none">
+                <polyline points="0,75 50,65 100,55 150,42 200,30 250,18 300,10 350,5 400,2" fill="none" stroke="#888" stroke-width="2" stroke-dasharray="6,3"/>
+                <text x="10" y="78" font-size="8" fill="#aaa">Age 30</text>
+                <text x="360" y="78" font-size="8" fill="#aaa">Age 60</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Shortfall alert -->
+          <div class="wf-card" style="margin-bottom:12px; border:1.5px dashed #aaa;">
+            <div class="wf-card-title">⚠️ Action Required</div>
+            <div style="font-size:10px; color:var(--mid); margin-bottom:8px;">Your current plan will not meet your retirement goals.</div>
+            <div style="background:var(--bg); border-radius:4px; padding:10px; text-align:center;">
+              <div style="font-size:9px; color:var(--mid);">Additional Monthly SIP Required</div>
+              <div style="font-size:22px; font-weight:700; margin-top:2px;">₹4,800 / mo</div>
+            </div>
+          </div>
+
+          <!-- Post-retirement chart -->
+          <div class="wf-card">
+            <div class="wf-card-title">📊 Post-Retirement Expenses (Inflation-Adjusted)</div>
+            <div class="wf-chart-area" style="height:110px;">
+              <div class="chart-label">MONTHLY EXPENSES · AGE-WISE BAR CHART · 6% INFLATION</div>
+              <div class="wf-bar-item" style="height:35%; background:#D8D8D8;"></div>
+              <div class="wf-bar-item" style="height:42%; background:#CCC;"></div>
+              <div class="wf-bar-item" style="height:50%; background:#D8D8D8;"></div>
+              <div class="wf-bar-item" style="height:59%; background:#CCC;"></div>
+              <div class="wf-bar-item" style="height:69%; background:#D8D8D8;"></div>
+              <div class="wf-bar-item" style="height:80%; background:#CCC;"></div>
+              <div class="wf-bar-item" style="height:92%; background:#D8D8D8;"></div>
+              <div class="wf-bar-item" style="height:100%; background:#C8C8C8;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 5 — SIP / SWP CALCULATOR
+  ══════════════════════════════════ -->
+  <div id="s5" class="screen">
+    <div class="screen-label">Screen 5 of 6</div>
+    <div class="screen-title">SIP / SWP Calculator</div>
+    <div class="screen-route">Route: /sip-swp</div>
+
+    <div class="device-frame">
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="sidebar-logo"><div class="logo-box"><div class="logo-icon">$</div><div class="logo-text">SMART<br>FINANCE</div></div></div>
+          <div class="sidebar-item"><div class="s-icon"></div>Dashboard</div>
+          <div class="sidebar-item"><div class="s-icon"></div>AI Advisor</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Personal Finance</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Savings</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Investments</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Tax Calculator</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Spending</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Goal Planning</div>
+          <div class="sidebar-item active"><div class="s-icon"></div>SIP / SWP</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Retirement</div>
+        </div>
+
+        <div class="main-content">
+          <div class="wf-header"><div class="wf-header-left"><h2>🔢 SIP / SWP Calculator</h2><p>Plan your investments and withdrawals smartly</p></div></div>
+
+          <!-- Mode selector -->
+          <div class="annotation">mode toggle cards</div>
+          <div class="wf-grid wf-grid-2" style="margin-bottom:12px;">
+            <div class="wf-card" style="border:2px solid var(--dark);">
+              <div style="font-weight:700; font-size:12px; margin-bottom:4px;">SIP Calculator ✔</div>
+              <div style="font-size:10px; color:var(--mid);">Invest monthly and grow wealth over time</div>
+            </div>
+            <div class="wf-card">
+              <div style="font-weight:700; font-size:12px; margin-bottom:4px;">SWP Calculator</div>
+              <div style="font-size:10px; color:var(--mid);">Withdraw fixed income from investments</div>
+            </div>
+          </div>
+
+          <!-- Calculator -->
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="wf-card-title">SIP Calculator</div>
+            <div style="margin-bottom:8px;"><div style="font-size:9px; margin-bottom:4px;">Monthly Investment (₹)</div><div class="wf-input">e.g. 5000</div></div>
+            <div class="annotation">income-relative hint — conditional</div>
+            <div style="font-size:9px; color:var(--mid); margin-bottom:8px;">This is 8% of your monthly income</div>
+            <div style="margin-bottom:8px;"><div style="font-size:9px; margin-bottom:4px;">Expected Return (%)</div><div class="wf-input">e.g. 12</div></div>
+            <div style="margin-bottom:10px;"><div style="font-size:9px; margin-bottom:4px;">Time (Years)</div><div class="wf-input">e.g. 10</div></div>
+            <div class="wf-btn primary" style="width:100%; justify-content:center;">Calculate</div>
+
+            <!-- Result -->
+            <div style="background:var(--bg); border-radius:4px; padding:12px; text-align:center; margin-top:10px; border:1px dashed var(--border);">
+              <div style="font-size:9px; color:var(--mid);">Future Value</div>
+              <div style="font-size:24px; font-weight:700;">₹11,61,695</div>
+            </div>
+          </div>
+
+          <!-- Growth chart -->
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="wf-card-title">📈 Growth Projection</div>
+            <div class="wf-line-chart" style="height:110px;">
+              <div class="chart-label">CORPUS GROWTH · YEAR-WISE LINE CHART</div>
+              <svg viewBox="0 0 400 70" preserveAspectRatio="none">
+                <polyline points="0,68 60,60 120,50 180,38 240,25 300,14 360,5 400,2" fill="none" stroke="#888" stroke-width="2.5"/>
+                <text x="10" y="68" font-size="8" fill="#aaa">Yr 1</text>
+                <text x="370" y="68" font-size="8" fill="#aaa">Yr 10</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- AI Recommendation -->
+          <div class="wf-card" style="margin-bottom:12px; background:var(--bg);">
+            <div class="wf-card-title">🤖 AI Recommendation</div>
+            <div style="font-size:10px; color:var(--mid); line-height:1.6;">You're investing ₹5,000 (8% of income). Based on your income ₹60,000, you should aim for ₹12,000 (20%) monthly for stronger wealth creation.</div>
+          </div>
+
+          <!-- Education cards -->
+          <div class="annotation">educational cards — 3 stacked</div>
+          <div class="wf-card" style="margin-bottom:6px;"><div class="wf-card-title">📘 What is SIP?</div><div style="font-size:9px; color:var(--mid); line-height:1.6;">A Systematic Investment Plan is a disciplined method to invest a fixed sum at regular intervals into mutual funds…</div></div>
+          <div class="wf-card" style="margin-bottom:6px;"><div class="wf-card-title">💡 Why is SIP useful?</div><div style="font-size:9px; color:var(--mid); line-height:1.6;">Reduces market risk through rupee cost averaging. Enables wealth creation through compounding…</div></div>
+          <div class="wf-card"><div class="wf-card-title">🎯 Who should use SIP?</div><div style="font-size:9px; color:var(--mid); line-height:1.6;">Ideal for disciplined investors, beginners, and anyone looking to build wealth long-term without a large lump sum…</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SCREEN 6 — TAX CALCULATOR
+  ══════════════════════════════════ -->
+  <div id="s6" class="screen">
+    <div class="screen-label">Screen 6 of 6</div>
+    <div class="screen-title">Tax Calculator</div>
+    <div class="screen-route">Route: /tax-calculator</div>
+
+    <div class="device-frame">
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="sidebar-logo"><div class="logo-box"><div class="logo-icon">$</div><div class="logo-text">SMART<br>FINANCE</div></div></div>
+          <div class="sidebar-item"><div class="s-icon"></div>Dashboard</div>
+          <div class="sidebar-item"><div class="s-icon"></div>AI Advisor</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Personal Finance</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Savings</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Investments</div>
+          <div class="sidebar-item active"><div class="s-icon"></div>Tax Calculator</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Spending</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Goal Planning</div>
+          <div class="sidebar-item"><div class="s-icon"></div>SIP / SWP</div>
+          <div class="sidebar-item"><div class="s-icon"></div>Retirement</div>
+        </div>
+
+        <div class="main-content">
+          <div class="wf-header"><div class="wf-header-left"><h2>🧾 Tax Calculator</h2><p>Compare Old vs New Tax Regime &amp; optimise savings</p></div></div>
+
+          <!-- Income input -->
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="wf-card-title">Annual Income</div>
+            <div class="annotation">auto-populated from onboarding: income × 12</div>
+            <div class="wf-input" style="margin-bottom:6px;">₹ 7,20,000 (auto-filled)</div>
+            <div style="font-size:9px; color:var(--mid);">Monthly income ₹60,000 × 12</div>
+          </div>
+
+          <!-- Deductions -->
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="wf-card-title">Deductions (Old Regime)</div>
+            <div class="wf-grid wf-grid-2">
+              <div><div style="font-size:9px; margin-bottom:4px;">80C (PPF, ELSS, LIC…)</div><div class="wf-input">Max ₹1,50,000</div></div>
+              <div><div style="font-size:9px; margin-bottom:4px;">80D (Health Insurance)</div><div class="wf-input">Max ₹25,000</div></div>
+              <div><div style="font-size:9px; margin-bottom:4px;">HRA Exemption</div><div class="wf-input">Enter amount</div></div>
+              <div><div style="font-size:9px; margin-bottom:4px;">80CCD (NPS)</div><div class="wf-input">Max ₹50,000</div></div>
+            </div>
+            <div style="height:8px;"></div>
+            <div class="wf-btn primary" style="width:100%; justify-content:center;">Calculate Tax</div>
+          </div>
+
+          <!-- Result: two regime cards -->
+          <div class="annotation">side-by-side tax regime comparison</div>
+          <div class="wf-grid wf-grid-2" style="margin-bottom:12px;">
+            <div class="wf-card" style="border:2px solid var(--dark);">
+              <div class="wf-card-title">Old Tax Regime ✔ Recommended</div>
+              <div class="wf-metric-value" style="font-size:20px;">₹54,600</div>
+              <div class="wf-metric-sub">Tax payable</div>
+              <hr class="divider" style="margin:8px 0;"/>
+              <div style="font-size:9px; color:var(--mid); line-height:1.6;">After deductions of ₹2,25,000 under 80C, 80D &amp; NPS. Taxable income: ₹4,95,000.</div>
+            </div>
+            <div class="wf-card">
+              <div class="wf-card-title">New Tax Regime</div>
+              <div class="wf-metric-value" style="font-size:20px;">₹33,800</div>
+              <div class="wf-metric-sub">Tax payable</div>
+              <hr class="divider" style="margin:8px 0;"/>
+              <div style="font-size:9px; color:var(--mid); line-height:1.6;">No deductions allowed. Taxable income: ₹7,20,000 with revised slab rates.</div>
+            </div>
+          </div>
+
+          <!-- Bar chart comparison -->
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="wf-card-title">📊 Tax Regime Comparison Chart</div>
+            <div class="wf-chart-area" style="justify-content:center;">
+              <div class="chart-label">OLD REGIME vs NEW REGIME · BAR CHART</div>
+              <div class="wf-bar-item" style="height:90%; background:#C8C8C8; max-width:80px;"></div>
+              <div style="width:16px;"></div>
+              <div class="wf-bar-item" style="height:60%; background:#D8D8D8; max-width:80px;"></div>
+            </div>
+            <div style="display:flex; gap:16px; margin-top:6px; justify-content:center;">
+              <div style="font-size:9px;">■ Old Regime ₹54,600</div>
+              <div style="font-size:9px; color:var(--mid);">■ New Regime ₹33,800</div>
+            </div>
+          </div>
+
+          <!-- Tax saving instruments -->
+          <div class="wf-card">
+            <div class="wf-card-title">💡 Tax-Saving Instruments</div>
+            <table class="wf-table">
+              <tr><th>Section</th><th>Instrument</th><th>Max Deduction</th><th>Status</th></tr>
+              <tr><td>80C</td><td>PPF, ELSS, LIC, NSC</td><td>₹1,50,000</td><td>Available</td></tr>
+              <tr><td>80D</td><td>Health Insurance</td><td>₹25,000</td><td>Available</td></tr>
+              <tr><td>80CCD</td><td>NPS</td><td>₹50,000</td><td>Available</td></tr>
+              <tr><td>80E</td><td>Education Loan</td><td>Interest paid</td><td>If applicable</td></tr>
+              <tr><td>24(b)</td><td>Home Loan Interest</td><td>₹2,00,000</td><td>If applicable</td></tr>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screens-container -->
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.top-nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
