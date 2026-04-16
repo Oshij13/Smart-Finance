@@ -16,6 +16,7 @@ export function SipSwpCalculator() {
     const [withdrawalRate, setWithdrawalRate] = useState("");
     const [swpTime, setSwpTime] = useState("");
     const [inflation, setInflation] = useState("");
+    const [monthlyWithdrawal, setMonthlyWithdrawal] = useState("");
 
     const [result, setResult] = useState<number | null>(null);
     const [totalInvested, setTotalInvested] = useState<number | null>(null);
@@ -225,65 +226,77 @@ export function SipSwpCalculator() {
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Initial Corpus (₹)
-                            </label>
-                            <input
-                                type="number"
-                                value={corpus}
-                                onChange={(e) => setCorpus(e.target.value)}
-                                placeholder="e.g. 1000000"
-                                className={inputClass}
-                            />
-                        </div>
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Expected Return (%)
-                            </label>
-                            <input
-                                type="number"
-                                value={withdrawalRate}
-                                onChange={(e) => setWithdrawalRate(e.target.value)}
-                                placeholder="e.g. 8"
-                                className={inputClass}
-                            />
-                        </div>
+                            {/* Corpus */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">
+                                    Initial Corpus (₹)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={corpus}
+                                    onChange={(e) => setCorpus(e.target.value)}
+                                    placeholder="e.g. 1000000"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Time (Years)
-                            </label>
-                            <input
-                                type="number"
-                                value={swpTime}
-                                onChange={(e) => setSwpTime(e.target.value)}
-                                placeholder="e.g. 20"
-                                className={inputClass}
-                            />
-                        </div>
+                            {/* Return */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">
+                                    Expected Return (%)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={withdrawalRate}
+                                    onChange={(e) => setWithdrawalRate(e.target.value)}
+                                    placeholder="e.g. 8"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Inflation / Withdrawal Increase (%)
-                            </label>
-                            <input
-                                type="number"
-                                value={inflation}
-                                onChange={(e) => setInflation(e.target.value)}
-                                placeholder="e.g. 6"
-                                className={inputClass}
-                            />
+                            {/* Time */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">
+                                    Time (Years)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
+                                    placeholder="e.g. 20"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                />
+                            </div>
+
+                            {/* Monthly Withdrawal */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">
+                                    Monthly Withdrawal (₹)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={monthlyWithdrawal}
+                                    onChange={(e) => setMonthlyWithdrawal(e.target.value)}
+                                    placeholder="e.g. 30000"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                />
+                            </div>
                         </div>
-                    </div>
+                        <div className="bg-gray-50 rounded-xl p-3 text-xs text-gray-600">
+                            Default inflation is set to <strong>6%</strong> annually.  
+                            This is used to increase your withdrawals over time.  
+                            You can adjust it if needed.
+                        </div>
+                    </>
                 )}
 
                 {/* CALCULATE BUTTON */}
                 <button
                     onClick={calculate}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium hover:opacity-90 transition"
+                    className="px-6 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:opacity-90 transition mx-auto block"
                 >
                     Calculate
                 </button>
