@@ -51,12 +51,14 @@ export default function AdvisorChat() {
 
         setSessionId(existingSession);
 
-        // 🚨 KEY FIX: detect reload
+        // 🚨 KEY FIX: detect reload only ONCE per page session
         const navEntries = performance.getEntriesByType("navigation");
         const isReload = navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === "reload";
+        const hasHandledReload = sessionStorage.getItem("reload_reset_done");
 
-        if (isReload) {
+        if (isReload && !hasHandledReload) {
             localStorage.removeItem("advisorChat");
+            sessionStorage.setItem("reload_reset_done", "true");
             setResetBackend(true);
         }
 
