@@ -16,7 +16,6 @@ export function SipSwpCalculator() {
     const [withdrawalRate, setWithdrawalRate] = useState("");
     const [swpTime, setSwpTime] = useState("");
     const [inflation, setInflation] = useState("");
-    const [monthlyWithdrawal, setMonthlyWithdrawal] = useState("");
 
     const [result, setResult] = useState<number | null>(null);
     const [totalInvested, setTotalInvested] = useState<number | null>(null);
@@ -56,42 +55,62 @@ export function SipSwpCalculator() {
         }
 
         if (mode === "swp") {
-            const P = parseFloat(corpus) || 0;
-            const r = (parseFloat(withdrawalRate) || 0) / 100 / 12;
-            const n = (parseFloat(swpTime) || 0) * 12;
+            const P = parseFloat(corpus) || 0; // initial corpus
+            const annualRate = (parseFloat(withdrawalRate) || 0) / 100;
+            const years = parseFloat(swpTime) || 0;
+            const inflationRate = (parseFloat(inflation) || 6) / 100;
 
-            const inflationRate = (parseFloat(inflation) || 0) / 100;
+            const r = annualRate / 12;
+            const n = years * 12;
 
-            const monthlyIncrease =
-                inflationRate > 0
-                    ? Math.pow(1 + inflationRate, 1 / 12) - 1
-                    : 0;
+            let withdrawal = 0;
+            let low = 0;
+            let high = P;
 
-            let value = P;
-            let withdrawal = P * r; // interest-only starting withdrawal
-            const initialWithdrawal = withdrawal;
+            // Binary search to find sustainable withdrawal
+            for (let iter = 0; iter < 50; iter++) {
+                let mid = (low + high) / 2;
+                let value = P;
+                let currentWithdrawal = mid;
 
-            for (let i = 1; i <= n; i++) {
-                value = value * (1 + r);
-                value = value - withdrawal;
+                for (let i = 0; i < n; i++) {
+                    value = value * (1 + r);
+                    value -= currentWithdrawal;
 
-                if (value < 0) {
-                    value = 0;
-                    withdrawal = 0;
+                    // increase withdrawal yearly (inflation adjusted)
+                    if ((i + 1) % 12 === 0) {
+                        currentWithdrawal *= (1 + inflationRate);
+                    }
+
+                    if (value < 0) break;
                 }
 
-                withdrawal = withdrawal * (1 + monthlyIncrease);
-
-                if (i % 12 === 0) {
-                    data.push({
-                        year: i / 12,
-                        corpus: Math.max(0, Math.round(value)),
-                        withdrawal: Math.round(withdrawal),
-                    });
+                if (value >= 0) {
+                    withdrawal = mid;
+                    low = mid;
+                } else {
+                    high = mid;
                 }
             }
 
-            setResult(initialWithdrawal);
+            // Build chart data using the optimal withdrawal we found
+            let finalValue = P;
+            let currentW = withdrawal;
+            for (let i = 0; i < n; i++) {
+                finalValue = finalValue * (1 + r);
+                finalValue -= currentW;
+
+                if ((i + 1) % 12 === 0) {
+                    data.push({
+                        year: (i + 1) / 12,
+                        corpus: Math.max(0, Math.round(finalValue)),
+                        withdrawal: Math.round(currentW),
+                    });
+                    currentW *= (1 + inflationRate);
+                }
+            }
+
+            setResult(Math.round(withdrawal));
             setChartData(data);
         }
     };
@@ -108,14 +127,7 @@ export function SipSwpCalculator() {
         return `Ensure your withdrawal is sustainable. Ideally, your withdrawal should be lower than your returns to avoid running out of money.`;
     };
 
-    const futureProjection = () => {
-        if (mode !== "sip" || !monthlyInvestment || !expectedReturn || !time) return null;
-        const P = parseFloat(monthlyInvestment);
-        const r = parseFloat(expectedReturn) / 100 / 12;
-        const n = parseFloat(time) * 12;
-        const FV = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
-        return { value: FV, years: parseFloat(time) };
-    };
+
 
     const inputClass = "w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500";
 
@@ -227,7 +239,7 @@ export function SipSwpCalculator() {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                             {/* Corpus */}
                             <div className="space-y-2">
@@ -264,26 +276,13 @@ export function SipSwpCalculator() {
                                 </label>
                                 <input
                                     type="number"
-                                    value={time}
-                                    onChange={(e) => setTime(e.target.value)}
+                                    value={swpTime}
+                                    onChange={(e) => setSwpTime(e.target.value)}
                                     placeholder="e.g. 20"
                                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                                 />
                             </div>
 
-                            {/* Monthly Withdrawal */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">
-                                    Monthly Withdrawal (₹)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={monthlyWithdrawal}
-                                    onChange={(e) => setMonthlyWithdrawal(e.target.value)}
-                                    placeholder="e.g. 30000"
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
                         </div>
                         <div className="bg-gray-50 rounded-xl p-3 text-xs text-gray-600">
                             Default inflation is set to <strong>6%</strong> annually.  
@@ -330,26 +329,19 @@ export function SipSwpCalculator() {
 
                 {/* SWP RESULT */}
                 {mode === "swp" && result !== null && (
-                    <div className="p-4 bg-green-50 rounded-xl text-center">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 divide-y md:divide-y-0 md:divide-x divide-green-200">
-                            <div className="flex flex-col justify-center py-2 md:py-0">
-                                <p className="text-sm text-gray-600">Monthly Withdrawal (Starting)</p>
-                                <p className="text-2xl font-bold text-teal-600">
-                                    ₹{Math.round(result).toLocaleString()}
-                                </p>
-                            </div>
-                            {chartData.length > 0 && (
-                                <div className="flex flex-col justify-center py-2 md:py-0">
-                                    <p className="text-sm text-gray-600">
-                                        Final Withdrawal after {swpTime} years
-                                    </p>
-                                    <p className="text-2xl font-bold text-green-600">
-                                        ₹{Math.round(chartData[chartData.length - 1].withdrawal).toLocaleString()}
-                                    </p>
-                                </div>
-                            )}
+                    <>
+                        <div className="bg-green-50 rounded-xl p-4 mt-4 text-center">
+                            <p className="text-sm text-gray-600">
+                                Sustainable Monthly Withdrawal
+                            </p>
+                            <h3 className="text-2xl font-semibold text-green-700">
+                                ₹ {result.toLocaleString()}
+                            </h3>
                         </div>
-                    </div>
+                        <p className="text-sm text-gray-500 mt-2 text-center">
+                            This withdrawal increases annually with inflation (default 6%)
+                        </p>
+                    </>
                 )}
             </div>
 
