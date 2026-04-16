@@ -141,14 +141,24 @@ export function SipSwpCalculator() {
                     months: monthsLasted % 12,
                 });
             } else {
-                setSwpResult(null);
-
-                // Build chart safely using sustainable so chart works when user withdrawal is empty
                 let value = P;
                 let w = sustainable;
+                let totalWithdrawn = 0;
+                let monthsLasted = 0;
+
                 for (let i = 0; i < n; i++) {
                     value = value * (1 + r);
                     value -= w;
+
+                    if (value <= 0) {
+                        monthsLasted = i;
+                        totalWithdrawn += w;
+                        value = 0;
+                        break;
+                    }
+
+                    totalWithdrawn += w;
+
                     if ((i + 1) % 12 === 0) {
                         data.push({
                             year: (i + 1) / 12,
@@ -157,7 +167,16 @@ export function SipSwpCalculator() {
                         });
                         w *= (1 + inflationRate);
                     }
+
+                    monthsLasted = i;
                 }
+
+                setSwpResult({
+                    finalCorpus: Math.round(value),
+                    totalWithdrawn: Math.round(totalWithdrawn),
+                    years: Math.floor(monthsLasted / 12),
+                    months: monthsLasted % 12,
+                });
             }
 
             setChartData(data);
@@ -169,7 +188,7 @@ export function SipSwpCalculator() {
             const amt = parseFloat(monthlyInvestment) || 0;
             const ideal = income * 0.2;
             if (amt < ideal) {
-                return `You're investing ₹${amt.toLocaleString()}, but based on your income ₹${income.toLocaleString()}, you should aim for around ₹${ideal.toLocaleString()} monthly for better wealth creation.`;
+                return `You're investing ₹${amt.toLocaleString('en-IN')}, but based on your income ₹${income.toLocaleString('en-IN')}, you should aim for around ₹${ideal.toLocaleString('en-IN')} monthly for better wealth creation.`;
             }
             return `Great! You're investing a strong amount. Keep it consistent to build long-term wealth.`;
         }
@@ -367,7 +386,7 @@ export function SipSwpCalculator() {
                         <div className="bg-green-50 rounded-xl p-4">
                             <p className="text-sm text-gray-600">Future Value</p>
                             <h3 className="text-xl font-semibold text-green-700">
-                                ₹ {result.toLocaleString()}
+                                ₹ {result.toLocaleString('en-IN')}
                             </h3>
                         </div>
 
@@ -375,12 +394,12 @@ export function SipSwpCalculator() {
                         <div className="bg-gray-50 rounded-xl p-4">
                             <p className="text-sm text-gray-600">Total Invested</p>
                             <h3 className="text-xl font-semibold">
-                                ₹ {totalInvested?.toLocaleString()}
+                                ₹ {totalInvested?.toLocaleString('en-IN')}
                             </h3>
                         </div>
 
                         <p className="text-sm text-gray-500 pt-2 md:col-span-2">
-                            You earned ₹ {(result! - totalInvested!).toLocaleString()} as returns
+                            You earned ₹ {(result! - totalInvested!).toLocaleString('en-IN')} as returns
                         </p>
 
                     </div>
@@ -403,7 +422,7 @@ export function SipSwpCalculator() {
                                 <p className="text-xs text-green-800/70 font-medium">Total Withdrawn</p>
                                 <h3 className="font-semibold text-lg text-green-700">
                                     {swpResult
-                                        ? `₹ ${swpResult.totalWithdrawn.toLocaleString()}`
+                                        ? `₹ ${swpResult.totalWithdrawn.toLocaleString('en-IN')}`
                                         : "-"}
                                 </h3>
                             </div>
@@ -413,7 +432,7 @@ export function SipSwpCalculator() {
                                 <p className="text-xs text-green-800/70 font-medium">Final Corpus</p>
                                 <h3 className="font-semibold text-lg text-green-700">
                                     {swpResult
-                                        ? `₹ ${swpResult.finalCorpus.toLocaleString()}`
+                                        ? `₹ ${swpResult.finalCorpus.toLocaleString('en-IN')}`
                                         : "-"}
                                 </h3>
                             </div>
@@ -425,7 +444,7 @@ export function SipSwpCalculator() {
                                 </p>
                                 <h3 className="font-semibold text-lg text-green-700">
                                     {sustainableWithdrawal !== null
-                                        ? `₹ ${sustainableWithdrawal.toLocaleString()}`
+                                        ? `₹ ${sustainableWithdrawal.toLocaleString('en-IN')}`
                                         : "-"}
                                 </h3>
                             </div>
