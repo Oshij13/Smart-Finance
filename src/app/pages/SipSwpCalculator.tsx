@@ -489,7 +489,7 @@ export function SipSwpCalculator() {
             )}
 
             {/* AI RECOMMENDATION */}
-            {result !== null && (
+            {(result !== null || sustainableWithdrawal !== null) && (
                 <Card className="border-none shadow-md bg-gradient-to-br from-emerald-50 to-teal-50">
                     <CardHeader>
                         <CardTitle>AI Recommendation</CardTitle>
