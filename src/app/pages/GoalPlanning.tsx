@@ -110,11 +110,29 @@ export function GoalPlanning() {
 
         {/* DETAILS */}
         <section>
-          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-4">
-            Details
-          </h2>
+          <div className="flex justify-between items-end mb-4">
+            <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">
+              Details
+            </h2>
+            {selectedGoal && target > 0 && (
+              <p className="text-[10px] text-muted-foreground uppercase tracking-tight animate-in fade-in">
+                Current progress: {currentProgress}%
+              </p>
+            )}
+          </div>
 
           <div className="rounded-2xl border hairline bg-card p-6 space-y-6">
+            {/* PROGRESS BAR (Only if goal set) */}
+            {selectedGoal && target > 0 && (
+              <div className="space-y-2 pb-2">
+                <div className="w-full bg-muted h-1 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-primary h-full rounded-full transition-all duration-1000" 
+                    style={{ width: `${Math.min(Number(currentProgress), 100)}%` }}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* ROW 1 */}
             <div className="grid md:grid-cols-2 gap-4">
@@ -205,31 +223,32 @@ export function GoalPlanning() {
 
             {/* CHART */}
             <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Growth Projection</h3>
+              <div className="flex justify-between items-center px-2">
+                <h3 className="text-sm text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Goal Growth Projection</h3>
                 <div className="flex items-center gap-4 text-[10px] uppercase font-bold tracking-tight">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 text-primary">
                     <div className="w-2 h-2 rounded-full bg-primary" />
-                    <span>Your Path</span>
+                    <span>Savings Path</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
                     <div className="w-2 h-1 border-t-2 border-dashed border-muted-foreground" />
                     <span>Target</span>
                   </div>
                 </div>
               </div>
 
-              <div className="h-[280px] w-full pt-4">
+              <div className="h-[300px] w-full pt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={projectionData}>
+                  <LineChart data={projectionData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <Tooltip 
                       cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--card))', 
                         border: '1px solid hsl(var(--border))', 
                         borderRadius: '0.75rem',
-                        fontSize: '12px',
-                        fontWeight: '500'
+                        fontSize: '11px',
+                        fontWeight: '500',
+                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
                       }}
                       formatter={(val: number) => [`₹${val.toLocaleString('en-IN')}`]}
                     />
@@ -239,7 +258,7 @@ export function GoalPlanning() {
                       stroke="hsl(var(--primary))" 
                       strokeWidth={3} 
                       dot={false}
-                      activeDot={{ r: 4, fill: 'hsl(var(--primary))' }}
+                      activeDot={{ r: 5, fill: 'hsl(var(--primary))', strokeWidth: 2, stroke: 'white' }}
                     />
                     <Line 
                       type="monotone" 
@@ -251,14 +270,44 @@ export function GoalPlanning() {
                     />
                     <XAxis 
                       dataKey="year" 
-                      hide
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 500 }}
+                      dy={10}
                     />
                     <YAxis 
-                      hide
-                      domain={['auto', 'auto']}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 500 }}
+                      tickFormatter={(val) => `₹${(val / 100000).toFixed(0)}L`}
+                      dx={-10}
                     />
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* ACTION STEPS */}
+            <div className="space-y-4">
+              <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mt-4 px-1">
+                Recommendation Steps
+              </h2>
+
+              <div className="rounded-2xl border hairline bg-card divide-y hairline overflow-hidden">
+                {[
+                  { title: "Set Up Automatic SIP", desc: `Start a monthly SIP of ₹${requiredMonthly.toLocaleString('en-IN')} in index funds or equity mutual funds.`, color: "bg-blue-500" },
+                  { title: "Review Quarterly", desc: "Check your progress every 3 months and increase SIP with salary increments.", color: "bg-purple-500" },
+                  { title: "Stay Invested", desc: "Don't panic during market corrections. Stay focused on your long-term goal.", color: "bg-indigo-500" },
+                  { title: "Bonus Investments", desc: "Use bonuses or windfall gains to make lump sum investments toward your goal.", color: "bg-cyan-500" }
+                ].map((step, i) => (
+                  <div key={i} className="px-6 py-5 flex items-start gap-5 hover:bg-muted/30 transition-colors group">
+                    <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${step.color} shadow-[0_0_8px_rgba(0,0,0,0.1)] group-hover:scale-125 transition-transform`} />
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-semibold text-foreground">{step.title}</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
