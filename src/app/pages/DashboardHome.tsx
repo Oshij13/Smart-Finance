@@ -17,6 +17,22 @@ import {
   Legend,
 } from "recharts";
 
+import { 
+  Sparkles, 
+  Download, 
+  CircleDollarSign, 
+  CreditCard, 
+  TrendingUp, 
+  Gem, 
+  ShieldCheck, 
+  AlertCircle, 
+  AlertTriangle, 
+  Shield, 
+  BarChart3, 
+  Trophy,
+  FileText
+} from "lucide-react";
+
 const colorMap: Record<string, string> = {
   red: "text-red-600 bg-red-100",
   orange: "text-orange-600 bg-orange-100",
@@ -306,19 +322,19 @@ export default function DashboardHome() {
   if (actions.length === 0) actions.push({ text: "Optimize your financial plan", action: "How to optimize my finances?" });
 
   const cards = [
-    { title: "Income", value: income, color: "text-green-600", bg: "bg-green-50", icon: "💰", insight: "Stable income flow" },
-    { title: "Expenses", value: expenses, color: "text-red-500", bg: "bg-red-50", icon: "💸", insight: expenses > income * 0.6 ? "High spending ⚠️" : "Controlled spending ✅" },
-    { title: "Savings", value: savings, color: "text-blue-600", bg: "bg-blue-50", icon: "📈", insight: savingsRate >= 20 ? "Strong savings 💪" : "Building phase ⚠️" },
-    { title: "Investments", value: investments, color: "text-purple-600", bg: "bg-purple-50", icon: "💎", insight: investmentRate > 15 ? "Investing expert 🚀" : "Start investing more 📈" },
+    { title: "Income", value: income, color: "text-green-600", bg: "bg-green-50", icon: <CircleDollarSign className="w-5 h-5 opacity-70" />, insight: "Stable income flow" },
+    { title: "Expenses", value: expenses, color: "text-red-500", bg: "bg-red-50", icon: <CreditCard className="w-5 h-5 opacity-70" />, insight: expenses > income * 0.6 ? "High spending" : "Controlled spending" },
+    { title: "Savings", value: savings, color: "text-blue-600", bg: "bg-blue-50", icon: <TrendingUp className="w-5 h-5 opacity-70" />, insight: savingsRate >= 20 ? "Strong savings" : "Building phase" },
+    { title: "Investments", value: investments, color: "text-purple-600", bg: "bg-purple-50", icon: <Gem className="w-5 h-5 opacity-70" />, insight: investmentRate > 15 ? "Investing expert" : "Start investing more" },
     {
       title: "Insurance",
       value: insurance,
       color: "text-indigo-600",
       bg: "bg-indigo-50",
-      icon: "🛡️",
+      icon: <ShieldCheck className="w-5 h-5 opacity-70" />,
       insight:
         insuranceStatus === "Strong"
-          ? "Well protected ✅"
+          ? "Well protected"
           : `₹${insurance.toLocaleString("en-IN")} vs ₹${idealInsurance.toLocaleString("en-IN")} needed`,
     }
   ];
@@ -331,7 +347,7 @@ export default function DashboardHome() {
       return {
         message: `You're spending ₹${expenses.toLocaleString('en-IN')} which is more than your income ₹${income.toLocaleString('en-IN')}. This is risky — reduce expenses immediately.`,
         color: "red",
-        icon: "🚨"
+        icon: <AlertCircle className="w-5 h-5" />
       };
     }
 
@@ -339,7 +355,7 @@ export default function DashboardHome() {
       return {
         message: `You're spending ₹${expenses.toLocaleString('en-IN')} (~${Math.round(expenseRatio * 100)}% of your income). Try to bring this below 60% for better financial stability.`,
         color: "red",
-        icon: "⚠️"
+        icon: <AlertTriangle className="w-5 h-5" />
       };
     }
 
@@ -347,7 +363,7 @@ export default function DashboardHome() {
       return {
         message: `Your insurance coverage is ₹${insurance.toLocaleString('en-IN')}. Based on your income ₹${income.toLocaleString('en-IN')}, you should aim for at least ₹${idealInsurance.toLocaleString('en-IN')} (10–12× income) to stay financially protected.`,
         color: "red",
-        icon: "🛡️"
+        icon: <Shield className="w-5 h-5" />
       };
     }
 
@@ -355,7 +371,7 @@ export default function DashboardHome() {
       return {
         message: `You're saving ₹${savings.toLocaleString('en-IN')} (~${Math.round(savingsRate)}%). Based on your income ₹${income.toLocaleString('en-IN')}, you should aim for ₹${idealSavings.toLocaleString('en-IN')} (20%) monthly.`,
         color: "orange",
-        icon: "📊"
+        icon: <BarChart3 className="w-5 h-5" />
       };
     }
 
@@ -363,7 +379,7 @@ export default function DashboardHome() {
       return {
         message: `You currently have ${emergencyMonths.toFixed(1)} months of emergency savings. Try to reach at least 3–6 months (₹${(expenses * 6).toLocaleString('en-IN')}) for safety.`,
         color: "orange",
-        icon: "🛡️"
+        icon: <Shield className="w-5 h-5" />
       };
     }
 
@@ -371,14 +387,14 @@ export default function DashboardHome() {
       return {
         message: `You're saving well (₹${savings.toLocaleString('en-IN')}), but investing only ₹${investments.toLocaleString('en-IN')}. Consider investing more to grow your wealth.`,
         color: "blue",
-        icon: "📈"
+        icon: <TrendingUp className="w-5 h-5" />
       };
     }
 
     return {
       message: `Excellent! You're saving ₹${savings.toLocaleString('en-IN')} and investing ₹${investments.toLocaleString('en-IN')}. You're on track for strong financial growth.`,
       color: "green",
-      icon: "🏆"
+      icon: <Trophy className="w-5 h-5" />
     };
   }
 
@@ -478,15 +494,17 @@ export default function DashboardHome() {
           <div className="flex gap-2 pt-3">
             <button
               onClick={() => navigate("/ai-advisor")}
-              className="pdf-ignore px-4 py-2 rounded-full border hairline text-sm hover:bg-muted transition-colors text-foreground"
+              className="pdf-ignore px-4 py-2 rounded-full border hairline text-sm hover:bg-muted transition-colors text-foreground flex items-center gap-2"
             >
+              <Sparkles className="w-4 h-4 text-primary" />
               Ask AI
             </button>
 
             <button
               onClick={handleDownloadPDF}
-              className="pdf-ignore px-4 py-2 rounded-full text-sm bg-primary text-white hover:opacity-90 transition-opacity"
+              className="pdf-ignore px-4 py-2 rounded-full text-sm bg-primary text-white hover:opacity-90 transition-opacity flex items-center gap-2"
             >
+              <Download className="w-4 h-4" />
               Download
             </button>
           </div>
@@ -502,7 +520,7 @@ export default function DashboardHome() {
             {cards.map((card, i) => (
               <div key={i} className="flex justify-between items-center px-5 py-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg opacity-70">{card.icon}</span>
+                  {card.icon}
                   <span className="text-sm text-foreground">{card.title}</span>
                 </div>
                 <span className="font-medium text-foreground">
@@ -713,7 +731,7 @@ export default function DashboardHome() {
         <div className="pdf-ignore fixed inset-0 z-[9999] flex items-center justify-center bg-background/40 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-card px-8 py-6 rounded-2xl border hairline shadow-2xl flex items-center gap-4">
             <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl animate-pulse">
-              📄
+              <FileText className="w-6 h-6 text-muted-foreground" />
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-lg leading-none mb-1 text-foreground">
