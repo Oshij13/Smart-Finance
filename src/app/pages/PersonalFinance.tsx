@@ -8,6 +8,15 @@ import {
   Headphones, 
   Newspaper 
 } from "lucide-react";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  ResponsiveContainer, 
+  Cell 
+} from "recharts";
 
 export function PersonalFinance() {
   const [income, setIncome] = useState("");
@@ -108,29 +117,51 @@ export function PersonalFinance() {
               Budget Breakdown (Monthly)
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {budgetBreakdown.map((item, i) => (
-                <div key={i} className="rounded-2xl border hairline bg-card p-6 flex flex-col justify-between min-h-[160px]">
-                  <div className="flex justify-between items-start">
-                    <p className="text-sm text-muted-foreground font-medium">{item.category}</p>
-                    <div className={`w-2 h-2 rounded-full ${item.color}`} />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-2xl font-semibold text-foreground">
-                      ₹{item.amount.toLocaleString('en-IN')}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-tight leading-none">
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <div className="rounded-2xl border hairline bg-card p-8">
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={budgetBreakdown} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                    <XAxis 
+                      dataKey="category" 
+                      axisLine={false} 
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12, fontWeight: 500 }}
+                      dy={10}
+                    />
+                    <YAxis 
+                      hide 
+                      domain={[0, 'auto']}
+                    />
+                    <Tooltip 
+                      cursor={{ fill: 'transparent' }}
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))', 
+                        borderRadius: '0.75rem',
+                        fontSize: '12px',
+                        fontWeight: '600'
+                      }}
+                      formatter={(val: number) => [`₹${val.toLocaleString('en-IN')}`, 'Allocation']}
+                    />
+                    <Bar dataKey="amount" radius={[6, 6, 0, 0]} barSize={60}>
+                      {budgetBreakdown.map((entry, index) => {
+                        const colors = ['#10b981', '#f59e0b', '#3b82f6'];
+                        return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} fillOpacity={0.8} />;
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
 
-            <div className="rounded-2xl border hairline bg-card p-8 text-center space-y-2">
-              <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Total Monthly Net Allocation</p>
-              <p className="text-4xl font-bold">₹{monthlyIncome.toLocaleString('en-IN')}</p>
-              <p className="text-xs text-muted-foreground">Based on your ₹{annualIncome.toLocaleString('en-IN')} annual target.</p>
+              <div className="grid grid-cols-3 gap-4 mt-8 pt-8 border-t hairline">
+                {budgetBreakdown.map((item, i) => (
+                  <div key={i} className="text-center space-y-1">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{item.category}</p>
+                    <p className="text-lg font-bold text-foreground">₹{item.amount.toLocaleString('en-IN')}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{item.category === 'Needs' ? '50%' : item.category === 'Wants' ? '30%' : '20%'}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         )}
