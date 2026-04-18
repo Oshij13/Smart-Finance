@@ -508,7 +508,7 @@ export default function DashboardHome() {
               <h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3>
               <span className="text-sm text-gray-500">{progress.toFixed(0)}%</span>
             </div>
-            
+
             {isEditingGoal ? (
               <div className="flex gap-2 items-center mb-2">
                 <input
