@@ -1,392 +1,148 @@
-import { BookMarked, Book, Headphones, Mail, Video, ExternalLink } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { useState } from "react";
+import { PageShell, PageHeader } from "../components/page/PageShell";
+import { BookOpen, Headphones, Mail, Youtube, Globe } from "lucide-react";
+
+const tabs = [
+  { id: "books", label: "Books", icon: BookOpen },
+  { id: "podcasts", label: "Podcasts", icon: Headphones },
+  { id: "newsletters", label: "Newsletters", icon: Mail },
+  { id: "youtube", label: "YouTube", icon: Youtube },
+  { id: "platforms", label: "Platforms", icon: Globe },
+] as const;
+
+const data: Record<string, { title: string; by?: string; tag?: string; text: string }[]> = {
+  books: [
+    { title: "Let's Talk Money", by: "Monika Halan", tag: "Beginner", text: "Essential India-specific guide to personal finance covering everything from insurance to investments." },
+    { title: "The Psychology of Money", by: "Morgan Housel", tag: "Mindset", text: "Timeless lessons on wealth, greed, and happiness. Focuses on behavior over formulas." },
+    { title: "Rich Dad Poor Dad", by: "Robert Kiyosaki", tag: "Wealth", text: "Classic book on building wealth through assets and financial literacy." },
+    { title: "Your Money or Your Life", by: "Vicki Robin", tag: "Independence", text: "Transform your relationship with money and achieve financial independence." },
+    { title: "The Intelligent Investor", by: "Benjamin Graham", tag: "Advanced", text: "The definitive book on value investing. A must-read for serious investors." },
+    { title: "I Will Teach You to Be Rich", by: "Ramit Sethi", tag: "Practical", text: "No-nonsense guide to personal finance for young professionals." },
+  ],
+  podcasts: [
+    { title: "Paisa Vaisa", by: "IVM Podcasts", tag: "Weekly", text: "Weekly discussions on personal finance, markets, and money management in India." },
+    { title: "The Seen and the Unseen", by: "Amit Varma", tag: "Weekly", text: "Deep dive into economics, policy, and society. Financial literacy through stories." },
+    { title: "Capitalmind Podcast", by: "Deepak Shenoy", tag: "Bi-weekly", text: "Indian markets, investing strategies, and economic analysis." },
+    { title: "BiggerPockets Money Podcast", by: "Mindy Jensen & Scott Trench", tag: "Weekly", text: "Financial independence and wealth building strategies." },
+    { title: "ChooseFI", by: "Jonathan Mendonsa & Brad Barrett", tag: "3x Weekly", text: "Achieve financial independence through optimized saving and investing." },
+  ],
+  newsletters: [
+    { title: "Finshots", tag: "Daily News", text: "Daily 3-minute newsletter breaking down financial news in simple language. (finshots.in)" },
+    { title: "Morning Context", tag: "Deep Analysis", text: "In-depth analysis of Indian business, economy, and policy. (themorningcontext.com)" },
+    { title: "The Ken", tag: "Investigative", text: "Long-form stories on technology, business, and finance in India. (the-ken.com)" },
+    { title: "Capitalmind", tag: "Market Analysis", text: "Indian markets, stocks, and investment research. (capitalmind.in)" },
+    { title: "Substack Finance Writers", tag: "Personal Finance", text: "Follow independent finance writers like Morgan Housel, Ben Carlson, and more. (substack.com)" },
+  ],
+  youtube: [
+    { title: "Zerodha Varsity", tag: "Stock Market", text: "Free educational content on trading, investing, and financial markets." },
+    { title: "CA Rachana Ranade", tag: "Investment", text: "Stock market basics, technical analysis, and investment strategies in Hindi & English." },
+    { title: "Labour Law Advisor", tag: "Financial Planning", text: "Financial planning, mutual funds, insurance, and tax planning." },
+    { title: "Pranjal Kamra", tag: "Youth Finance", text: "Personal finance, investing concepts, and money management for millennials." },
+    { title: "The Plain Bagel", tag: "Finance Basics", text: "Financial concepts explained simply without jargon." },
+    { title: "Ben Felix", tag: "Research-Based", text: "Evidence-based investing advice with academic research backing." },
+  ],
+  platforms: [
+    { title: "Zerodha Varsity", tag: "Learning", text: "Comprehensive free modules on stocks, derivatives, personal finance, and more. (zerodha.com/varsity)" },
+    { title: "NCFE", tag: "Government", text: "National Centre for Financial Education - Government-backed financial literacy resources and tools. (ncfe.org.in)" },
+    { title: "Investopedia", tag: "Encyclopedia", text: "World's largest financial education website with detailed guides and definitions. (investopedia.com)" },
+    { title: "Freefincal", tag: "Blog & Tools", text: "Independent financial planning blog with calculators and DIY guides. (freefincal.com)" },
+  ],
+};
+
+const path = [
+  { phase: "Foundation (Weeks 1–4)", desc: "Read 'Let's Talk Money', subscribe to Finshots, watch Zerodha Varsity basics." },
+  { phase: "Building Knowledge (Months 2–3)", desc: "Listen to Paisa Vaisa, follow CA Rachana Ranade, implement budgeting." },
+  { phase: "Advanced Learning (Months 4–6)", desc: "Read 'Psychology of Money', explore Capitalmind, start SIPs." },
+  { phase: "Mastery (Ongoing)", desc: "Deep-dive into 'The Intelligent Investor', specialize, teach others." },
+];
+
+const tips = [
+  { title: "Consistency over intensity", text: "15 minutes daily beats 2 hours once a week." },
+  { title: "Apply immediately", text: "Don't just consume. Set up that SIP, calculate that tax." },
+  { title: "Avoid analysis paralysis", text: "Don't wait to know everything. Start with basics." },
+];
 
 export function Resources() {
-  const books = [
-    {
-      title: "Let's Talk Money",
-      author: "Monika Halan",
-      description: "Essential India-specific guide to personal finance covering everything from insurance to investments.",
-      category: "Beginner Friendly"
-    },
-    {
-      title: "The Psychology of Money",
-      author: "Morgan Housel",
-      description: "Timeless lessons on wealth, greed, and happiness. Focuses on behavior over formulas.",
-      category: "Mindset & Behavior"
-    },
-    {
-      title: "Rich Dad Poor Dad",
-      author: "Robert Kiyosaki",
-      description: "Classic book on building wealth through assets and financial literacy.",
-      category: "Wealth Building"
-    },
-    {
-      title: "Your Money or Your Life",
-      author: "Vicki Robin & Joe Dominguez",
-      description: "Transform your relationship with money and achieve financial independence.",
-      category: "Financial Independence"
-    },
-    {
-      title: "The Intelligent Investor",
-      author: "Benjamin Graham",
-      description: "The definitive book on value investing. A must-read for serious investors.",
-      category: "Advanced Investing"
-    },
-    {
-      title: "I Will Teach You to Be Rich",
-      author: "Ramit Sethi",
-      description: "No-nonsense guide to personal finance for young professionals.",
-      category: "Practical Guide"
-    }
-  ];
-
-  const podcasts = [
-    {
-      title: "Paisa Vaisa",
-      host: "IVM Podcasts",
-      description: "Weekly discussions on personal finance, markets, and money management in India.",
-      frequency: "Weekly"
-    },
-    {
-      title: "The Seen and the Unseen",
-      host: "Amit Varma",
-      description: "Deep dive into economics, policy, and society. Financial literacy through stories.",
-      frequency: "Weekly"
-    },
-    {
-      title: "Capitalmind Podcast",
-      host: "Deepak Shenoy",
-      description: "Indian markets, investing strategies, and economic analysis.",
-      frequency: "Bi-weekly"
-    },
-    {
-      title: "BiggerPockets Money Podcast",
-      host: "Mindy Jensen & Scott Trench",
-      description: "Financial independence and wealth building strategies.",
-      frequency: "Weekly"
-    },
-    {
-      title: "ChooseFI",
-      host: "Jonathan Mendonsa & Brad Barrett",
-      description: "Achieve financial independence through optimized saving and investing.",
-      frequency: "3x per week"
-    }
-  ];
-
-  const newsletters = [
-    {
-      title: "Finshots",
-      description: "Daily 3-minute newsletter breaking down financial news in simple language.",
-      focus: "Daily News",
-      link: "finshots.in"
-    },
-    {
-      title: "Morning Context",
-      description: "In-depth analysis of Indian business, economy, and policy.",
-      focus: "Deep Analysis",
-      link: "themorningcontext.com"
-    },
-    {
-      title: "The Ken",
-      description: "Long-form stories on technology, business, and finance in India.",
-      focus: "Investigative",
-      link: "the-ken.com"
-    },
-    {
-      title: "Capitalmind",
-      description: "Indian markets, stocks, and investment research.",
-      focus: "Market Analysis",
-      link: "capitalmind.in"
-    },
-    {
-      title: "Substack Finance Writers",
-      description: "Follow independent finance writers like Morgan Housel, Ben Carlson, and more.",
-      focus: "Personal Finance",
-      link: "substack.com"
-    }
-  ];
-
-  const youtubeChannels = [
-    {
-      title: "Zerodha Varsity",
-      description: "Free educational content on trading, investing, and financial markets.",
-      focus: "Stock Market Education"
-    },
-    {
-      title: "CA Rachana Ranade",
-      description: "Stock market basics, technical analysis, and investment strategies in Hindi & English.",
-      focus: "Investment Education"
-    },
-    {
-      title: "Labour Law Advisor",
-      description: "Financial planning, mutual funds, insurance, and tax planning.",
-      focus: "Financial Planning"
-    },
-    {
-      title: "Pranjal Kamra",
-      description: "Personal finance, investing concepts, and money management for millennials.",
-      focus: "Youth Finance"
-    },
-    {
-      title: "The Plain Bagel",
-      description: "Financial concepts explained simply without jargon.",
-      focus: "Finance Basics"
-    },
-    {
-      title: "Ben Felix",
-      description: "Evidence-based investing advice with academic research backing.",
-      focus: "Research-Based"
-    }
-  ];
-
-  const platforms = [
-    {
-      title: "Zerodha Varsity",
-      description: "Comprehensive free modules on stocks, derivatives, personal finance, and more.",
-      type: "Learning Platform",
-      link: "zerodha.com/varsity"
-    },
-    {
-      title: "National Centre for Financial Education (NCFE)",
-      description: "Government-backed financial literacy resources and tools.",
-      type: "Government Resource",
-      link: "ncfe.org.in"
-    },
-    {
-      title: "Investopedia",
-      description: "World's largest financial education website with detailed guides and definitions.",
-      type: "Encyclopedia",
-      link: "investopedia.com"
-    },
-    {
-      title: "Freefincal",
-      description: "Independent financial planning blog with calculators and DIY guides.",
-      type: "Blog & Tools",
-      link: "freefincal.com"
-    }
-  ];
+  const [tab, setTab] = useState<typeof tabs[number]["id"]>("books");
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-            <BookMarked className="w-6 h-6" />
-          </div>
-          <h1 className="text-3xl font-bold">Learning Resources</h1>
-        </div>
-        <p className="text-lg text-purple-50">
-          Curated collection of books, podcasts, newsletters, and platforms to enhance your financial knowledge.
-        </p>
+    <PageShell>
+      <PageHeader
+        eyebrow="Library"
+        title="Learning resources"
+        description="A curated set of books, podcasts and newsletters."
+      />
+
+      <div className="rounded-2xl border hairline bg-card p-1 grid grid-cols-2 md:grid-cols-5 gap-1">
+        {tabs.map((t) => {
+          const active = tab === t.id;
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                active ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Tabs for different resource types */}
-      <Tabs defaultValue="books" className="space-y-6">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
-          <TabsTrigger value="books">
-            <Book className="w-4 h-4 mr-2" />
-            Books
-          </TabsTrigger>
-          <TabsTrigger value="podcasts">
-            <Headphones className="w-4 h-4 mr-2" />
-            Podcasts
-          </TabsTrigger>
-          <TabsTrigger value="newsletters">
-            <Mail className="w-4 h-4 mr-2" />
-            Newsletters
-          </TabsTrigger>
-          <TabsTrigger value="youtube">
-            <Video className="w-4 h-4 mr-2" />
-            YouTube
-          </TabsTrigger>
-          <TabsTrigger value="platforms">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Platforms
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Books */}
-        <TabsContent value="books" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {books.map((book, index) => (
-              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1 pr-4">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">{book.title}</h3>
-                      <p className="text-sm font-medium text-gray-600">by {book.author}</p>
-                    </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 whitespace-nowrap font-medium">
-                      {book.category}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700">{book.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Podcasts */}
-        <TabsContent value="podcasts" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {podcasts.map((podcast, index) => (
-              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1 pr-4">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">{podcast.title}</h3>
-                      <p className="text-sm font-medium text-gray-600">by {podcast.host}</p>
-                    </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap font-medium">
-                      {podcast.frequency}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700">{podcast.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Newsletters */}
-        <TabsContent value="newsletters" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {newsletters.map((newsletter, index) => (
-              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1 pr-4">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">{newsletter.title}</h3>
-                      <p className="text-sm font-medium text-blue-600">{newsletter.link}</p>
-                    </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap font-medium">
-                      {newsletter.focus}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700">{newsletter.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* YouTube */}
-        <TabsContent value="youtube" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {youtubeChannels.map((channel, index) => (
-              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1 flex-1 pr-4">{channel.title}</h3>
-                    <span className="text-xs px-2 py-1 rounded-full bg-rose-100 text-rose-700 whitespace-nowrap font-medium">
-                      {channel.focus}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700">{channel.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Platforms */}
-        <TabsContent value="platforms" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {platforms.map((platform, index) => (
-              <div key={index} className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1 pr-4">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">{platform.title}</h3>
-                      <p className="text-sm font-medium text-indigo-600">{platform.link}</p>
-                    </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap font-medium">
-                      {platform.type}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700">{platform.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Learning Path Recommendation */}
-      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6 mt-8">
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Recommended Learning Path</h2>
-          <p className="text-sm text-gray-600">Start your financial education journey with these steps</p>
-        </div>
-        <div className="space-y-4">
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold">
-              1
+      <div className="rounded-2xl border hairline bg-card divide-y divide-border overflow-hidden">
+        {data[tab].map((item) => (
+          <div key={item.title} className="px-5 py-5 flex items-start justify-between gap-4 hover:bg-muted/30 transition-colors">
+            <div className="min-w-0">
+              <p className="text-[14.5px] font-bold text-gray-900">{item.title}</p>
+              {item.by && <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight mt-0.5">by {item.by}</p>}
+              <p className="text-xs text-gray-500 font-medium mt-1.5 leading-relaxed">{item.text}</p>
             </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-purple-900 mb-1">Foundation (Weeks 1-4)</h3>
-              <p className="text-sm text-gray-700">Read "Let's Talk Money", subscribe to Finshots, watch Zerodha Varsity modules on basics.</p>
-            </div>
+            {item.tag && (
+              <span className="text-[10px] uppercase font-bold tracking-wider bg-blue-50 text-blue-600 px-2 py-1 rounded-full shrink-0">
+                {item.tag}
+              </span>
+            )}
           </div>
-
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold">
-              2
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-purple-900 mb-1">Building Knowledge (Months 2-3)</h3>
-              <p className="text-sm text-gray-700">Listen to Paisa Vaisa podcast, follow CA Rachana Ranade for investment basics, implement budgeting.</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold">
-              3
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-purple-900 mb-1">Advanced Learning (Months 4-6)</h3>
-              <p className="text-sm text-gray-700">Read "The Psychology of Money", explore Capitalmind for market insights, start SIPs.</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold">
-              4
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-purple-900 mb-1">Mastery (Ongoing)</h3>
-              <p className="text-sm text-gray-700">Deep dive into "The Intelligent Investor", follow specialized content based on your goals, teach others.</p>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Pro Tips */}
-      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 mt-8">
-        <h2 className="text-xl font-bold flex items-center gap-2 text-amber-900 mb-4">
-          Pro Tips for Learning
-        </h2>
-        <div className="space-y-3">
-          <div className="p-4 bg-white/80 rounded-lg">
-            <p className="text-sm text-gray-700">
-              <span className="font-semibold text-amber-900">Consistency over Intensity:</span> 15 minutes daily beats 2 hours once a week. Make learning a habit.
-            </p>
-          </div>
-          <div className="p-4 bg-white/80 rounded-lg">
-            <p className="text-sm text-gray-700">
-              <span className="font-semibold text-amber-900">Apply Immediately:</span> Don't just consume. Set up that SIP, create that budget, calculate your tax.
-            </p>
-          </div>
-          <div className="p-4 bg-white/80 rounded-lg">
-            <p className="text-sm text-gray-700">
-              <span className="font-semibold text-amber-900">Avoid Analysis Paralysis:</span> Don't wait to know everything. Start with basics and improve as you learn.
-            </p>
-          </div>
+      <section className="space-y-6">
+        <div className="space-y-1 px-1">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Process</p>
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight text-left">Recommended Path</h2>
         </div>
-      </div>
-    </div>
+        <div className="rounded-2xl border hairline bg-card divide-y divide-border overflow-hidden">
+          {path.map((p, i) => (
+            <div key={p.phase} className="px-5 py-5 flex gap-5 hover:bg-muted/30 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-xs font-bold text-gray-400 shrink-0">
+                {i + 1}
+              </div>
+              <div>
+                <p className="text-[14px] font-bold text-gray-900">{p.phase}</p>
+                <p className="text-xs text-gray-500 font-medium mt-1 leading-relaxed">{p.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <div className="space-y-1 px-1">
+          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest text-left">Advice</p>
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight text-left">Pro Tips</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pb-12">
+          {tips.map((t) => (
+            <div key={t.title} className="p-6 bg-white border hairline rounded-2xl shadow-sm">
+              <h3 className="text-sm font-bold text-gray-900 mb-2">{t.title}</h3>
+              <p className="text-xs text-gray-500 font-medium leading-relaxed">{t.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </PageShell>
   );
 }
