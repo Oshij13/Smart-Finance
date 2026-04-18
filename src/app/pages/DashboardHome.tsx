@@ -479,7 +479,7 @@ export default function DashboardHome() {
     <div id="dashboard-content" className="p-8 bg-background min-h-screen text-foreground font-sans">
       <div className="max-w-[1280px] mx-auto space-y-12">
         
-        {/* HEADER SECTION (QUIET & PREMIUM) */}
+        {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
             <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground">Hello, {userData?.name || "there"}.</h1>
@@ -501,128 +501,25 @@ export default function DashboardHome() {
           </div>
         </div>
 
-        {/* BENTO GRID START */}
+        {/* PRIMARY KPI CARDS (RESTORED INDIVIDUAL CARDS) */}
+        <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
+          {cards.map((card, i) => (
+            <div key={i} className={`md:col-span-2 bg-card border hairline p-6 rounded-[2rem] shadow-sm hover:scale-[1.02] transition-all cursor-default`}>
+              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl mb-4">
+                {card.icon}
+              </div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">{card.title}</p>
+              <h2 className="text-2xl font-bold tabular-nums mb-2 text-foreground">₹{card.value.toLocaleString('en-IN')}</h2>
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{card.insight}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* MAIN ANALYSIS SECTION */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           
-          {/* TOP HIGHLIGHTS (BENTO BRICKS) */}
-          <div className="md:col-span-8 flex flex-col gap-6">
-            
-            {/* HERO BANNER SECTION (SUBTLE GRADIENT) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* SMART ACTION CARD */}
-              <div className="bg-primary p-8 rounded-[2rem] text-white shadow-xl flex flex-col justify-between min-h-[220px]">
-                <div>
-                  <h2 className="text-xl font-bold mb-3 flex items-center gap-2 text-white/90">
-                    <Sparkles className="w-5 h-5" /> Next Best Action
-                  </h2>
-                  <p className="text-2xl font-semibold leading-tight">{smartAction.text}</p>
-                </div>
-                <button 
-                  onClick={handleAction} 
-                  className="bg-white text-primary w-fit px-6 py-2.5 rounded-full font-bold hover:scale-105 transition-transform active:scale-95 text-sm"
-                >
-                  {smartAction.cta}
-                </button>
-              </div>
-
-              {/* PROGRESS CARD */}
-              <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm flex flex-col justify-between min-h-[220px]">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">Emergency Fund</h3>
-                    <p className="text-2xl font-bold text-foreground">₹{currentValue.toLocaleString('en-IN')}</p>
-                  </div>
-                  <ShieldCheck className="w-5 h-5 text-muted-foreground" />
-                </div>
-                <div className="space-y-3">
-                  <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-primary h-full rounded-full transition-all duration-1000 ease-out" 
-                      style={{ width: `${Math.min(progress, 100)}%` }} 
-                    />
-                  </div>
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {progress.toFixed(0)}% complete · 8 months to goal
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* FUTURE PROJECTION (WIDE WITH GRADIENT) */}
-            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm relative overflow-hidden group">
-              <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">5 Year Projection</h3>
-                  <p className="text-5xl font-bold tracking-tighter text-foreground tabular-nums">
-                    ₹{calculateFutureNetWorth().toLocaleString('en-IN')}
-                  </p>
-                  <p className="text-emerald-600 text-sm font-medium flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4" /> Trending up · 12% est. growth
-                  </p>
-                </div>
-                <div className="h-[120px] w-full max-w-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={[
-                      { v: calculateFutureNetWorth() * 0.4 }, 
-                      { v: calculateFutureNetWorth() * 0.6 }, 
-                      { v: calculateFutureNetWorth() * 0.8 }, 
-                      { v: calculateFutureNetWorth() }
-                    ]}>
-                      <Area type="monotone" dataKey="v" stroke="#007aff" strokeWidth={2} fillOpacity={0.1} fill="#007aff" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* SIDE ASSETS (PROFILE & HEALTH LIST) */}
-          <div className="md:col-span-4 flex flex-col gap-6">
-            
-            {/* KPI LIST (INSPIRED BY SETTINGS) */}
-            <div className="bg-card border hairline rounded-[2rem] overflow-hidden divide-y divide-border">
-              {cards.map((card, i) => (
-                <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl">
-                      {card.icon}
-                    </div>
-                    <span className="text-sm font-medium">{card.title}</span>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <span className="font-bold tabular-nums">₹{card.value.toLocaleString('en-IN')}</span>
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-widest">{card.insight}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* HEALTH SCORE */}
-            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Health Score</h3>
-                <span className="text-3xl font-bold text-foreground">{score}</span>
-              </div>
-              <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden mb-4">
-                <div 
-                  className="h-full rounded-full transition-all duration-1000" 
-                  style={{ 
-                    width: `${score}%`, 
-                    backgroundColor: score > 75 ? "#34c759" : score > 50 ? "#ff9500" : "#ff3b30" 
-                  }} 
-                />
-              </div>
-              <div className={`p-4 rounded-2xl text-[13px] leading-relaxed ${colorMap[currentInsight.color]} bg-opacity-20 flex gap-3`}>
-                <span className="text-lg">{currentInsight.icon}</span>
-                <p>{currentInsight.message}</p>
-              </div>
-            </div>
-
-          </div>
-
-          {/* CHARTS (CLEANER & FUNCTIONAL) */}
-          <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* CHARTS (50/30/20 & CASHFLOW) */}
+          <div className="md:col-span-8 grid grid-cols-1 gap-6">
             <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">50/30/20 Analysis</h3>
               <div className="h-[250px] w-full">
@@ -656,7 +553,7 @@ export default function DashboardHome() {
                     data={[
                       { name: "In", value: income }, 
                       { name: "Out", value: expenses }, 
-                      { name: "Bank", value: savings }
+                      { name: "Savings", value: savings }
                     ]}
                     margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
                   >
@@ -669,42 +566,66 @@ export default function DashboardHome() {
             </div>
           </div>
 
-          {/* INSIGHTS & ACTIVITY */}
-          <div className="md:col-span-8 bg-card border hairline p-8 rounded-[2rem] shadow-sm">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">AI Smart Insights</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {insights.slice(0, 4).map((text, i) => (
-                <div key={i} className="flex items-start gap-3 p-4 rounded-2xl bg-secondary/50 text-[13.5px] font-medium leading-relaxed">
-                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${i % 2 === 0 ? "bg-primary" : "bg-emerald-500"}`} />
-                  {text}
-                </div>
-              ))}
+          {/* HEALTH & EMERGENCY FUND */}
+          <div className="md:col-span-4 flex flex-col gap-6">
+            
+            {/* HEALTH SCORE CARD */}
+            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm text-center">
+              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-4">Financial Health</h3>
+              <div className="w-24 h-24 rounded-full border-4 border-secondary mx-auto mb-4 flex items-center justify-center">
+                <span className="text-4xl font-bold text-foreground">{score}</span>
+              </div>
+              <div className={`p-4 rounded-2xl text-[13px] leading-relaxed ${colorMap[currentInsight.color]} bg-opacity-20 flex gap-3 text-left`}>
+                <span className="text-lg">{currentInsight.icon}</span>
+                <p>{currentInsight.message}</p>
+              </div>
             </div>
-          </div>
 
-          <div className="md:col-span-4 bg-card border hairline p-8 rounded-[2rem] shadow-sm">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">Recent Activity</h3>
-            <div className="space-y-4">
-              {[
-                { text: "Income recorded", time: "2h ago", color: "bg-emerald-500" },
-                { text: "Bill payment detected", time: "5h ago", color: "bg-primary" },
-                { text: "Investment goal progress", time: "1d ago", color: "bg-purple-500" }
-              ].map((act, i) => (
-                <div key={i} className="flex justify-between items-center text-sm">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-1.5 h-1.5 rounded-full ${act.color}`} />
-                    <span className="font-medium">{act.text}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground text-right">{act.time}</span>
+            {/* EMERGENCY FUND CARD */}
+            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Emergency Fund</h3>
+                <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-end">
+                  <p className="text-2xl font-bold text-foreground">₹{emergencyFund.toLocaleString('en-IN')}</p>
+                  <p className="text-xs text-muted-foreground">/ ₹{emergencyTarget.toLocaleString('en-IN')}</p>
                 </div>
-              ))}
+                <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-primary h-full rounded-full transition-all duration-1000 ease-out" 
+                    style={{ width: `${Math.min(progressPercent, 100)}%` }} 
+                  />
+                </div>
+                <p className="text-[11px] font-medium text-muted-foreground text-center">
+                  {progressPercent.toFixed(0)}% complete · {emergencyMonths.toFixed(1)} months coverage
+                </p>
+              </div>
             </div>
+
+            {/* QUICK ACTION CARD */}
+            <div className="bg-primary p-8 rounded-[2rem] text-white shadow-xl flex flex-col justify-between min-h-[160px]">
+              <div>
+                <h2 className="text-sm font-bold mb-2 flex items-center gap-2 text-white/90">
+                  <Sparkles className="w-4 h-4" /> Next Recommended Move
+                </h2>
+                <p className="text-base font-semibold leading-tight">{smartAction.text}</p>
+              </div>
+              <button 
+                onClick={handleAction} 
+                className="bg-white text-primary w-fit px-5 py-2 rounded-full font-bold hover:scale-105 transition-transform active:scale-95 text-xs mt-4"
+              >
+                {smartAction.cta}
+              </button>
+            </div>
+
           </div>
 
         </div>
       </div>
 
-      {/* PDF OVERLAY (PREMIUM BLUR) */}
+      {/* PDF OVERLAY */}
       {isGeneratingPDF && (
         <div className="pdf-ignore fixed inset-0 z-[9999] flex items-center justify-center bg-white/40 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-white px-10 py-8 rounded-[2rem] shadow-2xl flex flex-col items-center gap-4 text-center border hairline">
