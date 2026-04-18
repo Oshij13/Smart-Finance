@@ -145,8 +145,7 @@ export function PersonalFinance() {
                     />
                     <Bar dataKey="amount" radius={[6, 6, 0, 0]} barSize={60}>
                       {budgetBreakdown.map((entry, index) => {
-                        const colors = ['#10b981', '#f59e0b', '#3b82f6'];
-                        return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} fillOpacity={0.8} />;
+                        return <Cell key={`cell-${index}`} fill="hsl(var(--primary))" fillOpacity={0.8} />;
                       })}
                     </Bar>
                   </BarChart>
