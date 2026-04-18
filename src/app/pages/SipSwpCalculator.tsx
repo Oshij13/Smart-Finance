@@ -40,11 +40,18 @@ export function SipSwpCalculator() {
 
             let futureValue = 0;
 
+            // Add Initial Point (Year 0)
+            data.push({
+                year: 0,
+                corpus: Math.round(P),
+                withdrawal: 0
+            });
+
             for (let i = 0; i < n; i++) {
                 futureValue = (futureValue + P) * (1 + r);
-                if ((i + 1) % 12 === 0) {
+                if ((i + 1) % 12 === 0 || i === n - 1) { // Ensure final point is captured
                     data.push({
-                        year: (i + 1) / 12,
+                        year: Math.ceil((i + 1) / 12),
                         corpus: Math.max(0, Math.round(futureValue)),
                     });
                 }
@@ -97,6 +104,14 @@ export function SipSwpCalculator() {
 
             setSustainableWithdrawal(Math.round(sustainable));
 
+            // Start Data with Year 0
+            const startWithdrawal = monthlyWithdrawal ? parseFloat(monthlyWithdrawal) : sustainable;
+            data.push({
+                year: 0,
+                corpus: Math.round(P),
+                withdrawal: Math.round(startWithdrawal)
+            });
+
             if (monthlyWithdrawal) {
                 let value = P;
                 let w = parseFloat(monthlyWithdrawal);
@@ -111,6 +126,12 @@ export function SipSwpCalculator() {
                         monthsLasted = i;
                         totalWithdrawn += w;
                         value = 0;
+                        // Add final point when empty
+                        data.push({
+                            year: Number(((i + 1) / 12).toFixed(1)),
+                            corpus: 0,
+                            withdrawal: Math.round(w)
+                        });
                         break;
                     }
 
@@ -148,6 +169,11 @@ export function SipSwpCalculator() {
                         monthsLasted = i;
                         totalWithdrawn += w;
                         value = 0;
+                        data.push({
+                            year: Number(((i + 1) / 12).toFixed(1)),
+                            corpus: 0,
+                            withdrawal: Math.round(w)
+                        });
                         break;
                     }
 
@@ -192,35 +218,35 @@ export function SipSwpCalculator() {
     const inputClass = "w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all";
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
-            <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12">
+        <div className="min-h-screen bg-[#f8f9fa] text-foreground">
+            <div className="w-full px-6 lg:px-12 py-10 space-y-12">
 
                 {/* HEADER */}
                 <section className="space-y-2">
-                    <p className="text-sm text-muted-foreground">Calculator</p>
-                    <h1 className="text-4xl font-semibold tracking-tight">
+                    <p className="text-sm font-bold text-primary/60 uppercase tracking-widest">Calculators</p>
+                    <h1 className="text-5xl font-bold tracking-tight text-slate-900">
                         SIP / SWP
                     </h1>
-                    <p className="text-muted-foreground text-base max-w-xl">
-                        Plan your monthly investments and withdrawals.
+                    <p className="text-slate-500 text-lg max-w-2xl leading-relaxed">
+                        Plan your wealth journey with precision. Switch between monthly investing (SIP) and systematic withdrawals (SWP).
                     </p>
                 </section>
 
                 {/* MODE TOGGLE */}
-                <section>
-                    <div className="bg-muted p-1 rounded-2xl flex max-w-2xl mx-auto">
+                <section className="max-w-4xl">
+                    <div className="bg-slate-200/50 p-1.5 rounded-2xl flex w-full shadow-inner">
                         <button
                             onClick={() => { setMode("sip"); setResult(null); setChartData([]); }}
-                            className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all ${
-                                mode === "sip" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                            className={`flex-1 py-4 px-6 rounded-xl text-sm font-bold transition-all duration-300 ${
+                                mode === "sip" ? "bg-white shadow-md text-primary scale-[1.02]" : "text-slate-500 hover:text-slate-700"
                             }`}
                         >
                             SIP Calculator
                         </button>
                         <button
                             onClick={() => { setMode("swp"); setResult(null); setChartData([]); }}
-                            className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all ${
-                                mode === "swp" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                            className={`flex-1 py-4 px-6 rounded-xl text-sm font-bold transition-all duration-300 ${
+                                mode === "swp" ? "bg-white shadow-md text-primary scale-[1.02]" : "text-slate-500 hover:text-slate-700"
                             }`}
                         >
                             SWP Calculator
@@ -230,16 +256,22 @@ export function SipSwpCalculator() {
 
                 {/* CALCULATOR CONTAINER */}
                 <section className="space-y-8">
-                    <div className="rounded-2xl border hairline bg-card p-8 space-y-8">
-                        <div>
-                            <h3 className="text-lg font-semibold">
-                                {mode === "sip" ? "SIP Calculator" : "SWP Calculator"}
-                            </h3>
-                            <p className="text-xs text-muted-foreground mt-1 font-medium">
-                                {mode === "sip"
-                                    ? "Calculate your future wealth with monthly investments"
-                                    : "Plan your monthly withdrawals from your corpus"}
-                            </p>
+                    <div className="rounded-[2.5rem] border hairline bg-white p-10 lg:p-14 shadow-xl shadow-slate-200/50 space-y-10">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b hairline pb-8">
+                            <div>
+                                <h3 className="text-2xl font-bold text-slate-900">
+                                    {mode === "sip" ? "Growth Engine" : "Withdrawal Strategy"}
+                                </h3>
+                                <p className="text-sm text-slate-500 mt-2 font-medium">
+                                    {mode === "sip"
+                                        ? "Visualize how your monthly contributions compound over time."
+                                        : "Analyze how long your corpus can support your lifestyle."}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full border hairline">
+                                <Calculator className="w-4 h-4 text-primary" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Standard Formula Applied</span>
+                            </div>
                         </div>
 
                         {/* INPUTS GRID */}
@@ -375,45 +407,69 @@ export function SipSwpCalculator() {
 
                 {/* GRAPH SECTION */}
                 {chartData.length > 0 && (
-                    <section className="space-y-4">
-                        <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">Growth Projection</h2>
-                        <div className="rounded-2xl border hairline bg-card p-8 h-[400px]">
+                    <section className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-sm uppercase text-slate-400 font-bold tracking-[0.2em]">Projection Visualizer</h2>
+                            <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                                    <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-500">Corpus Value</span>
+                                </div>
+                                {mode === "swp" && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-slate-400"></div>
+                                        <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-500">Monthly Yield</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="rounded-[2.5rem] border hairline bg-white p-10 lg:p-14 shadow-xl shadow-slate-200/50 h-[500px]">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 0 }}>
+                                <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorCorpus" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
                                     <XAxis 
                                         dataKey="year" 
                                         axisLine={false} 
                                         tickLine={false} 
-                                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
-                                        dy={10}
+                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                                        dy={15}
+                                        label={{ value: 'Years', position: 'insideBottom', offset: -10, fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
                                     />
                                     <YAxis 
                                         axisLine={false} 
                                         tickLine={false} 
-                                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
                                         tickFormatter={(val) => `₹${(val / 100000).toFixed(0)}L`}
+                                        dx={-10}
                                     />
                                     <Tooltip 
-                                        cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
-                                        contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '0.75rem', fontSize: '11px' }}
+                                        cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
+                                        contentStyle={{ backgroundColor: '#ffffff', border: 'none', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px', padding: '12px' }}
+                                        formatter={(value: any) => [`₹${value.toLocaleString('en-IN')}`, 'Amount']}
                                     />
                                     <Line
                                         type="monotone"
                                         dataKey="corpus"
                                         stroke="hsl(var(--primary))"
-                                        strokeWidth={3}
-                                        dot={false}
-                                        name="Projected Corpus"
-                                        activeDot={{ r: 5, fill: 'hsl(var(--primary))' }}
+                                        strokeWidth={4}
+                                        dot={{ r: 0 }}
+                                        activeDot={{ r: 6, strokeWidth: 0, fill: 'hsl(var(--primary))' }}
+                                        name="Corpus"
+                                        animationDuration={1500}
                                     />
                                     {mode === "swp" && (
                                         <Line
                                             type="monotone"
                                             dataKey="withdrawal"
-                                            stroke="hsl(var(--muted-foreground))"
-                                            strokeWidth={2}
-                                            strokeDasharray="6 6"
-                                            name="Monthly Withdrawal"
+                                            stroke="#94a3b8"
+                                            strokeWidth={3}
+                                            strokeDasharray="8 8"
+                                            name="Withdrawal"
                                             dot={false}
                                         />
                                     )}
@@ -454,7 +510,7 @@ export function SipSwpCalculator() {
                             </p>
                         </div>
 
-                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default">
+                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default overflow-hidden relative">
                              <h4 className="text-sm font-bold flex items-center gap-2 mb-4">
                                 <Calculator className="w-4 h-4 text-primary" />
                                 Why use {mode === "sip" ? "SIP" : "SWP"}?
@@ -462,7 +518,19 @@ export function SipSwpCalculator() {
                             <p className="text-sm text-muted-foreground leading-relaxed">
                                 {mode === "sip"
                                     ? "SIP promotes disciplined investing, reduces market timing risk, and leverages the explosive power of compounding. It's the most effective way for long-term goal reaching with small, regular contributions."
-                                    : "SWP provides a predictable, tax-efficient stream of regular income while keeping your capital invested. It maintains your corpus longer by avoiding the need to time withdrawals."}
+                                    : "SWP provides a reliable, tax-efficient stream of regular income while keeping your capital invested. It maintains your corpus longer by avoiding the need to time withdrawals."}
+                            </p>
+                        </div>
+
+                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default">
+                             <h4 className="text-sm font-bold flex items-center gap-2 mb-4">
+                                <TrendingUp className="w-4 h-4 text-primary" />
+                                Who should use {mode === "sip" ? "SIP" : "SWP"}?
+                            </h4>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                {mode === "sip"
+                                    ? "Ideal for disciplined investors, beginners, and anyone looking to build wealth long-term without needing a large lump sum. Perfect for goals like retirement, education, or marriage."
+                                    : "Ideal for retirees or investors seeking regular, predictable income. Excellent for those in high tax brackets who want a tax-efficient method to withdraw funds while keeping principal invested."}
                             </p>
                         </div>
                    </div>
