@@ -23,6 +23,8 @@ import {
   XAxis,
   YAxis,
   Legend,
+  AreaChart,
+  Area,
 } from "recharts";
 
 const colorMap: Record<string, string> = {
@@ -475,135 +477,134 @@ export default function DashboardHome() {
 
   return (
     <div id="dashboard-content" className="p-8 bg-background min-h-screen text-foreground font-sans">
-      <div className="max-w-[1440px] mx-auto space-y-10">
+      <div className="max-w-[1280px] mx-auto space-y-12">
         
-        {/* HEADER SECTION (CLEAN & SPACIOUS) */}
+        {/* HEADER SECTION (QUIET & PREMIUM) */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground">Hey {userData?.name || "User"} 👋</h1>
-            <p className="text-muted-foreground text-lg">Here's your financial overview for today.</p>
+            <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground">Hello, {userData?.name || "there"}.</h1>
+            <p className="text-muted-foreground text-lg">A quiet look at your money today.</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => navigate("/ai-advisor")} 
-              className="pdf-ignore px-6 py-3 rounded-2xl text-sm font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-all active:scale-95 flex items-center gap-2"
+              className="pdf-ignore px-5 py-2.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
             >
-              <Sparkles className="w-4 h-4" /> AI Advisor
+              <Sparkles className="w-4 h-4" /> Ask AI
             </button>
             <button 
               onClick={handleDownloadPDF} 
-              className="pdf-ignore px-6 py-3 rounded-2xl text-sm font-semibold border border-border bg-white hover:bg-muted transition-all active:scale-95 flex items-center gap-2"
+              className="pdf-ignore px-5 py-2.5 rounded-full text-sm font-semibold border hairline bg-card hover:bg-muted transition-all active:scale-95 flex items-center gap-2"
             >
-              <Download className="w-4 h-4" /> Download PDF
+              <Download className="w-4 h-4" /> Export
             </button>
           </div>
         </div>
 
         {/* BENTO GRID START */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           
           {/* TOP HIGHLIGHTS (BENTO BRICKS) */}
-          <div className="md:col-span-8 flex flex-col gap-8">
+          <div className="md:col-span-8 flex flex-col gap-6">
             
             {/* HERO BANNER SECTION (SUBTLE GRADIENT) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* SMART ACTION CARD */}
-              <div className="bg-primary p-8 rounded-[2.5rem] text-white shadow-2xl flex flex-col justify-between min-h-[220px]">
+              <div className="bg-primary p-8 rounded-[2rem] text-white shadow-xl flex flex-col justify-between min-h-[220px]">
                 <div>
-                  <h2 className="text-2xl font-bold mb-3 flex items-center gap-2">
-                    <Sparkles className="w-6 h-6" /> Next Move
+                  <h2 className="text-xl font-bold mb-3 flex items-center gap-2 text-white/90">
+                    <Sparkles className="w-5 h-5" /> Next Best Action
                   </h2>
-                  <p className="text-white/80 leading-relaxed">{smartAction.text}</p>
+                  <p className="text-2xl font-semibold leading-tight">{smartAction.text}</p>
                 </div>
                 <button 
                   onClick={handleAction} 
-                  className="bg-white text-primary w-fit px-8 py-3 rounded-2xl font-bold hover:scale-105 transition-transform active:scale-95"
+                  className="bg-white text-primary w-fit px-6 py-2.5 rounded-full font-bold hover:scale-105 transition-transform active:scale-95 text-sm"
                 >
                   {smartAction.cta}
                 </button>
               </div>
 
               {/* PROGRESS CARD */}
-              <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] flex flex-col justify-between min-h-[220px]">
+              <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm flex flex-col justify-between min-h-[220px]">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-semibold text-muted-foreground mb-1">Goal Progress</h3>
-                    <p className="text-2xl font-bold text-foreground">{goal}</p>
+                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">Emergency Fund</h3>
+                    <p className="text-2xl font-bold text-foreground">₹{currentValue.toLocaleString('en-IN')}</p>
                   </div>
-                  <span className="text-3xl font-black text-primary/20">{progress.toFixed(0)}%</span>
+                  <ShieldCheck className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div className="space-y-3">
-                  <div className="w-full bg-secondary h-4 rounded-full overflow-hidden">
+                  <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden">
                     <div 
                       className="bg-primary h-full rounded-full transition-all duration-1000 ease-out" 
                       style={{ width: `${Math.min(progress, 100)}%` }} 
                     />
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    ₹{currentValue.toLocaleString('en-IN')} saved of ₹{target.toLocaleString('en-IN')}
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {progress.toFixed(0)}% complete · 8 months to goal
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* FUTURE PROJECTION (WIDE) */}
-            <div className="bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] relative overflow-hidden group">
+            {/* FUTURE PROJECTION (WIDE WITH GRADIENT) */}
+            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm relative overflow-hidden group">
               <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-muted-foreground">5 Year Projection</h3>
-                  <p className="text-5xl font-black tracking-tight text-foreground">
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">5 Year Projection</h3>
+                  <p className="text-5xl font-bold tracking-tighter text-foreground tabular-nums">
                     ₹{calculateFutureNetWorth().toLocaleString('en-IN')}
                   </p>
-                  <p className="text-green-600 font-medium flex items-center gap-1">
-                    📈 Estimated growth at current pace
+                  <p className="text-emerald-600 text-sm font-medium flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4" /> Trending up · 12% est. growth
                   </p>
                 </div>
-                <div className="w-32 h-32 rounded-full bg-primary/5 absolute -right-8 -top-8 group-hover:scale-110 transition-transform duration-700" />
+                <div className="h-[120px] w-full max-w-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={[
+                      { v: calculateFutureNetWorth() * 0.4 }, 
+                      { v: calculateFutureNetWorth() * 0.6 }, 
+                      { v: calculateFutureNetWorth() * 0.8 }, 
+                      { v: calculateFutureNetWorth() }
+                    ]}>
+                      <Area type="monotone" dataKey="v" stroke="#007aff" strokeWidth={2} fillOpacity={0.1} fill="#007aff" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </div>
 
           </div>
 
-          {/* SIDE ASSETS (PROFILE & HEALTH) */}
-          <div className="md:col-span-4 flex flex-col gap-8">
+          {/* SIDE ASSETS (PROFILE & HEALTH LIST) */}
+          <div className="md:col-span-4 flex flex-col gap-6">
             
-            {/* PROFILE CARD */}
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] text-center">
-              <div className="w-24 h-24 rounded-full bg-secondary mx-auto mb-4 flex items-center justify-center text-4xl font-bold text-primary">
-                {(userData?.name || "U")[0]}
-              </div>
-              <h2 className="text-2xl font-bold mb-1">{userData?.name || "User"}</h2>
-              <p className="text-muted-foreground mb-6">Monthly Income: ₹{income.toLocaleString('en-IN')}</p>
-              
-              <div className="pt-6 border-t border-border">
-                <p className="text-sm text-muted-foreground mb-2">Primary Goal</p>
-                {isEditingGoal ? (
-                  <div className="flex gap-2 items-center justify-center">
-                    <input
-                      value={goalInput}
-                      onChange={(e) => setGoalInput(e.target.value)}
-                      className="bg-secondary px-4 py-2 rounded-xl text-sm w-full outline-none ring-2 ring-transparent focus:ring-primary/20 transition-all"
-                      placeholder="Enter goal"
-                      autoFocus
-                    />
-                    <button onClick={handleSaveGoal} className="text-primary font-bold">Save</button>
+            {/* KPI LIST (INSPIRED BY SETTINGS) */}
+            <div className="bg-card border hairline rounded-[2rem] overflow-hidden divide-y divide-border">
+              {cards.map((card, i) => (
+                <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl">
+                      {card.icon}
+                    </div>
+                    <span className="text-sm font-medium">{card.title}</span>
                   </div>
-                ) : (
-                  <div onClick={() => setIsEditingGoal(true)} className="cursor-pointer group">
-                    <p className="text-xl font-bold text-primary group-hover:underline">{userData?.goal || "Wealth Building"}</p>
-                    <p className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">Edit</p>
+                  <div className="flex flex-col items-end">
+                    <span className="font-bold tabular-nums">₹{card.value.toLocaleString('en-IN')}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-widest">{card.insight}</span>
                   </div>
-                )}
-              </div>
+                </div>
+              ))}
             </div>
 
-            {/* FINANCIAL HEALTH BEAT */}
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+            {/* HEALTH SCORE */}
+            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-muted-foreground">Health Score</h3>
-                <span className="text-3xl font-black text-foreground">{score}</span>
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Health Score</h3>
+                <span className="text-3xl font-bold text-foreground">{score}</span>
               </div>
-              <div className="w-full bg-secondary h-6 rounded-full overflow-hidden mb-4">
+              <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden mb-4">
                 <div 
                   className="h-full rounded-full transition-all duration-1000" 
                   style={{ 
@@ -612,7 +613,7 @@ export default function DashboardHome() {
                   }} 
                 />
               </div>
-              <div className={`p-4 rounded-3xl text-sm leading-relaxed ${colorMap[currentInsight.color]} bg-opacity-20 flex gap-3`}>
+              <div className={`p-4 rounded-2xl text-[13px] leading-relaxed ${colorMap[currentInsight.color]} bg-opacity-20 flex gap-3`}>
                 <span className="text-lg">{currentInsight.icon}</span>
                 <p>{currentInsight.message}</p>
               </div>
@@ -620,131 +621,83 @@ export default function DashboardHome() {
 
           </div>
 
-          {/* KPI TOKENS (SIX PACK) */}
-          <div className="md:col-span-12 grid grid-cols-2 md:grid-cols-5 gap-6">
-            {cards.map((card, i) => (
-              <div 
-                key={i} 
-                className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:scale-[1.02] transition-transform cursor-pointer"
-              >
-                <div className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center text-xl mb-4">
-                  {card.icon}
-                </div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">{card.title}</p>
-                <h2 className="text-2xl font-black truncate">₹{card.value.toLocaleString('en-IN')}</h2>
+          {/* CHARTS (CLEANER & FUNCTIONAL) */}
+          <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">50/30/20 Analysis</h3>
+              <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart 
+                    data={[
+                      { name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, 
+                      { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, 
+                      { name: "Savings", Target: income * 0.2, Actual: savings + investments }
+                    ]}
+                    margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                  >
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 11 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 10 }} tickFormatter={(val) => `₹${val / 1000}k`} />
+                    <Tooltip 
+                      cursor={{ fill: 'rgba(0,122,255,0.02)' }}
+                      contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }} 
+                    />
+                    <Bar dataKey="Target" fill="#f2f2f7" radius={[6, 6, 0, 0]} barSize={24} />
+                    <Bar dataKey="Actual" fill="#007aff" radius={[6, 6, 0, 0]} barSize={24} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            ))}
-          </div>
-
-          {/* CHARTS (CLEANER) */}
-          <div className="md:col-span-7 bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
-            <h3 className="text-xl font-bold mb-8">50/30/20 Analysis</h3>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={[
-                    { name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, 
-                    { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, 
-                    { name: "Savings", Target: income * 0.2, Actual: savings + investments }
-                  ]}
-                  margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
-                >
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 12 }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 10 }} tickFormatter={(val) => `₹${val / 1000}k`} />
-                  <Tooltip 
-                    cursor={{ fill: 'rgba(0,122,255,0.05)' }}
-                    contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
-                  />
-                  <Bar dataKey="Target" fill="#f2f2f7" radius={[10, 10, 0, 0]} barSize={24} />
-                  <Bar dataKey="Actual" fill="#007aff" radius={[10, 10, 0, 0]} barSize={24} />
-                </BarChart>
-              </ResponsiveContainer>
             </div>
-          </div>
 
-          <div className="md:col-span-5 bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
-            <h3 className="text-xl font-bold mb-8">Cashflow Snapshot</h3>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={[
-                    { name: "In", value: income }, 
-                    { name: "Out", value: expenses }, 
-                    { name: "Bank", value: savings }
-                  ]}
-                  margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
-                >
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 12 }} dy={10} />
-                  <Tooltip 
-                    cursor={{ fill: 'rgba(0,122,255,0.05)' }}
-                    contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
-                  />
-                  <Bar dataKey="value" fill="#007aff" radius={[12, 12, 12, 12]} barSize={40} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* INSIGHTS (BENTO BOX STYLE) */}
-          <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] relative">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center text-primary">
-                  <Sparkles className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold">Top Expense</h3>
+            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">Cashflow Snapshot</h3>
+              <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart 
+                    data={[
+                      { name: "In", value: income }, 
+                      { name: "Out", value: expenses }, 
+                      { name: "Bank", value: savings }
+                    ]}
+                    margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                  >
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 11 }} dy={10} />
+                    <Tooltip cursor={{ fill: 'rgba(0,122,255,0.02)' }} contentStyle={{ borderRadius: '16px', border: 'none' }} />
+                    <Bar dataKey="value" fill="#007aff" radius={[8, 8, 8, 8]} barSize={40} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-              {topCategory ? (
-                <div>
-                  <p className="text-muted-foreground text-sm uppercase tracking-widest font-bold mb-1">{topCategory.category}</p>
-                  <p className="text-4xl font-black mb-2">₹{Number(topCategory.amount).toLocaleString('en-IN')}</p>
-                  <p className="text-sm font-medium text-muted-foreground">{topPercentage}% of your total spending</p>
-                </div>
-              ) : (
-                <p className="text-muted-foreground">No data available yet</p>
-              )}
             </div>
+          </div>
 
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] md:col-span-2">
-              <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" /> AI Smart Analysis
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {insights.slice(0, 4).map((text, i) => (
-                  <div key={i} className="bg-secondary p-4 rounded-2xl text-sm font-medium leading-relaxed border border-transparent hover:border-primary/20 transition-colors">
-                    {text}
+          {/* INSIGHTS & ACTIVITY */}
+          <div className="md:col-span-8 bg-card border hairline p-8 rounded-[2rem] shadow-sm">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">AI Smart Insights</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {insights.slice(0, 4).map((text, i) => (
+                <div key={i} className="flex items-start gap-3 p-4 rounded-2xl bg-secondary/50 text-[13.5px] font-medium leading-relaxed">
+                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${i % 2 === 0 ? "bg-primary" : "bg-emerald-500"}`} />
+                  {text}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="md:col-span-4 bg-card border hairline p-8 rounded-[2rem] shadow-sm">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">Recent Activity</h3>
+            <div className="space-y-4">
+              {[
+                { text: "Income recorded", time: "2h ago", color: "bg-emerald-500" },
+                { text: "Bill payment detected", time: "5h ago", color: "bg-primary" },
+                { text: "Investment goal progress", time: "1d ago", color: "bg-purple-500" }
+              ].map((act, i) => (
+                <div key={i} className="flex justify-between items-center text-sm">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-1.5 h-1.5 rounded-full ${act.color}`} />
+                    <span className="font-medium">{act.text}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* EMERGENCY FUND CARD (CLEAN) */}
-          <div className="md:col-span-12 bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] flex flex-col md:flex-row items-center gap-10">
-            <div className="flex-1 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  🛡️
+                  <span className="text-xs text-muted-foreground text-right">{act.time}</span>
                 </div>
-                <h3 className="text-2xl font-bold">Emergency Fund</h3>
-              </div>
-              <p className="text-muted-foreground leading-relaxed">
-                You have {emergencyMonths.toFixed(1)} months of coverage. 
-                A solid safety net protects you from unexpected job loss or medical emergencies.
-              </p>
-            </div>
-            <div className="w-full md:w-64 space-y-3">
-              <div className="flex justify-between text-sm font-bold mb-1">
-                <span>Coverage</span>
-                <span className="text-primary">{Math.min((emergencyMonths / 6) * 100, 100).toFixed(0)}%</span>
-              </div>
-              <div className="w-full bg-secondary h-4 rounded-full overflow-hidden">
-                <div 
-                  className="bg-primary h-full rounded-full" 
-                  style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} 
-                />
-              </div>
-              <p className="text-xs text-center text-muted-foreground font-medium">Target: 6 months of expenses</p>
+              ))}
             </div>
           </div>
 
@@ -754,13 +707,13 @@ export default function DashboardHome() {
       {/* PDF OVERLAY (PREMIUM BLUR) */}
       {isGeneratingPDF && (
         <div className="pdf-ignore fixed inset-0 z-[9999] flex items-center justify-center bg-white/40 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white px-10 py-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center gap-4 text-center">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary text-4xl animate-bounce">
+          <div className="bg-white px-10 py-8 rounded-[2rem] shadow-2xl flex flex-col items-center gap-4 text-center border hairline">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl animate-bounce">
               <Download />
             </div>
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-foreground">Generating High-Res Report</h2>
-              <p className="text-muted-foreground font-medium">{pdfStatus || "Polishing the document..."}</p>
+              <h2 className="text-xl font-bold text-foreground tracking-tight">Exporting Report</h2>
+              <p className="text-muted-foreground text-sm font-medium">{pdfStatus || "Polishing document..."}</p>
             </div>
           </div>
         </div>
