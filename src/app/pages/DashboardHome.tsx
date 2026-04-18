@@ -505,7 +505,7 @@ export default function DashboardHome() {
                   <span className="text-lg opacity-70">{card.icon}</span>
                   <span className="text-sm text-foreground">{card.title}</span>
                 </div>
-                <span className="font-medium text-primary">
+                <span className="font-medium text-foreground">
                   ₹{card.value.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -520,7 +520,7 @@ export default function DashboardHome() {
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
             <h3 className="text-sm text-muted-foreground font-medium">Financial Health</h3>
 
-            <p className="text-3xl font-semibold text-primary">
+            <p className="text-3xl font-semibold text-foreground">
               {score}/100
             </p>
 
@@ -580,40 +580,17 @@ export default function DashboardHome() {
           </div>
 
           {/* GOAL Progress with Inline Editing */}
-          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
-            <h3 className="text-sm text-muted-foreground font-medium">Goal Progress</h3>
+          <div className="rounded-2xl border hairline bg-card p-6 space-y-4 relative">
+            {/* TOP RIGHT GOAL */}
+            <div className="absolute top-4 right-4 text-xs text-muted-foreground">
+              {goal}
+            </div>
 
-            <p className="text-lg font-semibold text-primary">
+            <h3 className="text-sm text-muted-foreground">Goal Progress</h3>
+
+            <p className="text-lg font-semibold text-foreground">
               {progress.toFixed(0)}%
             </p>
-
-            {isEditingGoal ? (
-              <div className="flex gap-2 items-center">
-                <input
-                  value={goalInput}
-                  onChange={(e) => setGoalInput(e.target.value)}
-                  className="border hairline px-2 py-1 rounded text-sm bg-background w-full text-foreground"
-                  placeholder="Enter your goal"
-                  autoFocus
-                />
-                <button
-                  onClick={handleSaveGoal}
-                  className="bg-primary text-white px-3 py-1 rounded-full text-xs font-medium"
-                >
-                  Save
-                </button>
-              </div>
-            ) : (
-              <div
-                onClick={() => setIsEditingGoal(true)}
-                className="cursor-pointer hover:bg-muted/50 p-2 -mx-2 rounded-lg transition-colors group"
-              >
-                <p className="text-sm font-semibold text-primary group-hover:underline">
-                  {userData?.goal || "Wealth Building"}
-                </p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Click to edit goal</p>
-              </div>
-            )}
 
             <div className="w-full bg-muted h-1.5 rounded-full">
               <div
