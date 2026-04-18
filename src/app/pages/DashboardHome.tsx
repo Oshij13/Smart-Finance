@@ -459,15 +459,14 @@ export default function DashboardHome() {
 
     setUserData(updatedData);       // save to store
     setUserDataState(updatedData);  // update UI instantly
-
     setIsEditingGoal(false);
   };
 
   const smartAction = getSmartNextMove();
 
   return (
-    <div id="dashboard-content" className="min-h-screen bg-background">
-      <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12 text-foreground">
+    <div id="dashboard-content" className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12">
 
         {/* HEADER */}
         <section className="space-y-1">
@@ -481,43 +480,60 @@ export default function DashboardHome() {
           <div className="flex gap-2 pt-3">
             <button
               onClick={() => navigate("/ai-advisor")}
-              className="pdf-ignore px-4 py-2 rounded-full border hairline text-sm bg-background hover:bg-muted transition-colors"
+              className="pdf-ignore px-4 py-2 rounded-full border hairline text-sm hover:bg-muted transition-colors"
             >
-              ✨ Ask AI
+              Ask AI
             </button>
 
             <button
               onClick={handleDownloadPDF}
-              className="pdf-ignore px-4 py-2 rounded-full text-sm bg-foreground text-background hover:opacity-90 transition-opacity"
+              className="pdf-ignore px-4 py-2 rounded-full text-sm bg-primary text-white hover:opacity-90 transition-opacity"
             >
-              Download PDF
+              Download
             </button>
           </div>
         </section>
 
-        {/* NEXT ACTION */}
-        <section>
+        {/* EMERGENCY FUND + NEXT ACTION */}
+        <section className="grid md:grid-cols-2 gap-4">
+
+          {/* EMERGENCY FUND */}
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
-            <h2 className="text-base font-semibold">Next Best Action</h2>
-            <p className="text-xl font-semibold">{smartAction.text}</p>
+            <h3 className="text-sm text-muted-foreground font-medium">Emergency Fund</h3>
+
+            <div className="flex justify-between items-end">
+              <p className="text-2xl font-semibold">
+                ₹{savedAmount.toLocaleString('en-IN')}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                / ₹{targetAmount.toLocaleString('en-IN')}
+              </p>
+            </div>
+
+            <div className="w-full bg-muted h-1.5 rounded-full">
+              <div
+                className="bg-primary h-1.5 rounded-full transition-all"
+                style={{ width: `${Math.min(progressPercent, 100)}%` }}
+              />
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              {Math.round(progressPercent)}% complete • {Math.ceil((targetAmount - savedAmount) / (savings || 1))} months to goal
+            </div>
+          </div>
+
+          {/* NEXT ACTION */}
+          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
+            <h3 className="text-sm text-muted-foreground font-medium">Next Best Action</h3>
+
+            <p className="text-lg font-semibold">{smartAction.text}</p>
+
             <button
               onClick={handleAction}
-              className="text-sm px-4 py-2 rounded-full bg-foreground text-background w-fit hover:opacity-90 transition-opacity"
+              className="text-sm px-4 py-2 rounded-full bg-primary text-white w-fit hover:opacity-90 transition-opacity"
             >
               {smartAction.cta}
             </button>
-
-            <div className="pt-3">
-              <div className="w-full bg-muted h-1.5 rounded-full">
-                <div
-                  className="bg-foreground h-1.5 rounded-full transition-all"
-                  style={{ width: `${Math.min(progressPercent, 100)}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                ₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}
-              </p>
-            </div>
           </div>
         </section>
 
@@ -534,7 +550,7 @@ export default function DashboardHome() {
                   <span className="text-lg opacity-70">{card.icon}</span>
                   <span className="text-sm">{card.title}</span>
                 </div>
-                <span className="font-medium">
+                <span className="font-medium text-primary">
                   ₹{card.value.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -545,26 +561,26 @@ export default function DashboardHome() {
         {/* HEALTH + GOAL */}
         <section className="grid md:grid-cols-2 gap-4">
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
-            <h3 className="text-sm text-muted-foreground">Financial Health</h3>
-            <p className="text-3xl font-semibold">{score}/100</p>
+            <h3 className="text-sm text-muted-foreground font-medium">Financial Health</h3>
+            <p className="text-3xl font-semibold text-primary">{score}/100</p>
 
             <div className="w-full bg-muted h-1.5 rounded-full">
               <div
-                className="h-1.5 bg-foreground rounded-full transition-all"
+                className="h-1.5 bg-primary rounded-full transition-all"
                 style={{ width: `${score}%` }}
               />
             </div>
 
-            <p className="text-sm text-muted-foreground italic leading-relaxed">
-              "{currentInsight.message}"
+            <p className="text-sm text-muted-foreground">
+              {currentInsight.message}
             </p>
           </div>
 
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
-            <div className="flex justify-between items-start">
-              <h3 className="text-sm text-muted-foreground">Goal Progress</h3>
-              <p className="text-lg font-semibold">{progress.toFixed(0)}%</p>
-            </div>
+            <h3 className="text-sm text-muted-foreground font-medium">Goal Progress</h3>
+            <p className="text-lg font-semibold text-primary">
+              {progress.toFixed(0)}%
+            </p>
 
             {isEditingGoal ? (
               <div className="flex gap-2 items-center">
@@ -577,7 +593,7 @@ export default function DashboardHome() {
                 />
                 <button
                   onClick={handleSaveGoal}
-                  className="bg-foreground text-background px-3 py-1 rounded-full text-xs font-medium"
+                  className="bg-primary text-white px-3 py-1 rounded-full text-xs font-medium"
                 >
                   Save
                 </button>
@@ -587,7 +603,7 @@ export default function DashboardHome() {
                 onClick={() => setIsEditingGoal(true)}
                 className="cursor-pointer hover:bg-muted/50 p-2 -mx-2 rounded-lg transition-colors group"
               >
-                <p className="text-sm font-semibold text-foreground group-hover:underline">
+                <p className="text-sm font-semibold text-primary group-hover:underline">
                   {userData?.goal || "Wealth Building"}
                 </p>
                 <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Click to edit goal</p>
@@ -596,7 +612,7 @@ export default function DashboardHome() {
 
             <div className="w-full bg-muted h-1.5 rounded-full">
               <div
-                className="bg-foreground h-1.5 rounded-full transition-all"
+                className="bg-primary h-1.5 rounded-full transition-all"
                 style={{ width: `${Math.min(progress, 100)}%` }}
               />
             </div>
@@ -606,7 +622,7 @@ export default function DashboardHome() {
         {/* CHARTS */}
         <section className="grid md:grid-cols-2 gap-4">
           <div className="rounded-2xl border hairline bg-card p-6">
-            <h3 className="text-base font-semibold mb-4">Monthly Overview</h3>
+            <h3 className="text-base font-semibold mb-4 text-foreground">Monthly Overview</h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={[
                 { name: "Income", value: income },
@@ -622,7 +638,7 @@ export default function DashboardHome() {
           </div>
 
           <div className="rounded-2xl border hairline bg-card p-6">
-            <h3 className="text-base font-semibold mb-4">50/30/20 Rule</h3>
+            <h3 className="text-base font-semibold mb-4 text-foreground">50/30/20 Rule</h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={[
                 { name: "Needs", value: expenses * 0.6 },
@@ -632,7 +648,7 @@ export default function DashboardHome() {
                 <XAxis dataKey="name" fontSize={11} axisLine={false} tickLine={false} />
                 <YAxis hide />
                 <Tooltip cursor={{fill: 'transparent'}} />
-                <Bar dataKey="value" fill="hsl(var(--muted-foreground))" radius={[4,4,0,0]} />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4,4,0,0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
