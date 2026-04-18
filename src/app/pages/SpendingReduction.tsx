@@ -102,39 +102,36 @@ export function SpendingReduction() {
   return (
     <div className="w-full px-6 lg:px-10 py-12 space-y-12">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-500 to-blue-600 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-            <TrendingDown className="w-6 h-6" />
-          </div>
-          <h1 className="text-3xl font-bold">Spending Reduction</h1>
+      <header className="space-y-4">
+        <div className="space-y-1">
+          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Budget</p>
+          <h1 className="text-6xl font-black text-gray-900 tracking-tighter">Find your spending leaks</h1>
         </div>
-        <p className="text-lg text-indigo-50">
-          Identify spending leaks and discover ways to save more without sacrificing quality of life.
+        <p className="text-xl text-gray-500 max-w-2xl font-medium leading-relaxed">
+          Track once, save every month after. Identify where your money goes and how to keep more of it.
         </p>
-      </div>
+      </header>
 
       {/* Input Form */}
-      <div className="space-y-4 py-2 mt-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Track Your Monthly Expenses</h2>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Monthly Income (₹)</label>
+      <div className="space-y-10">
+        <div className="space-y-4">
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">monthly income (₹)</label>
           <input
             type="number"
-            placeholder="e.g. 50000"
+            placeholder="e.g. 50,000"
             value={monthlyIncome}
             onChange={(e) => setMonthlyIncome(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full max-w-md px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 text-lg font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-gray-300"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
           {expenseCategories.map((category) => {
             const Icon = category.icon;
             return (
-              <div key={category.key} className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Icon className="w-4 h-4" style={{ color: category.color }} />
+              <div key={category.key} className="group space-y-3">
+                <label className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest group-focus-within:text-blue-500 transition-colors">
+                  <Icon className="w-4 h-4 opacity-50" />
                   {category.label}
                 </label>
                 <input
@@ -142,7 +139,7 @@ export function SpendingReduction() {
                   placeholder="₹"
                   value={expenses[category.key as keyof typeof expenses]}
                   onChange={(e) => handleExpenseChange(category.key, e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 text-lg font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-gray-300"
                 />
               </div>
             );
@@ -151,70 +148,75 @@ export function SpendingReduction() {
 
         <button
           onClick={analyzeSpending}
-          className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:opacity-90 transition mx-auto block mt-6"
+          className="px-10 py-4 rounded-full bg-blue-600 text-white text-lg font-bold hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all active:scale-95"
         >
-          Analyze My Spending
+          Analyze Spending
         </button>
       </div>
 
       {/* Results */}
       {showResults && income > 0 && (
-        <>
-          {/* Summary Cards */}
-          <div className="bg-indigo-50 rounded-xl p-4 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-sm text-indigo-900/70 font-medium">Total Monthly Expenses</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">₹{totalExpenses.toLocaleString('en-IN')}</p>
-                <p className="text-xs text-indigo-800/60 mt-1">
-                  {((totalExpenses / income) * 100).toFixed(0)}% of income
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {/* Summary Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-8 rounded-3xl bg-gray-50/50 border border-gray-100 flex flex-col justify-between h-full">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">monthly expenses</p>
+              <div className="mt-4">
+                <p className="text-4xl font-black text-gray-900">₹{totalExpenses.toLocaleString('en-IN')}</p>
+                <p className="text-sm font-bold text-gray-400 mt-1 uppercase tracking-tight">
+                    {((totalExpenses / income) * 100).toFixed(0)}% of income
                 </p>
               </div>
+            </div>
 
-              <div>
-                <p className="text-sm text-indigo-900/70 font-medium">Current Savings Rate</p>
-                <p className={`text-2xl font-bold mt-1 ${
+            <div className="p-8 rounded-3xl bg-gray-50/50 border border-gray-100 flex flex-col justify-between h-full">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">savings rate</p>
+              <div className="mt-4">
+                <p className={`text-4xl font-black ${
                   parseFloat(savingsRate) >= 20 ? 'text-emerald-600' : 
                   parseFloat(savingsRate) >= 10 ? 'text-amber-600' : 'text-rose-600'
                 }`}>
                   {savingsRate}%
                 </p>
-                <p className="text-xs text-indigo-800/60 mt-1">
-                  {parseFloat(savingsRate) >= 20 ? 'Excellent!' : 
-                   parseFloat(savingsRate) >= 10 ? 'Good, can improve' : 'Needs attention'}
+                <p className="text-sm font-bold text-gray-400 mt-1 uppercase tracking-tight">
+                  {parseFloat(savingsRate) >= 20 ? 'excellent' : 
+                   parseFloat(savingsRate) >= 10 ? 'improvable' : 'critical'}
                 </p>
               </div>
+            </div>
 
-              <div>
-                <p className="text-sm text-indigo-900/70 font-medium">Potential Monthly Savings</p>
-                <p className="text-2xl font-bold text-emerald-600 mt-1">₹{Math.round(totalPotentialSavings).toLocaleString('en-IN')}</p>
-                <p className="text-xs text-indigo-800/60 mt-1">With smart cutbacks</p>
+            <div className="p-8 rounded-3xl bg-blue-600 border border-blue-500 flex flex-col justify-between h-full shadow-xl shadow-blue-500/20">
+              <p className="text-xs font-bold text-blue-200 uppercase tracking-widest">potential savings</p>
+              <div className="mt-4">
+                <p className="text-4xl font-black text-white">₹{Math.round(totalPotentialSavings).toLocaleString('en-IN')}</p>
+                <p className="text-sm font-bold text-blue-200 mt-1 uppercase tracking-tight">monthly cutbacks</p>
               </div>
             </div>
           </div>
 
           {/* Expense Breakdown */}
           {expenseData.length > 0 && (
-            <Card className="border-none shadow-md bg-white mt-4">
-              <CardHeader>
-                <CardTitle>Spending Breakdown</CardTitle>
-                <CardDescription>Where your money is going each month</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                  <ResponsiveContainer width="100%" height={300}>
+            <div className="space-y-8">
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Expenditure</p>
+                <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Budget Breakdown</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white border border-gray-100 p-8 lg:p-12 rounded-[2.5rem] shadow-sm">
+                <div className="relative aspect-square">
+                  <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={expenseData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={70}
-                        outerRadius={100}
-                        paddingAngle={5}
+                        innerRadius="65%"
+                        outerRadius="90%"
+                        paddingAngle={4}
                         dataKey="value"
                       >
                         {expenseData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                          <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                         ))}
                       </Pie>
                       <Tooltip 
@@ -222,67 +224,69 @@ export function SpendingReduction() {
                         contentStyle={{ 
                           backgroundColor: 'rgba(255, 255, 255, 0.95)', 
                           border: 'none', 
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                          borderRadius: '16px',
+                          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                         }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
-
-                  <div className="space-y-3">
-                    {expenseData.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 text-sm">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                          <span className="font-semibold text-gray-700">{item.name}</span>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-gray-900" style={{ color: item.color }}>₹{item.value.toLocaleString('en-IN')}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            {((item.value / totalExpenses) * 100).toFixed(0)}%
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">total</p>
+                    <p className="text-3xl font-black text-gray-900">₹{totalExpenses.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {expenseData.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between p-6 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-gray-200 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${item.color}15` }}>
+                          <span className="text-xl" style={{ color: item.color }}>•</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">{item.name}</p>
+                          <p className="text-xs font-bold text-gray-400 uppercase tracking-tight">{((item.value / totalExpenses) * 100).toFixed(0)}% SHARE</p>
+                        </div>
+                      </div>
+                      <p className="text-xl font-black text-gray-900">₹{item.value.toLocaleString('en-IN')}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
 
-          {/* Savings Recommendations */}
-          <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Smart Saving Tips by Category</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Recommendations */}
+          <div className="space-y-8">
+            <div className="space-y-1">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Optimisation</p>
+              <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Smart Saving Tips</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {potentialSavings.map((item, index) => {
                 const Icon = item.icon;
                 return (
-                  <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-start justify-between border-b border-gray-200 pb-4 mb-4">
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: `${item.color}20` }}
-                        >
-                          <Icon className="w-5 h-5" style={{ color: item.color }} />
+                  <div key={index} className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
+                    <div className="flex items-center justify-between border-b border-gray-50 pb-8">
+                      <div className="flex items-center gap-5">
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-gray-50">
+                          <Icon className="w-7 h-7 text-gray-900" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900">{item.category}</h3>
-                          <p className="text-sm text-gray-600">₹{item.current.toLocaleString('en-IN')}/month</p>
+                          <h3 className="text-xl font-black text-gray-900 tracking-tight">{item.category}</h3>
+                          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">₹{item.current.toLocaleString('en-IN')} Current</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Save up to</p>
-                        <p className="text-xl font-bold text-emerald-600 mt-1">
-                          ₹{Math.round(item.potential).toLocaleString('en-IN')}
-                        </p>
+                        <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">SAVE UP TO</p>
+                        <p className="text-3xl font-black text-emerald-600 mt-1">₹{Math.round(item.potential).toLocaleString('en-IN')}</p>
                       </div>
                     </div>
-                    <ul className="space-y-2">
+                    <ul className="grid grid-cols-1 gap-4 text-sm font-medium text-gray-500">
                       {item.tips.map((tip, tipIndex) => (
-                        <li key={tipIndex} className="flex items-start gap-2 text-sm">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
-                          <span className="text-gray-700">{tip}</span>
+                        <li key={tipIndex} className="flex items-center gap-3">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                          {tip}
                         </li>
                       ))}
                     </ul>
@@ -292,29 +296,29 @@ export function SpendingReduction() {
             </div>
           </div>
 
-          {/* General Tips */}
-          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6 mt-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Universal Money-Saving Strategies</h2>
-            <div className="space-y-3">
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-indigo-900 mb-1">Track Every Rupee</h3>
-                <p className="text-sm text-gray-600">Use apps like Walnut or Money Manager to automatically track expenses from SMS.</p>
-              </div>
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-indigo-900 mb-1">The 24-Hour Rule</h3>
-                <p className="text-sm text-gray-600">Wait 24 hours before making any non-essential purchase above ₹500.</p>
-              </div>
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-indigo-900 mb-1">Cashless Challenge</h3>
-                <p className="text-sm text-gray-600">Use UPI/cards for better tracking. Avoid cash for discretionary spending.</p>
-              </div>
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-indigo-900 mb-1">Zero-Based Budgeting</h3>
-                <p className="text-sm text-gray-600">Allocate every rupee a purpose at month start. Income - Expenses = 0.</p>
-              </div>
+          {/* General Strategies */}
+          <div className="bg-gray-900 rounded-[3rem] p-10 lg:p-20 text-white space-y-16 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 blur-[100px] rounded-full -mr-48 -mt-48" />
+            <div className="space-y-2 relative">
+                <p className="text-sm font-bold text-blue-400 uppercase tracking-widest">mastery</p>
+                <h2 className="text-5xl lg:text-7xl font-black tracking-tighter max-w-2xl leading-[0.9]">Universal High-Level Strategies</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 relative">
+              {[
+                { title: "Track Every Rupee", desc: "Use automation to map your spends directly from bank SMS and alerts." },
+                { title: "The 24-Hour Rule", desc: "Wait 24 hours before any non-essential purchase above ₹500 to curb impulse." },
+                { title: "Cashless Challenge", desc: "Use digital payments exclusively for better metadata and automatic tracking." },
+                { title: "Zero-Based Budgeting", desc: "Your income minus expenses MUST equal zero. Every rupee needs a defined job." }
+              ].map((strategy, i) => (
+                <div key={i} className="space-y-4 p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                  <h3 className="text-2xl font-black tracking-tight">{strategy.title}</h3>
+                  <p className="text-lg text-gray-400 font-medium leading-relaxed">{strategy.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

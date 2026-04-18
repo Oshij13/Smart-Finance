@@ -234,12 +234,12 @@ export function SipSwpCalculator() {
 
                 {/* MODE TOGGLE */}
                 <section>
-                    <div className="bg-[#f8f9fa] p-1.5 rounded-[1.75rem] flex w-full max-w-7xl shadow-inner border border-gray-100/50">
+                    <div className="grid grid-cols-2 gap-1.5 p-1 rounded-2xl bg-gray-50/80 border border-gray-100 w-full max-w-7xl">
                         <button
                             onClick={() => { setMode("sip"); setResult(null); setChartData([]); }}
-                            className={`flex-1 py-4 px-8 rounded-[1.25rem] text-sm font-bold transition-all duration-300 ${
+                            className={`py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
                                 mode === "sip" 
-                                ? "bg-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] text-gray-900 border border-gray-100" 
+                                ? "bg-white text-gray-900 shadow-sm border border-gray-100" 
                                 : "text-gray-400 hover:text-gray-600"
                             }`}
                         >
@@ -247,9 +247,9 @@ export function SipSwpCalculator() {
                         </button>
                         <button
                             onClick={() => { setMode("swp"); setResult(null); setChartData([]); }}
-                            className={`flex-1 py-4 px-8 rounded-[1.25rem] text-sm font-bold transition-all duration-300 ${
+                            className={`py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
                                 mode === "swp" 
-                                ? "bg-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] text-gray-900 border border-gray-100" 
+                                ? "bg-white text-gray-900 shadow-sm border border-gray-100" 
                                 : "text-gray-400 hover:text-gray-600"
                             }`}
                         >
@@ -273,7 +273,7 @@ export function SipSwpCalculator() {
                         </div>
 
                         {/* INPUTS GRID */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className={`grid grid-cols-1 gap-8 ${mode === "sip" ? "md:grid-cols-3" : "md:grid-cols-5"}`}>
                             {mode === "sip" ? (
                                 <>
                                     <div className="space-y-4">
@@ -340,7 +340,7 @@ export function SipSwpCalculator() {
                                             type="number"
                                             value={swpTime}
                                             onChange={(e) => setSwpTime(e.target.value)}
-                                            placeholder="20"
+                                            placeholder="10"
                                             className={inputClass}
                                         />
                                     </div>
@@ -354,7 +354,7 @@ export function SipSwpCalculator() {
                                             className={inputClass}
                                         />
                                     </div>
-                                    <div className="space-y-4 md:col-span-2">
+                                    <div className="space-y-4">
                                         <label className="text-xs font-medium text-gray-400">Monthly Withdrawal (₹)</label>
                                         <input
                                             type="number"
