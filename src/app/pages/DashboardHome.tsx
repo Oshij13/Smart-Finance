@@ -389,145 +389,178 @@ export default function DashboardHome() {
   const smartAction = getSmartNextMove();
 
   return (
-    <div id="dashboard-content" className="bg-[#f7f7f8] min-h-screen px-6 py-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-
+    <div id="dashboard-content" className="bg-white p-6">
+      <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
           <div>
-            <h1 className="text-3xl font-semibold text-gray-900">
-              Hello, {userData?.name || "there"} 👋
-            </h1>
-            <p className="text-gray-500 text-sm mt-1">
-              A quiet look at your money today.
-            </p>
+            <h1 className="text-2xl font-bold">Hey {userData?.name || "User"} 👋</h1>
+            <p className="text-sm opacity-90">Your financial dashboard</p>
           </div>
-
           <div className="flex gap-3">
-            <button
-              onClick={() => navigate("/ai-advisor")}
-              className="px-4 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200 hover:bg-gray-50 transition"
-            >
-              ✨ Ask AI
-            </button>
-            <button
-              onClick={handleDownloadPDF}
-              className="px-4 py-2 rounded-xl text-sm font-medium bg-gray-900 text-white hover:opacity-90 transition"
-            >
-              Download PDF
-            </button>
+            <button onClick={() => navigate("/ai-advisor")} className="pdf-ignore px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">✨ AI Advisor</button>
+            <button onClick={handleDownloadPDF} className="pdf-ignore px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">📄 Download PDF</button>
           </div>
         </div>
 
         {/* NEXT MOVE */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Your next step
-          </h2>
-          <p className="text-gray-600 text-sm mb-4">{smartAction.text}</p>
-
-          <button
-            onClick={handleAction}
-            className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90"
-          >
-            {smartAction.cta}
-          </button>
-
-          <div className="mt-5">
-            <div className="w-full bg-gray-100 h-2 rounded-full">
-              <div
-                className="bg-gray-900 h-2 rounded-full transition-all"
-                style={{ width: `${Math.min(progressPercent, 100)}%` }}
-              />
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              ₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}
-            </p>
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-2">🚀 Your Next Move</h2>
+          <p className="text-sm opacity-90 mb-4">{smartAction.text}</p>
+          <button onClick={handleAction} className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition">{smartAction.cta}</button>
+          <div className="mt-4">
+            <div className="w-full bg-white/30 h-2 rounded-full"><div className="bg-white h-2 rounded-full transition-all" style={{ width: `${Math.min(progressPercent, 100)}%` }} /></div>
+            <p className="text-xs mt-1 opacity-80">₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}</p>
           </div>
         </div>
 
+        {/* FUTURE PROJECTION */}
+        <div className="bg-gradient-to-r from-indigo-500 to-blue-600 text-white p-6 rounded-2xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-2">📈 Future Projection</h2>
+          <p className="text-sm opacity-90">
+            At your current pace, your net worth can grow to
+          </p>
+
+          <p className="text-2xl font-bold mt-2">
+            ₹{calculateFutureNetWorth().toLocaleString('en-IN')}
+          </p>
+
+          <p className="text-sm opacity-80 mt-1">
+            in the next 5 years
+          </p>
+        </div>
+
         {/* PROFILE */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-200 flex justify-between items-center">
+        <div className="bg-white p-6 rounded-2xl shadow-sm flex justify-between items-center h-full">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-gray-900 text-white flex items-center justify-center font-semibold">
-              {(userData?.name || "U")[0]}
-            </div>
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">{(userData?.name || "U")[0]}</div>
             <div>
-              <h2 className="font-semibold text-gray-900">{userData?.name}</h2>
-              <p className="text-sm text-gray-500">
-                ₹{income.toLocaleString('en-IN')} monthly income
-              </p>
+              <h2 className="text-lg font-semibold">{userData?.name || "User"}</h2>
+              <p className="text-sm text-gray-500">Monthly Income: ₹{Number(userData?.income || 0).toLocaleString('en-IN')}</p>
             </div>
           </div>
-
           <div className="text-right">
-            <p className="text-xs text-gray-500">Goal</p>
-            <p className="font-medium text-gray-900">
-              {userData?.goal || "Wealth Building"}
-            </p>
+            <p className="text-sm text-gray-500">Primary Goal</p>
+
+            {isEditingGoal ? (
+              <div className="flex gap-2 items-center">
+                <input
+                  value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  className="border px-2 py-1 rounded text-sm text-gray-900"
+                  placeholder="Enter your goal"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveGoal}
+                  className="text-green-600 text-sm font-medium hover:text-green-700"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => setIsEditingGoal(true)}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                <p className="font-semibold text-blue-600">
+                  {userData?.goal || "Wealth Building"}
+                </p>
+                <p className="text-xs text-gray-400">Click to edit</p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* CORE STATUS */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-gray-200">
-            <h3 className="text-sm text-gray-500 mb-2">Financial Health</h3>
-            <p className="text-3xl font-semibold text-gray-900">{score}/100</p>
-
-            <div className="w-full bg-gray-100 h-2 rounded-full mt-4">
-              <div
-                className="h-2 rounded-full bg-gray-900"
-                style={{ width: `${score}%` }}
-              />
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
+            <div className="flex justify-between items-center mb-4"><h3 className="text-lg font-semibold text-gray-800">💯 Financial Health</h3><span className="text-2xl font-bold text-blue-600">{score}/100</span></div>
+            <div className="w-full bg-gray-200 h-3 rounded-full mb-4"><div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} /></div>
+            <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[currentInsight.color]}`}><span>{currentInsight.icon}</span><span>{currentInsight.message}</span></div>
           </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200">
-            <h3 className="text-sm text-gray-500 mb-2">Goal Progress</h3>
-            <p className="text-lg font-semibold text-gray-900">{progress.toFixed(0)}%</p>
-
-            <div className="w-full bg-gray-100 h-2 rounded-full mt-4">
-              <div
-                className="bg-gray-900 h-2 rounded-full"
-                style={{ width: `${Math.min(progress, 100)}%` }}
-              />
-            </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
+            <div className="flex justify-between items-center mb-3"><h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3><span className="text-sm text-gray-500">{progress.toFixed(0)}%</span></div>
+            <p className="text-sm text-gray-600 mb-2">{goal}</p>
+            <div className="w-full bg-gray-200 h-3 rounded-full"><div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} /></div>
           </div>
         </div>
 
         {/* SNAPSHOT */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {cards.map((card, i) => (
-            <div key={i} className="bg-white p-5 rounded-2xl border border-gray-200">
-              <p className="text-xs text-gray-500">{card.title}</p>
-              <p className="text-xl font-semibold text-gray-900 mt-1">
-                ₹{card.value.toLocaleString('en-IN')}
-              </p>
+            <div key={i} className={`p-6 rounded-2xl shadow-sm h-full ${card.bg}`}>
+              <span className="text-xl">{card.icon}</span>
+              <p className="text-sm text-gray-500 mt-2">{card.title}</p>
+              <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
             </div>
           ))}
         </div>
 
-        {/* ACTIONS */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            What should you do next?
-          </h3>
-
-          <div className="space-y-3">
-            {actions.map((item, i) => (
-              <div
-                key={i}
-                onClick={() =>
-                  navigate("/ai-advisor", { state: { query: item.action } })
-                }
-                className="p-4 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer"
-              >
-                <p className="text-sm text-gray-800">{item.text}</p>
-              </div>
-            ))}
+        {/* CHARTS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full min-h-[350px]">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚖️ 50/30/20 Rule Analysis</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={[{ name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, { name: "Savings", Target: income * 0.2, Actual: savings + investments }]}>
+                <XAxis dataKey="name" fontSize={12} />
+                <YAxis fontSize={11} tickFormatter={(val) => `₹${val / 1000}k`} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Actual" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full min-h-[350px]">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Monthly Overview</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(val) => `₹${val / 1000}k`} />
+                <Tooltip />
+                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
+        {/* ACTION & INSIGHTS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚡ What Should You Do Next?</h3>
+            <div className="space-y-3">
+              {actions.map((item, i) => (
+                <div key={i} onClick={() => navigate("/ai-advisor", { state: { query: item.action } })} className="p-4 rounded-xl border hover:bg-gray-50 cursor-pointer transition">
+                  <p className="text-sm font-medium">{item.text} →</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={`p-6 rounded-2xl shadow-sm border h-full ${colorMap[currentInsight.color]}`}>
+            <p className="font-semibold flex items-center gap-2">{currentInsight.icon} Smart Insight</p>
+            <p className="text-sm mt-3 leading-relaxed">{currentInsight.message}</p>
+            {action && <p className="text-xs mt-3 opacity-70 border-t pt-3 border-current">✨ AI Recommendation: {action}</p>}
+          </div>
+        </div>
+
+        {/* EMERGENCY & AI INSIGHTS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">🛡️ Emergency Fund</h3>
+            <p className="text-sm text-gray-500 mb-3">{emergencyMonths.toFixed(1)} months covered</p>
+            <div className="w-full bg-gray-200 h-2 rounded-full"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} /></div>
+            <div className="bg-blue-50 p-4 rounded-xl text-sm mt-4">💡 3–6 months of savings protects you from unexpected job loss or medical emergencies.</div>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 AI Smart Insights</h3>
+            <div className="space-y-3">
+              {insights.slice(0, 3).map((text, i) => (
+                <div key={i} className="bg-blue-50 p-3 rounded-xl text-sm">{text}</div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {isGeneratingPDF && (
