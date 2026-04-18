@@ -496,64 +496,6 @@ export default function DashboardHome() {
           </div>
         </div>
 
-        {/* FUTURE PROJECTION */}
-        <div className="bg-gradient-to-r from-indigo-500 to-blue-600 text-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">📈 Future Projection</h2>
-          <p className="text-sm opacity-90">
-            At your current pace, your net worth can grow to
-          </p>
-
-          <p className="text-2xl font-bold mt-2">
-            ₹{calculateFutureNetWorth().toLocaleString('en-IN')}
-          </p>
-
-          <p className="text-sm opacity-80 mt-1">
-            in the next 5 years
-          </p>
-        </div>
-
-        {/* PROFILE */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm flex justify-between items-center h-full">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">{(userData?.name || "U")[0]}</div>
-            <div>
-              <h2 className="text-lg font-semibold">{userData?.name || "User"}</h2>
-              <p className="text-sm text-gray-500">Monthly Income: ₹{Number(userData?.income || 0).toLocaleString('en-IN')}</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Primary Goal</p>
-
-            {isEditingGoal ? (
-              <div className="flex gap-2 items-center">
-                <input
-                  value={goalInput}
-                  onChange={(e) => setGoalInput(e.target.value)}
-                  className="border px-2 py-1 rounded text-sm text-gray-900"
-                  placeholder="Enter your goal"
-                  autoFocus
-                />
-                <button
-                  onClick={handleSaveGoal}
-                  className="text-green-600 text-sm font-medium hover:text-green-700"
-                >
-                  Save
-                </button>
-              </div>
-            ) : (
-              <div
-                onClick={() => setIsEditingGoal(true)}
-                className="cursor-pointer hover:opacity-80 transition-opacity"
-              >
-                <p className="font-semibold text-blue-600">
-                  {userData?.goal || "Wealth Building"}
-                </p>
-                <p className="text-xs text-gray-400">Click to edit</p>
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* CORE STATUS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
@@ -562,14 +504,47 @@ export default function DashboardHome() {
             <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[currentInsight.color]}`}><span>{currentInsight.icon}</span><span>{currentInsight.message}</span></div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <div className="flex justify-between items-center mb-3"><h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3><span className="text-sm text-gray-500">{progress.toFixed(0)}%</span></div>
-            <p className="text-sm text-gray-600 mb-2">{goal}</p>
-            <div className="w-full bg-gray-200 h-3 rounded-full"><div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} /></div>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3>
+              <span className="text-sm text-gray-500">{progress.toFixed(0)}%</span>
+            </div>
+            
+            {isEditingGoal ? (
+              <div className="flex gap-2 items-center mb-2">
+                <input
+                  value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  className="border px-2 py-1 rounded text-sm text-gray-900 w-full"
+                  placeholder="Enter your goal"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveGoal}
+                  className="bg-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:opacity-90 transition-opacity"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => setIsEditingGoal(true)}
+                className="cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-lg transition-colors mb-2 group"
+              >
+                <p className="text-sm font-semibold text-blue-600 group-hover:text-blue-700">
+                  {userData?.goal || "Wealth Building"}
+                </p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Click to edit goal</p>
+              </div>
+            )}
+
+            <div className="w-full bg-gray-200 h-3 rounded-full">
+              <div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
+            </div>
           </div>
         </div>
 
         {/* SNAPSHOT */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {cards.map((card, i) => (
             <div key={i} className={`p-6 rounded-2xl shadow-sm h-full ${card.bg}`}>
               <span className="text-xl">{card.icon}</span>
