@@ -466,61 +466,118 @@ export default function DashboardHome() {
   const smartAction = getSmartNextMove();
 
   return (
-    <div id="dashboard-content" className="p-6 bg-[#f9fafb]">
-      <div className="space-y-6">
+    <div id="dashboard-content" className="min-h-screen bg-background">
+      <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12 text-foreground">
+
         {/* HEADER */}
-        <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
-          <div>
-            <h1 className="text-2xl font-bold">Hey {userData?.name || "User"} 👋</h1>
-            <p className="text-sm opacity-90">Your financial dashboard</p>
-          </div>
-          <div className="flex gap-3">
-            <button onClick={() => navigate("/ai-advisor")} className="pdf-ignore px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">✨ AI Advisor</button>
-            <button onClick={handleDownloadPDF} className="pdf-ignore px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">📄 Download PDF</button>
-          </div>
-        </div>
+        <section className="space-y-1">
+          <h1 className="text-4xl font-semibold tracking-tight">
+            Hello, {userData?.name || "there"}.
+          </h1>
+          <p className="text-muted-foreground text-base">
+            A quiet look at your money today.
+          </p>
 
-        {/* NEXT MOVE */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">🚀 Your Next Move</h2>
-          <p className="text-sm opacity-90 mb-4">{smartAction.text}</p>
-          <button onClick={handleAction} className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition">{smartAction.cta}</button>
-          <div className="mt-4">
-            <div className="w-full bg-white/30 h-2 rounded-full"><div className="bg-white h-2 rounded-full transition-all" style={{ width: `${Math.min(progressPercent, 100)}%` }} /></div>
-            <p className="text-xs mt-1 opacity-80">₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}</p>
-            {insurance < idealInsurance * 0.5 && (
-              <p className="text-xs text-red-100 mt-1 font-medium">
-                ⚠️ Your insurance coverage is low
+          <div className="flex gap-2 pt-3">
+            <button
+              onClick={() => navigate("/ai-advisor")}
+              className="pdf-ignore px-4 py-2 rounded-full border hairline text-sm bg-background hover:bg-muted transition-colors"
+            >
+              ✨ Ask AI
+            </button>
+
+            <button
+              onClick={handleDownloadPDF}
+              className="pdf-ignore px-4 py-2 rounded-full text-sm bg-foreground text-background hover:opacity-90 transition-opacity"
+            >
+              Download PDF
+            </button>
+          </div>
+        </section>
+
+        {/* NEXT ACTION */}
+        <section>
+          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
+            <h2 className="text-base font-semibold">Next Best Action</h2>
+            <p className="text-xl font-semibold">{smartAction.text}</p>
+            <button
+              onClick={handleAction}
+              className="text-sm px-4 py-2 rounded-full bg-foreground text-background w-fit hover:opacity-90 transition-opacity"
+            >
+              {smartAction.cta}
+            </button>
+
+            <div className="pt-3">
+              <div className="w-full bg-muted h-1.5 rounded-full">
+                <div
+                  className="bg-foreground h-1.5 rounded-full transition-all"
+                  style={{ width: `${Math.min(progressPercent, 100)}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                ₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}
               </p>
-            )}
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* CORE STATUS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <div className="flex justify-between items-center mb-4"><h3 className="text-lg font-semibold text-gray-800">💯 Financial Health</h3><span className="text-2xl font-bold text-blue-600">{score}/100</span></div>
-            <div className="w-full bg-gray-200 h-3 rounded-full mb-4"><div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} /></div>
-            <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[currentInsight.color]}`}><span>{currentInsight.icon}</span><span>{currentInsight.message}</span></div>
+        {/* OVERVIEW */}
+        <section>
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-3">
+            Overview
+          </h2>
+
+          <div className="rounded-2xl border hairline bg-card divide-y hairline">
+            {cards.map((card, i) => (
+              <div key={i} className="flex justify-between items-center px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg opacity-70">{card.icon}</span>
+                  <span className="text-sm">{card.title}</span>
+                </div>
+                <span className="font-medium">
+                  ₹{card.value.toLocaleString('en-IN')}
+                </span>
+              </div>
+            ))}
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3>
-              <span className="text-sm text-gray-500">{progress.toFixed(0)}%</span>
+        </section>
+
+        {/* HEALTH + GOAL */}
+        <section className="grid md:grid-cols-2 gap-4">
+          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
+            <h3 className="text-sm text-muted-foreground">Financial Health</h3>
+            <p className="text-3xl font-semibold">{score}/100</p>
+
+            <div className="w-full bg-muted h-1.5 rounded-full">
+              <div
+                className="h-1.5 bg-foreground rounded-full transition-all"
+                style={{ width: `${score}%` }}
+              />
+            </div>
+
+            <p className="text-sm text-muted-foreground italic leading-relaxed">
+              "{currentInsight.message}"
+            </p>
+          </div>
+
+          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
+            <div className="flex justify-between items-start">
+              <h3 className="text-sm text-muted-foreground">Goal Progress</h3>
+              <p className="text-lg font-semibold">{progress.toFixed(0)}%</p>
             </div>
 
             {isEditingGoal ? (
-              <div className="flex gap-2 items-center mb-2">
+              <div className="flex gap-2 items-center">
                 <input
                   value={goalInput}
                   onChange={(e) => setGoalInput(e.target.value)}
-                  className="border px-2 py-1 rounded text-sm text-gray-900 w-full"
+                  className="border hairline px-2 py-1 rounded text-sm bg-background w-full"
                   placeholder="Enter your goal"
                   autoFocus
                 />
                 <button
                   onClick={handleSaveGoal}
-                  className="bg-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:opacity-90 transition-opacity"
+                  className="bg-foreground text-background px-3 py-1 rounded-full text-xs font-medium"
                 >
                   Save
                 </button>
@@ -528,127 +585,108 @@ export default function DashboardHome() {
             ) : (
               <div
                 onClick={() => setIsEditingGoal(true)}
-                className="cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded-lg transition-colors mb-2 group"
+                className="cursor-pointer hover:bg-muted/50 p-2 -mx-2 rounded-lg transition-colors group"
               >
-                <p className="text-sm font-semibold text-blue-600 group-hover:text-blue-700">
+                <p className="text-sm font-semibold text-foreground group-hover:underline">
                   {userData?.goal || "Wealth Building"}
                 </p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Click to edit goal</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Click to edit goal</p>
               </div>
             )}
 
-            <div className="w-full bg-gray-200 h-3 rounded-full">
-              <div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
+            <div className="w-full bg-muted h-1.5 rounded-full">
+              <div
+                className="bg-foreground h-1.5 rounded-full transition-all"
+                style={{ width: `${Math.min(progress, 100)}%` }}
+              />
             </div>
           </div>
-        </div>
-
-        {/* SNAPSHOT */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {cards.map((card, i) => (
-            <div key={i} className={`p-6 rounded-2xl shadow-sm h-full ${card.bg}`}>
-              <span className="text-xl">{card.icon}</span>
-              <p className="text-sm text-gray-500 mt-2">{card.title}</p>
-              <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
-            </div>
-          ))}
-        </div>
-
-        {/* TOP CATEGORY INSIGHT */}
-        {topCategory && (
-          <div className="bg-yellow-50 p-6 rounded-2xl shadow-sm border border-yellow-100">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">💡</span>
-              <div>
-                <p className="text-sm text-gray-600">
-                  You spend most on <span className="font-semibold">{topCategory.category}</span>
-                </p>
-                <p className="text-xl font-bold text-yellow-700">
-                  ₹{Number(topCategory.amount).toLocaleString('en-IN')}
-                  <span className="text-sm font-medium ml-2 opacity-80">({topPercentage}% of total expenses)</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        </section>
 
         {/* CHARTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full min-h-[350px]">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚖️ 50/30/20 Rule Analysis</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={[{ name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, { name: "Savings", Target: income * 0.2, Actual: savings + investments }]}>
-                <XAxis dataKey="name" fontSize={12} />
-                <YAxis fontSize={11} tickFormatter={(val) => `₹${val / 1000}k`} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Actual" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+        <section className="grid md:grid-cols-2 gap-4">
+          <div className="rounded-2xl border hairline bg-card p-6">
+            <h3 className="text-base font-semibold mb-4">Monthly Overview</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={[
+                { name: "Income", value: income },
+                { name: "Expenses", value: expenses },
+                { name: "Savings", value: savings }
+              ]}>
+                <XAxis dataKey="name" fontSize={11} axisLine={false} tickLine={false} />
+                <YAxis hide />
+                <Tooltip cursor={{fill: 'transparent'}} />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4,4,0,0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full min-h-[350px]">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Monthly Overview</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(val) => `₹${val / 1000}k`} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+
+          <div className="rounded-2xl border hairline bg-card p-6">
+            <h3 className="text-base font-semibold mb-4">50/30/20 Rule</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={[
+                { name: "Needs", value: expenses * 0.6 },
+                { name: "Wants", value: expenses * 0.4 },
+                { name: "Savings", value: savings + investments }
+              ]}>
+                <XAxis dataKey="name" fontSize={11} axisLine={false} tickLine={false} />
+                <YAxis hide />
+                <Tooltip cursor={{fill: 'transparent'}} />
+                <Bar dataKey="value" fill="hsl(var(--muted-foreground))" radius={[4,4,0,0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </section>
 
-        {/* ACTION & INSIGHTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚡ What Should You Do Next?</h3>
-            <div className="space-y-3">
-              {actions.map((item, i) => (
-                <div key={i} onClick={() => navigate("/ai-advisor", { state: { query: item.action } })} className="p-4 rounded-xl border hover:bg-gray-50 cursor-pointer transition">
-                  <p className="text-sm font-medium">{item.text} →</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className={`p-6 rounded-2xl shadow-sm border h-full ${colorMap[currentInsight.color]}`}>
-            <p className="font-semibold flex items-center gap-2">{currentInsight.icon} Smart Insight</p>
-            <p className="text-sm mt-3 leading-relaxed">{currentInsight.message}</p>
-            {action && <p className="text-xs mt-3 opacity-70 border-t pt-3 border-current">✨ AI Recommendation: {action}</p>}
-          </div>
-        </div>
+        {/* ACTIONS */}
+        <section>
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-3">
+            What should you do next
+          </h2>
 
-        {/* EMERGENCY & AI INSIGHTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">🛡️ Emergency Fund</h3>
-            <p className="text-sm text-gray-500 mb-3">{emergencyMonths.toFixed(1)} months covered</p>
-            <div className="w-full bg-gray-200 h-2 rounded-full"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} /></div>
-            <div className="bg-blue-50 p-4 rounded-xl text-sm mt-4">💡 3–6 months of savings protects you from unexpected job loss or medical emergencies.</div>
+          <div className="rounded-2xl border hairline bg-card divide-y hairline">
+            {actions.map((item, i) => (
+              <div
+                key={i}
+                onClick={() =>
+                  navigate("/ai-advisor", { state: { query: item.action } })
+                }
+                className="px-5 py-4 cursor-pointer hover:bg-muted/40 transition-colors"
+              >
+                <p className="text-sm font-medium">{item.text}</p>
+              </div>
+            ))}
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 AI Smart Insights</h3>
-            <div className="space-y-3">
-              {insights.slice(0, 3).map((text, i) => (
-                <div key={i} className="bg-blue-50 p-3 rounded-xl text-sm">{text}</div>
-              ))}
-            </div>
+        </section>
+
+        {/* INSIGHTS */}
+        <section>
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-3">
+            Smart Insights
+          </h2>
+
+          <div className="rounded-2xl border hairline bg-card divide-y hairline">
+            {insights.slice(0, 3).map((text, i) => (
+              <div key={i} className="px-5 py-4 text-sm leading-relaxed text-muted-foreground">
+                {text}
+              </div>
+            ))}
           </div>
-        </div>
+        </section>
+
       </div>
 
       {isGeneratingPDF && (
-        <div className="pdf-ignore popup fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="bg-white px-8 py-6 rounded-2xl shadow-2xl flex items-center gap-4 animate-in fade-in zoom-in duration-300">
-            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-2xl animate-pulse">
+        <div className="pdf-ignore fixed inset-0 z-[9999] flex items-center justify-center bg-background/40 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-card px-8 py-6 rounded-2xl border hairline shadow-2xl flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl animate-pulse">
               📄
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg text-gray-900 leading-none mb-1">
-                Generating Report
+              <span className="font-bold text-lg leading-none mb-1">
+                Exporting Report
               </span>
-              <span className="text-sm font-medium text-gray-500">
+              <span className="text-sm font-medium text-muted-foreground">
                 {pdfStatus || "Please wait..."}
               </span>
             </div>
