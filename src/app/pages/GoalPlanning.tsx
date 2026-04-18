@@ -9,39 +9,38 @@ import { Progress } from "../components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export function GoalPlanning() {
-  const [goalType, setGoalType] = useState("");
+  const [selectedGoal, setSelectedGoal] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
-  const [timeframe, setTimeframe] = useState("");
+  const [years, setYears] = useState("");
   const [currentSavings, setCurrentSavings] = useState("");
-  const [monthlyIncome, setMonthlyIncome] = useState("");
+  const [income, setIncome] = useState("");
   const [showResults, setShowResults] = useState(false);
 
-  const calculateGoal = () => {
-    if (goalType && targetAmount && timeframe && monthlyIncome) {
+  const handleCalculate = () => {
+    if (selectedGoal && targetAmount && years && income) {
       setShowResults(true);
     }
   };
 
   const target = parseInt(targetAmount) || 0;
-  const years = parseInt(timeframe) || 1;
+  const timeframeYears = parseInt(years) || 1;
   const current = parseInt(currentSavings) || 0;
-  const income = parseInt(monthlyIncome) || 0;
-  const months = years * 12;
+  const monthlyIncome = parseInt(income) || 0;
+  const months = timeframeYears * 12;
 
   // Calculate required monthly SIP assuming 12% annual return
   const monthlyRate = 0.12 / 12;
   const requiredMonthly = Math.round(
-    ((target - current * Math.pow(1.12, years)) * monthlyRate) / 
+    ((target - current * Math.pow(1.12, timeframeYears)) * monthlyRate) / 
     (Math.pow(1 + monthlyRate, months) - 1)
   );
 
-  const percentageOfIncome = ((requiredMonthly / income) * 100).toFixed(1);
+  const percentageOfIncome = ((requiredMonthly / monthlyIncome) * 100).toFixed(1);
   const currentProgress = ((current / target) * 100).toFixed(1);
 
   // Projection data
-  const projectionData = Array.from({ length: years + 1 }, (_, i) => {
+  const projectionData = Array.from({ length: timeframeYears + 1 }, (_, i) => {
     const year = i;
-    const sipContributions = requiredMonthly * 12 * year;
     const futureValueOfCurrent = current * Math.pow(1.12, year);
     const futureValueOfSIP = requiredMonthly * ((Math.pow(1 + monthlyRate, 12 * year) - 1) / monthlyRate);
     return {
@@ -51,261 +50,221 @@ export function GoalPlanning() {
     };
   });
 
-  const goalTypes = [
-    { value: "home", label: "Home Purchase", icon: Home, suggestedAmount: 5000000 },
-    { value: "education", label: "Child's Education", icon: GraduationCap, suggestedAmount: 2000000 },
-    { value: "car", label: "Car Purchase", icon: Car, suggestedAmount: 1000000 },
-    { value: "vacation", label: "Dream Vacation", icon: Plane, suggestedAmount: 500000 },
-    { value: "retirement", label: "Retirement Corpus", icon: TrendingUp, suggestedAmount: 10000000 },
-    { value: "custom", label: "Custom Goal", icon: Target, suggestedAmount: 0 },
-  ];
-
-  const milestones = [
-    { percentage: 25, label: "Foundation Built", achieved: parseFloat(currentProgress) >= 25 },
-    { percentage: 50, label: "Halfway There", achieved: parseFloat(currentProgress) >= 50 },
-    { percentage: 75, label: "Final Push", achieved: parseFloat(currentProgress) >= 75 },
-    { percentage: 100, label: "Goal Achieved!", achieved: parseFloat(currentProgress) >= 100 },
+  const goals = [
+    { value: "home", label: "Home Purchase", icon: <Home className="w-5 h-5 mb-1" /> },
+    { value: "education", label: "Child's Education", icon: <GraduationCap className="w-5 h-5 mb-1" /> },
+    { value: "car", label: "Car Purchase", icon: <Car className="w-5 h-5 mb-1" /> },
+    { value: "vacation", label: "Dream Vacation", icon: <Plane className="w-5 h-5 mb-1" /> },
+    { value: "retirement", label: "Retirement Corpus", icon: <TrendingUp className="w-5 h-5 mb-1" /> },
+    { value: "custom", label: "Custom Goal", icon: <Target className="w-5 h-5 mb-1" /> },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-            <Target className="w-6 h-6" />
-          </div>
-          <h1 className="text-3xl font-bold">Goal-Based Planning</h1>
-        </div>
-        <p className="text-lg text-amber-50">
-          Set clear financial goals and create a personalized savings plan to achieve them.
-        </p>
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12">
 
-      {/* Goal Selector */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {goalTypes.map((goal) => {
-          const Icon = goal.icon;
-          return (
-            <button
-              key={goal.value}
-              onClick={() => {
-                setGoalType(goal.value);
-                if (goal.suggestedAmount > 0) setTargetAmount(goal.suggestedAmount.toString());
-              }}
-              className={`p-4 rounded-xl border-2 transition-all ${
-                goalType === goal.value
-                  ? 'border-amber-500 bg-amber-50 shadow-lg'
-                  : 'border-gray-200 bg-white hover:border-amber-300'
-              }`}
-            >
-              <Icon className={`w-8 h-8 mx-auto mb-2 ${
-                goalType === goal.value ? 'text-amber-600' : 'text-gray-600'
-              }`} />
-              <p className="text-sm font-semibold text-center text-gray-900">{goal.label}</p>
-            </button>
-          );
-        })}
-      </div>
+        {/* HEADER */}
+        <section className="space-y-2">
+          <p className="text-sm text-muted-foreground">My Plan</p>
 
-      {/* Input Form */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Target Amount (₹)</label>
-          <input
-            type="number"
-            placeholder="e.g. 2000000"
-            value={targetAmount}
-            onChange={(e) => setTargetAmount(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-        </div>
+          <h1 className="text-4xl font-semibold tracking-tight">
+            Goal-based planning
+          </h1>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Timeframe (Years)</label>
-          <input
-            type="number"
-            placeholder="e.g. 5"
-            value={timeframe}
-            onChange={(e) => setTimeframe(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-        </div>
+          <p className="text-muted-foreground text-base max-w-xl">
+            Pick a life goal and we’ll map a calm, monthly path to reach it.
+          </p>
+        </section>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Current Savings (₹)</label>
-          <input
-            type="number"
-            placeholder="e.g. 100000"
-            value={currentSavings}
-            onChange={(e) => setCurrentSavings(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-        </div>
+        {/* GOAL SELECTION */}
+        <section>
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-4">
+            Choose a goal
+          </h2>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Monthly Income (₹)</label>
-          <input
-            type="number"
-            placeholder="e.g. 50000"
-            value={monthlyIncome}
-            onChange={(e) => setMonthlyIncome(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-        </div>
-      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {goals.map((goalItem) => {
+              const isSelected = selectedGoal === goalItem.value;
 
-      <button
-        onClick={calculateGoal}
-        className="px-6 py-2.5 rounded-lg bg-amber-600 text-white font-medium hover:opacity-90 transition mx-auto block mt-4"
-      >
-        Calculate
-      </button>
-
-      {/* Results */}
-      {showResults && target > 0 && (
-        <>
-          {/* Current Progress */}
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 mt-4">
-            <div className="mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Current Progress</h2>
-              <p className="text-sm text-gray-600">You've saved ₹{current.toLocaleString('en-IN')} towards your goal</p>
-            </div>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Progress</span>
-                  <span className="font-semibold text-amber-600">{currentProgress}%</span>
-                </div>
-                <Progress value={parseFloat(currentProgress)} className="h-3" />
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                {milestones.map((milestone, index) => (
-                  <div
-                    key={index}
-                    className={`p-3 rounded-lg border-2 text-center ${
-                      milestone.achieved
-                        ? 'border-amber-500 bg-amber-50'
-                        : 'border-gray-200 bg-white'
-                    }`}
-                  >
-                    <p className={`text-2xl font-bold ${
-                      milestone.achieved ? 'text-amber-600' : 'text-gray-400'
-                    }`}>
-                      {milestone.percentage}%
-                    </p>
-                    <p className="text-xs text-gray-600 mt-1">{milestone.label}</p>
+              return (
+                <div
+                  key={goalItem.value}
+                  onClick={() => setSelectedGoal(goalItem.value)}
+                  className={`rounded-2xl border p-6 cursor-pointer transition-all flex flex-col items-start gap-2
+                    ${isSelected
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:bg-muted/40"}
+                  `}
+                >
+                  <div className={`${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {goalItem.icon}
                   </div>
-                ))}
+                  <p className="text-sm font-medium">
+                    {goalItem.label}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* DETAILS */}
+        <section>
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-4">
+            Details
+          </h2>
+
+          <div className="rounded-2xl border hairline bg-card p-6 space-y-6">
+
+            {/* ROW 1 */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground font-medium">
+                  Target Amount (₹)
+                </label>
+                <input
+                  value={targetAmount}
+                  onChange={(e) => setTargetAmount(e.target.value)}
+                  placeholder="e.g. 2,00,000"
+                  className="w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground font-medium">
+                  Timeframe (Years)
+                </label>
+                <input
+                  value={years}
+                  onChange={(e) => setYears(e.target.value)}
+                  placeholder="e.g. 5"
+                  className="w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                />
               </div>
             </div>
-          </div>
 
-          {/* Required Investment */}
-          <div className="bg-amber-50 rounded-xl p-4 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-sm text-amber-900/70 font-medium">Required Monthly SIP</p>
-                <h3 className="text-2xl font-bold text-amber-700">₹{requiredMonthly.toLocaleString('en-IN')}</h3>
-                <p className="text-xs text-amber-800/60 mt-1">Assuming 12% annual returns</p>
+            {/* ROW 2 */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground font-medium">
+                  Current Savings (₹)
+                </label>
+                <input
+                  value={currentSavings}
+                  onChange={(e) => setCurrentSavings(e.target.value)}
+                  placeholder="e.g. 1,00,000"
+                  className="w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                />
               </div>
 
-              <div>
-                <p className="text-sm text-amber-900/70 font-medium">As % of Income</p>
-                <h3 className="text-2xl font-bold text-amber-900">{percentageOfIncome}%</h3>
-                <p className="text-xs text-amber-800/60 mt-1">
-                  {parseFloat(percentageOfIncome) <= 20 ? 'Easily achievable' : 
-                   parseFloat(percentageOfIncome) <= 35 ? 'Requires discipline' : 'Consider extending timeline'}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-amber-900/70 font-medium">Total Investment</p>
-                <h3 className="text-2xl font-bold text-amber-900">₹{(requiredMonthly * months + current).toLocaleString('en-IN')}</h3>
-                <p className="text-xs text-amber-800/60 mt-1">Over {years} years</p>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground font-medium">
+                  Monthly Income (₹)
+                </label>
+                <input
+                  value={income}
+                  onChange={(e) => setIncome(e.target.value)}
+                  placeholder="e.g. 50,000"
+                  className="w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                />
               </div>
             </div>
-          </div>
 
-          {/* Growth Projection */}
-          <Card className="border-none shadow-md bg-white mt-4">
-            <CardHeader>
-              <CardTitle>Goal Achievement Projection</CardTitle>
-              <CardDescription>How your savings will grow over time to reach your target</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={projectionData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis 
-                    dataKey="year" 
-                    label={{ value: 'Years', position: 'insideBottom', offset: -5 }} 
-                    stroke="#6b7280"
-                  />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip 
-                    formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
-
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                      border: 'none', 
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="total" 
-                    stroke="#f59e0b" 
-                    strokeWidth={3} 
-                    name="Your Savings"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="target" 
-                    stroke="#10b981" 
-                    strokeWidth={2} 
-                    strokeDasharray="5 5" 
-                    name="Target Amount"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Action Steps */}
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 mt-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Action Steps to Achieve Your Goal</h2>
-            <div className="space-y-3">
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-amber-900 mb-1">1. Set Up Automatic SIP</h3>
-                <p className="text-sm text-gray-600">
-                  Start a monthly SIP of ₹{requiredMonthly.toLocaleString('en-IN')} in index funds or equity mutual funds.
-                </p>
-              </div>
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-amber-900 mb-1">2. Review Quarterly</h3>
-                <p className="text-sm text-gray-600">
-                  Check your progress every 3 months and increase SIP with salary increments.
-                </p>
-              </div>
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-amber-900 mb-1">3. Stay Invested</h3>
-                <p className="text-sm text-gray-600">
-                  Don't panic during market corrections. Stay focused on your long-term goal.
-                </p>
-              </div>
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-amber-900 mb-1">4. Bonus Investments</h3>
-                <p className="text-sm text-gray-600">
-                  Use bonuses, tax refunds, or windfall gains to make lump sum investments toward your goal.
-                </p>
-              </div>
+            {/* CTA */}
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={handleCalculate}
+                className="px-6 py-3 rounded-full bg-primary text-white text-sm font-medium hover:opacity-90 transition shadow-sm"
+              >
+                Calculate
+              </button>
             </div>
           </div>
-        </>
-      )}
+        </section>
+
+        {/* RESULTS */}
+        {showResults && target > 0 && (
+          <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+            <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">
+              YOUR PLAN
+            </h2>
+
+            <div className="rounded-2xl border hairline bg-card p-10 space-y-4">
+              <p className="text-sm text-muted-foreground">
+                To reach ₹{target.toLocaleString('en-IN')}, save
+              </p>
+              
+              <p className="text-6xl font-bold text-foreground">
+                ₹{requiredMonthly.toLocaleString('en-IN')}
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                per month at an assumed 12% annual return.
+              </p>
+            </div>
+
+            {/* CHART */}
+            <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Growth Projection</h3>
+                <div className="flex items-center gap-4 text-[10px] uppercase font-bold tracking-tight">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                    <span>Your Path</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-1 border-t-2 border-dashed border-muted-foreground" />
+                    <span>Target</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-[280px] w-full pt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={projectionData}>
+                    <Tooltip 
+                      cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))', 
+                        borderRadius: '0.75rem',
+                        fontSize: '12px',
+                        fontWeight: '500'
+                      }}
+                      formatter={(val: number) => [`₹${val.toLocaleString('en-IN')}`]}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="total" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={3} 
+                      dot={false}
+                      activeDot={{ r: 4, fill: 'hsl(var(--primary))' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="target" 
+                      stroke="hsl(var(--muted-foreground))" 
+                      strokeWidth={1} 
+                      strokeDasharray="5 5" 
+                      dot={false}
+                    />
+                    <XAxis 
+                      dataKey="year" 
+                      hide
+                    />
+                    <YAxis 
+                      hide
+                      domain={['auto', 'auto']}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </section>
+        )}
+
+      </div>
     </div>
   );
 }

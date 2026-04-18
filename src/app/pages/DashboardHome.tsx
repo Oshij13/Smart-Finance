@@ -696,17 +696,21 @@ export default function DashboardHome() {
           </h2>
 
           <div className="rounded-2xl border hairline bg-card divide-y hairline">
-            {actions.map((item, i) => (
-              <div
-                key={i}
-                onClick={() =>
-                  navigate("/ai-advisor", { state: { query: item.action } })
-                }
-                className="px-5 py-4 cursor-pointer hover:bg-muted/40 transition-colors"
-              >
-                <p className="text-sm font-medium text-foreground">{item.text}</p>
-              </div>
-            ))}
+            {actions.map((item, i) => {
+              const colors = ["bg-blue-500", "bg-purple-500", "bg-indigo-500", "bg-cyan-500"];
+              return (
+                <div
+                  key={i}
+                  onClick={() =>
+                    navigate("/ai-advisor", { state: { query: item.action } })
+                  }
+                  className="px-5 py-4 cursor-pointer hover:bg-muted/40 transition-colors flex items-center gap-4"
+                >
+                  <div className={`w-1.5 h-1.5 rounded-full ${colors[i % colors.length]}`} />
+                  <p className="text-sm font-medium text-foreground">{item.text}</p>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -717,11 +721,15 @@ export default function DashboardHome() {
           </h2>
 
           <div className="rounded-2xl border hairline bg-card divide-y hairline">
-            {insights.slice(0, 3).map((text, i) => (
-              <div key={i} className="px-5 py-4 text-sm leading-relaxed text-muted-foreground">
-                {text}
-              </div>
-            ))}
+            {insights.slice(0, 3).map((text, i) => {
+              const colors = ["bg-emerald-500", "bg-amber-500", "bg-rose-500"];
+              return (
+                <div key={i} className="px-5 py-4 text-sm leading-relaxed text-muted-foreground flex items-start gap-4">
+                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${colors[i % colors.length]}`} />
+                  <span>{text}</span>
+                </div>
+              );
+            })}
           </div>
         </section>
 
