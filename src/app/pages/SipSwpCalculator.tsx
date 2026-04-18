@@ -470,65 +470,45 @@ export function SipSwpCalculator() {
 
                 {/* ABOUT SECTION */}
                 <section className="pt-12 border-t border-gray-100">
-                    <div className="space-y-8">
-                        <div className="space-y-1">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Resources</p>
-                            <h2 className="text-2xl font-black text-gray-900 tracking-tight text-left">
-                                {mode === "sip" ? "About SIP" : "About SWP"}
-                            </h2>
-                        </div>
+                    <div className="space-y-1 mb-8">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">About</p>
+                        <h2 className="text-2xl font-black text-gray-900 tracking-tight text-left">
+                            {mode === "sip" ? "SIP Calculator" : "SWP Calculator"}
+                        </h2>
+                    </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
-                            {mode === "sip" ? (
-                                <>
-                                    <div className="space-y-2">
-                                        <p className="font-bold text-gray-900">What is SIP?</p>
-                                        <p className="text-sm text-gray-500 leading-relaxed">
-                                            A Systematic Investment Plan (SIP) is a disciplined, automated method for investing fixed sums into the market. 
-                                            It acts like a recurring deposit but leverages market returns, using rupee cost averaging to build significant wealth over time.
-                                        </p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <p className="font-bold text-gray-900">Why start an SIP?</p>
-                                        <p className="text-sm text-gray-500 leading-relaxed">
-                                            SIP promoting disciplined investing, reduces market timing risk, and leverages the explosive power of compounding. 
-                                            It's the most effective way for long-term goal reaching with small, regular contributions.
-                                        </p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <p className="font-bold text-gray-900">Who should use it?</p>
-                                        <p className="text-sm text-gray-500 leading-relaxed">
-                                            Ideal for disciplined investors, beginners, and anyone looking to build wealth long-term without needing 
-                                            a large lump sum. Perfect for goals like retirement, education, or marriage.
-                                        </p>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="space-y-2">
-                                        <p className="font-bold text-gray-900">What is SWP?</p>
-                                        <p className="text-sm text-gray-500 leading-relaxed">
-                                            A Systematic Withdrawal Plan (SWP) is a way to create a steady income stream from your capital. 
-                                            It is a structured method to withdraw fixed amounts at regular intervals, often used for retirement.
-                                        </p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <p className="font-bold text-gray-900">How does it work?</p>
-                                        <p className="text-sm text-gray-500 leading-relaxed">
-                                            SWP provides a reliable, tax-efficient stream of regular income while keeping your capital invested. 
-                                            It maintains your corpus longer by avoiding the need to time large withdrawals.
-                                        </p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <p className="font-bold text-gray-900">Who should use it?</p>
-                                        <p className="text-sm text-gray-500 leading-relaxed">
-                                            Ideal for retirees or investors seeking regular, predictable income. Excellent for those wanting 
-                                            a tax-efficient method to withdraw funds while keeping principal invested.
-                                        </p>
-                                    </div>
-                                </>
-                            )}
-                        </div>
+                    <div className="space-y-4 text-sm px-1">
+                        {mode === "sip" ? (
+                            <>
+                                <div>
+                                    <p className="font-medium text-gray-900">What is SIP?</p>
+                                    <p className="text-gray-500 mt-1">A Systematic Investment Plan invests a fixed sum into mutual funds at regular intervals. Start as small as ₹500.</p>
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Why SIP?</p>
+                                    <p className="text-gray-500 mt-1">Disciplined investing, rupee cost averaging, compounding over time.</p>
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Who should use SIP?</p>
+                                    <p className="text-gray-500 mt-1">Anyone building long-term wealth — beginners and pros alike.</p>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div>
+                                    <p className="font-medium text-gray-900">What is SWP?</p>
+                                    <p className="text-gray-500 mt-1">A Systematic Withdrawal Plan allows you to withdraw a fixed sum from your mutual fund investments regularly.</p>
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Why SWP?</p>
+                                    <p className="text-gray-500 mt-1">Provides a steady stream of income while keeping the remaining principal invested.</p>
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Who should use SWP?</p>
+                                    <p className="text-gray-500 mt-1">Ideal for retirees or individuals looking for a regular monthly payout from their savings.</p>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </section>
 
