@@ -1,63 +1,27 @@
-import { Outlet, Link, useLocation, useNavigate } from "react-router";
+import { Outlet, Link, useLocation } from "react-router";
 import {
-  LayoutDashboard,
-  Target,
-  Sparkles,
-  PiggyBank,
-  TrendingUp,
-  Lightbulb,
-  Wallet,
-  Leaf,
-  BookOpen,
-  Menu,
-  X,
   Bell,
   Download,
+  Search,
 } from "lucide-react";
-import { useState } from "react";
 import { Button } from "./ui/button";
-import { cn } from "./ui/utils";
-import { Badge } from "./ui/badge";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
+import { AppSidebar } from "./AppSidebar";
 import { getUserData } from "../store/userStore";
-
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: Target, label: "My Plan", path: "/goals" },
-  { icon: Sparkles, label: "Personal Finance", path: "/personal-finance" },
-  { icon: PiggyBank, label: "Savings", path: "/savings" },
-  { icon: TrendingUp, label: "Investments", path: "/investments" },
-  { icon: TrendingUp, label: "SIP/SWP Calculator", path: "/sip-swp" },
-  { icon: Wallet, label: "Budget", path: "/spending" },
-  { icon: Lightbulb, label: "Income Tax Calculator", path: "/tax-calculator" },
-  { icon: Leaf, label: "Retirement", path: "/retirement" },
-  { icon: BookOpen, label: "Resources", path: "/resources" },
-
-
-];
-
 export function DashboardLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const userData = getUserData();
   const userName = userData?.name || "User";
 
-  const getUserInitial = () => {
-    return userName.charAt(0).toUpperCase();
-  };
-
-  // ✅ GLOBAL PDF DOWNLOAD (works for any page inside layout)
   const handleDownloadPDF = async () => {
     const element = document.getElementById("dashboard-content");
     if (!element) return;
 
     const canvas = await html2canvas(element, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-
     const pdf = new jsPDF("p", "mm", "a4");
 
     const imgWidth = 210;
@@ -81,114 +45,55 @@ export function DashboardLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-
-      {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-slate-200/60 z-50 shadow-sm">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-slate-900 text-sm">Smart Finance</h1>
-              <p className="text-xs text-slate-500">AI Advisor</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon">
-              <Bell className="w-5 h-5" />
-            </Button>
-
-            {/* ✅ PDF BUTTON (MOBILE) */}
-            <Button variant="ghost" size="icon" onClick={handleDownloadPDF}>
-              <Download className="w-5 h-5" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              {sidebarOpen ? <X /> : <Menu />}
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed top-0 left-0 h-full bg-white border-r z-40 transition-transform duration-300",
-          "lg:translate-x-0 w-64",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        {/* Logo */}
-        <div className="p-5 border-b hidden lg:block">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold">Smart Finance</h1>
-              <p className="text-xs text-slate-500">AI Advisor</p>
-            </div>
-          </div>
-        </div>
-
-        {/* USER */}
-        <div className="p-4 border-b mt-16 lg:mt-0">
-          <div className="p-3 rounded-xl bg-blue-50 border">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-                {getUserInitial()}
-              </div>
-
-              <div>
-                <p className="font-semibold text-sm">{userName}</p>
-                <Badge className="text-xs mt-1 bg-blue-100 text-blue-700 border-0">
-                  Beginner
-                </Badge>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-white">
+        <AppSidebar />
+        
+        <SidebarInset>
+          {/* Top Navigation Bar */}
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white/80 backdrop-blur-md px-4 lg:px-6">
+            <SidebarTrigger className="-ml-1" />
+            
+            <div className="flex-1 min-w-0">
+              <div className="hidden md:flex items-center text-xs text-muted-foreground gap-2">
+                <span>Smart Finance</span>
+                <span>/</span>
+                <span className="text-foreground font-medium capitalize">
+                  {location.pathname === "/" ? "Dashboard" : location.pathname.substring(1).replace("-", " ")}
+                </span>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* NAV */}
-        <nav className="p-3 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="search"
+                  placeholder="Search insights..."
+                  className="pl-9 h-9 w-64 rounded-xl border hairline bg-gray-50/50 text-sm focus:outline-hidden focus:ring-1 focus:ring-primary/20"
+                />
+              </div>
 
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-xl",
-                  isActive
-                    ? "bg-blue-600 text-white"
-                    : "text-slate-600 hover:bg-slate-100"
-                )}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-sm">{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
+              <Button variant="ghost" size="icon" onClick={handleDownloadPDF} title="Download Report">
+                <Download className="w-5 h-5 text-gray-500" />
+              </Button>
 
-      {/* MAIN */}
-      <div className="flex-1 bg-white lg:ml-64 min-h-screen pt-16 lg:pt-0">
+              <Button variant="ghost" size="icon">
+                <Bell className="w-5 h-5 text-gray-500" />
+              </Button>
 
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+            </div>
+          </header>
 
-
-        <Outlet />
+          {/* Page Content */}
+          <main className="flex-1 overflow-y-auto" id="dashboard-content">
+            <Outlet />
+          </main>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
