@@ -465,7 +465,7 @@ export default function DashboardHome() {
   const smartAction = getSmartNextMove();
 
   return (
-    <div id="dashboard-content" className="min-h-screen bg-background text-foreground">
+    <div id="dashboard-content" className="min-h-screen bg-background">
       <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12">
 
         {/* HEADER */}
@@ -480,7 +480,7 @@ export default function DashboardHome() {
           <div className="flex gap-2 pt-3">
             <button
               onClick={() => navigate("/ai-advisor")}
-              className="pdf-ignore px-4 py-2 rounded-full border hairline text-sm hover:bg-muted transition-colors"
+              className="pdf-ignore px-4 py-2 rounded-full border text-sm hover:bg-muted transition-colors"
             >
               Ask AI
             </button>
@@ -494,10 +494,48 @@ export default function DashboardHome() {
           </div>
         </section>
 
-        {/* EMERGENCY FUND + NEXT ACTION */}
+        {/* ROW 1 */}
         <section className="grid md:grid-cols-2 gap-4">
 
-          {/* EMERGENCY FUND */}
+          {/* FINANCIAL HEALTH (LEFT) */}
+          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
+            <h3 className="text-sm text-muted-foreground font-medium">Financial Health</h3>
+
+            <p className="text-3xl font-semibold text-primary">
+              {score}/100
+            </p>
+
+            <div className="w-full bg-muted h-1.5 rounded-full">
+              <div
+                className="h-1.5 bg-primary rounded-full transition-all"
+                style={{ width: `${score}%` }}
+              />
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              {currentInsight.message}
+            </p>
+          </div>
+
+          {/* NEXT ACTION (RIGHT) */}
+          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
+            <h3 className="text-sm text-muted-foreground font-medium">Next Best Action</h3>
+
+            <p className="text-lg font-semibold">{smartAction.text}</p>
+
+            <button
+              onClick={handleAction}
+              className="text-sm px-4 py-2 rounded-full bg-primary text-white w-fit hover:opacity-90 transition-opacity"
+            >
+              {smartAction.cta}
+            </button>
+          </div>
+        </section>
+
+        {/* ROW 2 */}
+        <section className="grid md:grid-cols-2 gap-4">
+
+          {/* EMERGENCY FUND (LEFT NOW) */}
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
             <h3 className="text-sm text-muted-foreground font-medium">Emergency Fund</h3>
 
@@ -517,67 +555,15 @@ export default function DashboardHome() {
               />
             </div>
 
-            <div className="text-sm text-muted-foreground">
-              {Math.round(progressPercent)}% complete • {Math.ceil((targetAmount - savedAmount) / (savings || 1))} months to goal
-            </div>
-          </div>
-
-          {/* NEXT ACTION */}
-          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
-            <h3 className="text-sm text-muted-foreground font-medium">Next Best Action</h3>
-
-            <p className="text-lg font-semibold">{smartAction.text}</p>
-
-            <button
-              onClick={handleAction}
-              className="text-sm px-4 py-2 rounded-full bg-primary text-white w-fit hover:opacity-90 transition-opacity"
-            >
-              {smartAction.cta}
-            </button>
-          </div>
-        </section>
-
-        {/* OVERVIEW */}
-        <section>
-          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-3">
-            Overview
-          </h2>
-
-          <div className="rounded-2xl border hairline bg-card divide-y hairline">
-            {cards.map((card, i) => (
-              <div key={i} className="flex justify-between items-center px-5 py-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-lg opacity-70">{card.icon}</span>
-                  <span className="text-sm">{card.title}</span>
-                </div>
-                <span className="font-medium text-primary">
-                  ₹{card.value.toLocaleString('en-IN')}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* HEALTH + GOAL */}
-        <section className="grid md:grid-cols-2 gap-4">
-          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
-            <h3 className="text-sm text-muted-foreground font-medium">Financial Health</h3>
-            <p className="text-3xl font-semibold text-primary">{score}/100</p>
-
-            <div className="w-full bg-muted h-1.5 rounded-full">
-              <div
-                className="h-1.5 bg-primary rounded-full transition-all"
-                style={{ width: `${score}%` }}
-              />
-            </div>
-
             <p className="text-sm text-muted-foreground">
-              {currentInsight.message}
+              {Math.round(progressPercent)}% complete
             </p>
           </div>
 
+          {/* GOAL */}
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
             <h3 className="text-sm text-muted-foreground font-medium">Goal Progress</h3>
+
             <p className="text-lg font-semibold text-primary">
               {progress.toFixed(0)}%
             </p>
@@ -619,15 +605,38 @@ export default function DashboardHome() {
           </div>
         </section>
 
-        {/* CHARTS */}
+        {/* OVERVIEW */}
+        <section>
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-3">
+            Overview
+          </h2>
+
+          <div className="rounded-2xl border hairline bg-card divide-y hairline">
+            {cards.map((card, i) => (
+              <div key={i} className="flex justify-between items-center px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg opacity-70">{card.icon}</span>
+                  <span className="text-sm">{card.title}</span>
+                </div>
+                <span className="font-medium text-primary">
+                  ₹{card.value.toLocaleString('en-IN')}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* CHARTS (SWAPPED) */}
         <section className="grid md:grid-cols-2 gap-4">
+
+          {/* 50/30/20 LEFT */}
           <div className="rounded-2xl border hairline bg-card p-6">
-            <h3 className="text-base font-semibold mb-4 text-foreground">Monthly Overview</h3>
+            <h3 className="text-base font-semibold mb-4 text-foreground">50/30/20 Rule</h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={[
-                { name: "Income", value: income },
-                { name: "Expenses", value: expenses },
-                { name: "Savings", value: savings }
+                { name: "Needs", value: expenses * 0.6 },
+                { name: "Wants", value: expenses * 0.4 },
+                { name: "Savings", value: savings + investments }
               ]}>
                 <XAxis dataKey="name" fontSize={11} axisLine={false} tickLine={false} />
                 <YAxis hide />
@@ -637,13 +646,14 @@ export default function DashboardHome() {
             </ResponsiveContainer>
           </div>
 
+          {/* MONTHLY RIGHT */}
           <div className="rounded-2xl border hairline bg-card p-6">
-            <h3 className="text-base font-semibold mb-4 text-foreground">50/30/20 Rule</h3>
+            <h3 className="text-base font-semibold mb-4 text-foreground">Monthly Overview</h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={[
-                { name: "Needs", value: expenses * 0.6 },
-                { name: "Wants", value: expenses * 0.4 },
-                { name: "Savings", value: savings + investments }
+                { name: "Income", value: income },
+                { name: "Expenses", value: expenses },
+                { name: "Savings", value: savings }
               ]}>
                 <XAxis dataKey="name" fontSize={11} axisLine={false} tickLine={false} />
                 <YAxis hide />
