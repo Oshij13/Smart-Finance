@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { BookOpen, TrendingUp, Shield, Wallet } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { 
+  BookOpen, 
+  TrendingUp, 
+  Shield, 
+  Wallet, 
+  Smartphone, 
+  Headphones, 
+  Newspaper 
+} from "lucide-react";
 
 export function PersonalFinance() {
   const [income, setIncome] = useState("");
@@ -15,156 +18,165 @@ export function PersonalFinance() {
   };
 
   const annualIncome = parseInt(income) || 0;
-  const monthlyIncome = annualIncome / 12;
+  const monthlyIncome = Math.round(annualIncome / 12);
 
   const budgetBreakdown = [
-    { category: "Needs (50%)", amount: monthlyIncome * 0.5, percentage: 50, color: "#10b981" },
-    { category: "Wants (30%)", amount: monthlyIncome * 0.3, percentage: 30, color: "#f59e0b" },
-    { category: "Savings (20%)", amount: monthlyIncome * 0.2, percentage: 20, color: "#3b82f6" },
+    { category: "Needs", desc: "50% for rent, groceries, bills", amount: monthlyIncome * 0.5, color: "bg-emerald-500" },
+    { category: "Wants", desc: "30% for dining, hobbies, travel", amount: monthlyIncome * 0.3, color: "bg-amber-500" },
+    { category: "Savings", desc: "20% for future goals, debt", amount: monthlyIncome * 0.2, color: "bg-blue-500" },
   ];
 
   const tips = [
     {
-      icon: Wallet,
+      icon: <Wallet className="w-4 h-4" />,
       title: "Follow the 50-30-20 Rule",
-      description: "Allocate 50% for needs, 30% for wants, and 20% for savings and debt repayment."
+      description: "50% needs, 30% wants, 20% savings & debt."
     },
     {
-      icon: Shield,
+      icon: <Shield className="w-4 h-4" />,
       title: "Build an Emergency Fund",
-      description: "Aim for 6 months of expenses saved in a liquid account for unexpected situations."
+      description: "Aim for 6 months of expenses in liquid funds."
     },
     {
-      icon: TrendingUp,
+      icon: <TrendingUp className="w-4 h-4" />,
       title: "Track Your Expenses",
-      description: "Use apps or spreadsheets to monitor where your money goes each month."
+      description: "Use apps or sheets to monitor monthly flow."
     },
     {
-      icon: BookOpen,
+      icon: <BookOpen className="w-4 h-4" />,
       title: "Educate Yourself",
-      description: "Read books like 'Let's Talk Money' by Monika Halan for India-specific advice."
+      description: "Read 'Let's Talk Money' by Monika Halan."
     },
   ];
 
+  const resources = [
+    { icon: <BookOpen className="w-4 h-4" />, title: "Book: Let's Talk Money", desc: "India-specific personal finance guide." },
+    { icon: <Headphones className="w-4 h-4" />, title: "Podcast: Paisa Vaisa", desc: "Weekly discussions on money in India." },
+    { icon: <Newspaper className="w-4 h-4" />, title: "Newsletter: Finshots", desc: "Daily finance news in plain words." }
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-            <BookOpen className="w-6 h-6" />
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12">
+
+        {/* HEADER */}
+        <section className="space-y-2">
+          <p className="text-sm text-muted-foreground">Personal Finance</p>
+          <h1 className="text-4xl font-semibold tracking-tight leading-tight">
+            Build a strong foundation
+          </h1>
+          <p className="text-muted-foreground text-base max-w-xl">
+            A few quiet habits compound into long-term security.
+          </p>
+        </section>
+
+        {/* QUICK CALCULATOR */}
+        <section className="space-y-4">
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">
+            Quick Calculator
+          </h2>
+
+          <div className="rounded-2xl border hairline bg-card p-8 space-y-6">
+            <div className="space-y-3">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-tight">
+                Annual Gross Income (₹)
+              </label>
+              <div className="max-w-md">
+                <input
+                  type="number"
+                  placeholder="e.g. 600,000"
+                  value={income}
+                  onChange={(e) => setIncome(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleCalculate}
+              className="px-6 py-3 rounded-full bg-primary text-white text-sm font-medium hover:opacity-90 transition shadow-sm"
+            >
+              Calculate
+            </button>
           </div>
-          <h1 className="text-3xl font-bold">Personal Finance Basics</h1>
-        </div>
-        <p className="text-lg text-blue-50">
-          Master the fundamentals of money management and build a strong financial foundation.
-        </p>
-      </div>
+        </section>
 
-      {/* Income Input */}
-      <div className="space-y-4 max-w-md mx-auto py-2">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Annual Gross Income (₹)</label>
-          <input
-            type="number"
-            placeholder="e.g. 600000"
-            value={income}
-            onChange={(e) => setIncome(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <button
-          onClick={handleCalculate}
-          className="px-6 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:opacity-90 transition mx-auto block"
-        >
-          Calculate
-        </button>
-      </div>
+        {/* RESULTS */}
+        {showResults && (
+          <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">
+              Budget Breakdown (Monthly)
+            </h2>
 
-      {/* Results */}
-      {showResults && (
-        <>
-          {/* Budget Breakdown Chart */}
-          <Card className="border-none shadow-md bg-white">
-            <CardHeader>
-              <CardTitle>Your Monthly Budget Breakdown</CardTitle>
-              <CardDescription>Based on the 50-30-20 rule for ₹{monthlyIncome.toLocaleString('en-IN')}/month</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={budgetBreakdown}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="category" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip 
-                    formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                      border: 'none', 
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
-                    {budgetBreakdown.map((entry, index) => (
-                      <rect key={index} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                {budgetBreakdown.map((item, index) => (
-                  <div key={index} className="p-4 rounded-xl bg-gray-50 text-center">
-                    <span className="font-medium text-gray-500 text-xs uppercase tracking-wider">{item.category}</span>
-                    <p className="text-2xl font-bold mt-1" style={{ color: item.color }}>₹{item.amount.toLocaleString('en-IN')}</p>
-                    <p className="text-sm text-gray-500 mt-1">{item.percentage}% of income</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {budgetBreakdown.map((item, i) => (
+                <div key={i} className="rounded-2xl border hairline bg-card p-6 flex flex-col justify-between min-h-[160px]">
+                  <div className="flex justify-between items-start">
+                    <p className="text-sm text-muted-foreground font-medium">{item.category}</p>
+                    <div className={`w-2 h-2 rounded-full ${item.color}`} />
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      )}
-
-      {/* Tips Grid */}
-      <div className="mt-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Essential Financial Tips</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {tips.map((tip, index) => {
-            const Icon = tip.icon;
-            return (
-              <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100 flex gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                  <Icon className="w-6 h-6 text-blue-600" />
+                  <div className="space-y-1">
+                    <p className="text-2xl font-semibold text-foreground">
+                      ₹{item.amount.toLocaleString('en-IN')}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-tight leading-none">
+                      {item.desc}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{tip.title}</h3>
-                  <p className="text-sm text-gray-600">{tip.description}</p>
+              ))}
+            </div>
+
+            <div className="rounded-2xl border hairline bg-card p-8 text-center space-y-2">
+              <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Total Monthly Net Allocation</p>
+              <p className="text-4xl font-bold">₹{monthlyIncome.toLocaleString('en-IN')}</p>
+              <p className="text-xs text-muted-foreground">Based on your ₹{annualIncome.toLocaleString('en-IN')} annual target.</p>
+            </div>
+          </section>
+        )}
+
+        {/* ESSENTIAL TIPS */}
+        <section className="space-y-5">
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest px-1">
+            Essential Tips
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {tips.map((tip, i) => (
+              <div key={i} className="rounded-2xl border hairline bg-card p-6 flex items-start gap-4 hover:bg-muted/30 transition-colors group">
+                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
+                  {tip.icon}
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-semibold text-foreground leading-none">{tip.title}</h3>
+                  <p className="text-[13px] text-muted-foreground">{tip.description}</p>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
+            ))}
+          </div>
+        </section>
 
-      {/* Resources */}
-      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 mt-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Recommended Resources</h2>
-        <div className="space-y-3">
-          <div className="p-4 bg-white/80 rounded-lg">
-            <h3 className="font-semibold text-blue-900 mb-1">📚 Book: Let's Talk Money by Monika Halan</h3>
-            <p className="text-sm text-gray-600">India-specific personal finance guide for beginners</p>
+        {/* RECOMMENDED */}
+        <section className="space-y-5 pb-10">
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest px-1">
+            Recommended
+          </h2>
+
+          <div className="rounded-2xl border hairline bg-card divide-y hairline overflow-hidden">
+            {resources.map((res, i) => (
+              <div key={i} className="px-6 py-5 flex items-center gap-5 hover:bg-muted/30 transition-colors group cursor-pointer">
+                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
+                  {res.icon}
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-semibold text-foreground leading-none">{res.title}</h4>
+                  <p className="text-xs text-muted-foreground">{res.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="p-4 bg-white/80 rounded-lg">
-            <h3 className="font-semibold text-blue-900 mb-1">🎧 Podcast: Paisa Vaisa by IVM Podcasts</h3>
-            <p className="text-sm text-gray-600">Weekly discussions on money management in India</p>
-          </div>
-          <div className="p-4 bg-white/80 rounded-lg">
-            <h3 className="font-semibold text-blue-900 mb-1">📰 Newsletter: Finshots</h3>
-            <p className="text-sm text-gray-600">Daily finance news explained in simple terms</p>
-          </div>
-        </div>
+        </section>
+
       </div>
     </div>
   );
