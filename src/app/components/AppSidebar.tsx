@@ -3,10 +3,7 @@ import {
   LayoutGrid, Target, Sparkles, PiggyBank, TrendingUp,
   LineChart, Wallet, Lightbulb, Leaf, BookOpen,
 } from "lucide-react";
-import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar, SidebarTrigger,
-} from "./ui/sidebar";
+import { useSidebar, SidebarTrigger } from "./ui/sidebar";
 
 const items = [
   { title: "Dashboard", url: "/", icon: LayoutGrid },
@@ -27,49 +24,46 @@ export function AppSidebar() {
   const { pathname } = useLocation();
 
   return (
-    <Sidebar collapsible="icon" className="border-r hairline">
-      <SidebarContent className="bg-sidebar">
-        <div className="px-4 pt-5 pb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-foreground text-background flex items-center justify-center text-[11px] font-semibold shrink-0">SF</div>
-            {!collapsed && (
-              <div className="min-w-0">
-                <p className="text-sm font-semibold tracking-tight truncate">Smart Finance</p>
-                <p className="text-[11px] text-muted-foreground truncate">AI Advisor</p>
-              </div>
-            )}
-          </div>
-          <SidebarTrigger className={collapsed ? "hidden" : "h-7 w-7 text-gray-400 hover:text-foreground"} />
+    <aside 
+      className={`h-screen bg-white border-r hairline flex flex-col transition-all duration-300 ease-in-out shrink-0 ${
+        collapsed ? "w-16" : "w-64"
+      }`}
+    >
+      {/* Sidebar Header */}
+      <div className="px-3 pt-6 pb-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold shrink-0">SF</div>
+          {!collapsed && (
+            <div className="min-w-0">
+              <p className="text-sm font-bold tracking-tight truncate text-gray-900">Smart Finance</p>
+              <p className="text-[10px] text-gray-400 font-medium truncate uppercase tracking-wider">AI Advisor</p>
+            </div>
+          )}
         </div>
+        <SidebarTrigger className="h-7 w-7 text-gray-400 hover:text-gray-900 transition-colors" />
+      </div>
 
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => {
-                const isActive = item.url === "/" ? pathname === "/" : pathname.startsWith(item.url);
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="rounded-lg">
-                      <NavLink
-                        to={item.url}
-                        end={item.url === "/"}
-                        className={`flex items-center gap-3 px-3 py-2 text-[13.5px] transition-colors ${
-                          isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                            : "text-sidebar-foreground hover:bg-sidebar-accent/60"
-                        }`}
-                      >
-                        <item.icon className="w-4 h-4 shrink-0" strokeWidth={2} />
-                        {!collapsed && <span className="truncate">{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
+        {items.map((item) => {
+          const isActive = item.url === "/" ? pathname === "/" : pathname.startsWith(item.url);
+          return (
+            <NavLink
+              key={item.title}
+              to={item.url}
+              end={item.url === "/"}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                isActive
+                  ? "bg-gray-100 text-gray-900 font-medium"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <item.icon className={`w-4 h-4 shrink-0 ${isActive ? "text-gray-900" : ""}`} strokeWidth={2} />
+              {!collapsed && <span className="text-[13.5px] truncate">{item.title}</span>}
+            </NavLink>
+          );
+        })}
+      </nav>
+    </aside>
   );
 }
