@@ -8,6 +8,14 @@ import jsPDF from "jspdf";
 import Onboarding from "./Onboarding";
 
 import {
+  Sparkles,
+  Download,
+  TrendingUp,
+  ShieldCheck,
+  LayoutDashboard,
+} from "lucide-react";
+
+import {
   Tooltip,
   ResponsiveContainer,
   BarChart,
@@ -466,216 +474,293 @@ export default function DashboardHome() {
   const smartAction = getSmartNextMove();
 
   return (
-    <div id="dashboard-content" className="p-6 bg-[#f9fafb]">
-      <div className="space-y-6">
-        {/* HEADER */}
-        <div className="flex justify-between items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg">
-          <div>
-            <h1 className="text-2xl font-bold">Hey {userData?.name || "User"} 👋</h1>
-            <p className="text-sm opacity-90">Your financial dashboard</p>
+    <div id="dashboard-content" className="p-8 bg-background min-h-screen text-foreground font-sans">
+      <div className="max-w-[1440px] mx-auto space-y-10">
+        
+        {/* HEADER SECTION (CLEAN & SPACIOUS) */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">Hey {userData?.name || "User"} 👋</h1>
+            <p className="text-muted-foreground text-lg">Here's your financial overview for today.</p>
           </div>
-          <div className="flex gap-3">
-            <button onClick={() => navigate("/ai-advisor")} className="pdf-ignore px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">✨ AI Advisor</button>
-            <button onClick={handleDownloadPDF} className="pdf-ignore px-4 py-2 rounded-xl text-sm font-medium border border-white/30 hover:bg-white/10 transition">📄 Download PDF</button>
-          </div>
-        </div>
-
-        {/* NEXT MOVE */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">🚀 Your Next Move</h2>
-          <p className="text-sm opacity-90 mb-4">{smartAction.text}</p>
-          <button onClick={handleAction} className="bg-white text-green-600 px-4 py-2 rounded-xl font-medium hover:scale-105 transition">{smartAction.cta}</button>
-          <div className="mt-4">
-            <div className="w-full bg-white/30 h-2 rounded-full"><div className="bg-white h-2 rounded-full transition-all" style={{ width: `${Math.min(progressPercent, 100)}%` }} /></div>
-            <p className="text-xs mt-1 opacity-80">₹{savedAmount.toLocaleString('en-IN')} / ₹{targetAmount.toLocaleString('en-IN')}</p>
-            {insurance < idealInsurance * 0.5 && (
-              <p className="text-xs text-red-100 mt-1 font-medium">
-                ⚠️ Your insurance coverage is low
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* FUTURE PROJECTION */}
-        <div className="bg-gradient-to-r from-indigo-500 to-blue-600 text-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">📈 Future Projection</h2>
-          <p className="text-sm opacity-90">
-            At your current pace, your net worth can grow to
-          </p>
-
-          <p className="text-2xl font-bold mt-2">
-            ₹{calculateFutureNetWorth().toLocaleString('en-IN')}
-          </p>
-
-          <p className="text-sm opacity-80 mt-1">
-            in the next 5 years
-          </p>
-        </div>
-
-        {/* PROFILE */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm flex justify-between items-center h-full">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">{(userData?.name || "U")[0]}</div>
-            <div>
-              <h2 className="text-lg font-semibold">{userData?.name || "User"}</h2>
-              <p className="text-sm text-gray-500">Monthly Income: ₹{Number(userData?.income || 0).toLocaleString('en-IN')}</p>
-            </div>
+            <button 
+              onClick={() => navigate("/ai-advisor")} 
+              className="pdf-ignore px-6 py-3 rounded-2xl text-sm font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-all active:scale-95 flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" /> AI Advisor
+            </button>
+            <button 
+              onClick={handleDownloadPDF} 
+              className="pdf-ignore px-6 py-3 rounded-2xl text-sm font-semibold border border-border bg-white hover:bg-muted transition-all active:scale-95 flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" /> Download PDF
+            </button>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Primary Goal</p>
+        </div>
 
-            {isEditingGoal ? (
-              <div className="flex gap-2 items-center">
-                <input
-                  value={goalInput}
-                  onChange={(e) => setGoalInput(e.target.value)}
-                  className="border px-2 py-1 rounded text-sm text-gray-900"
-                  placeholder="Enter your goal"
-                  autoFocus
-                />
-                <button
-                  onClick={handleSaveGoal}
-                  className="text-green-600 text-sm font-medium hover:text-green-700"
+        {/* BENTO GRID START */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          
+          {/* TOP HIGHLIGHTS (BENTO BRICKS) */}
+          <div className="md:col-span-8 flex flex-col gap-8">
+            
+            {/* HERO BANNER SECTION (SUBTLE GRADIENT) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* SMART ACTION CARD */}
+              <div className="bg-primary p-8 rounded-[2.5rem] text-white shadow-2xl flex flex-col justify-between min-h-[220px]">
+                <div>
+                  <h2 className="text-2xl font-bold mb-3 flex items-center gap-2">
+                    <Sparkles className="w-6 h-6" /> Next Move
+                  </h2>
+                  <p className="text-white/80 leading-relaxed">{smartAction.text}</p>
+                </div>
+                <button 
+                  onClick={handleAction} 
+                  className="bg-white text-primary w-fit px-8 py-3 rounded-2xl font-bold hover:scale-105 transition-transform active:scale-95"
                 >
-                  Save
+                  {smartAction.cta}
                 </button>
               </div>
-            ) : (
-              <div
-                onClick={() => setIsEditingGoal(true)}
-                className="cursor-pointer hover:opacity-80 transition-opacity"
-              >
-                <p className="font-semibold text-blue-600">
-                  {userData?.goal || "Wealth Building"}
-                </p>
-                <p className="text-xs text-gray-400">Click to edit</p>
-              </div>
-            )}
-          </div>
-        </div>
 
-        {/* CORE STATUS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <div className="flex justify-between items-center mb-4"><h3 className="text-lg font-semibold text-gray-800">💯 Financial Health</h3><span className="text-2xl font-bold text-blue-600">{score}/100</span></div>
-            <div className="w-full bg-gray-200 h-3 rounded-full mb-4"><div className="h-3 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: score > 75 ? "#22c55e" : score > 50 ? "#f59e0b" : "#ef4444" }} /></div>
-            <div className={`mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${colorMap[currentInsight.color]}`}><span>{currentInsight.icon}</span><span>{currentInsight.message}</span></div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <div className="flex justify-between items-center mb-3"><h3 className="text-lg font-semibold text-gray-800">🎯 Goal Progress</h3><span className="text-sm text-gray-500">{progress.toFixed(0)}%</span></div>
-            <p className="text-sm text-gray-600 mb-2">{goal}</p>
-            <div className="w-full bg-gray-200 h-3 rounded-full"><div className="bg-blue-500 h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} /></div>
-          </div>
-        </div>
-
-        {/* SNAPSHOT */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {cards.map((card, i) => (
-            <div key={i} className={`p-6 rounded-2xl shadow-sm h-full ${card.bg}`}>
-              <span className="text-xl">{card.icon}</span>
-              <p className="text-sm text-gray-500 mt-2">{card.title}</p>
-              <h2 className={`text-2xl font-bold ${card.color}`}>₹{card.value.toLocaleString('en-IN')}</h2>
-            </div>
-          ))}
-        </div>
-
-        {/* TOP CATEGORY INSIGHT */}
-        {topCategory && (
-          <div className="bg-yellow-50 p-6 rounded-2xl shadow-sm border border-yellow-100">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">💡</span>
-              <div>
-                <p className="text-sm text-gray-600">
-                  You spend most on <span className="font-semibold">{topCategory.category}</span>
-                </p>
-                <p className="text-xl font-bold text-yellow-700">
-                  ₹{Number(topCategory.amount).toLocaleString('en-IN')}
-                  <span className="text-sm font-medium ml-2 opacity-80">({topPercentage}% of total expenses)</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* CHARTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full min-h-[350px]">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚖️ 50/30/20 Rule Analysis</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={[{ name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, { name: "Savings", Target: income * 0.2, Actual: savings + investments }]}>
-                <XAxis dataKey="name" fontSize={12} />
-                <YAxis fontSize={11} tickFormatter={(val) => `₹${val / 1000}k`} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Actual" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full min-h-[350px]">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Monthly Overview</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={[{ name: "Income", value: income }, { name: "Expenses", value: expenses }, { name: "Savings", value: savings }]}>
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(val) => `₹${val / 1000}k`} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* ACTION & INSIGHTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚡ What Should You Do Next?</h3>
-            <div className="space-y-3">
-              {actions.map((item, i) => (
-                <div key={i} onClick={() => navigate("/ai-advisor", { state: { query: item.action } })} className="p-4 rounded-xl border hover:bg-gray-50 cursor-pointer transition">
-                  <p className="text-sm font-medium">{item.text} →</p>
+              {/* PROGRESS CARD */}
+              <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] flex flex-col justify-between min-h-[220px]">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold text-muted-foreground mb-1">Goal Progress</h3>
+                    <p className="text-2xl font-bold text-foreground">{goal}</p>
+                  </div>
+                  <span className="text-3xl font-black text-primary/20">{progress.toFixed(0)}%</span>
                 </div>
-              ))}
+                <div className="space-y-3">
+                  <div className="w-full bg-secondary h-4 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-primary h-full rounded-full transition-all duration-1000 ease-out" 
+                      style={{ width: `${Math.min(progress, 100)}%` }} 
+                    />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    ₹{currentValue.toLocaleString('en-IN')} saved of ₹{target.toLocaleString('en-IN')}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className={`p-6 rounded-2xl shadow-sm border h-full ${colorMap[currentInsight.color]}`}>
-            <p className="font-semibold flex items-center gap-2">{currentInsight.icon} Smart Insight</p>
-            <p className="text-sm mt-3 leading-relaxed">{currentInsight.message}</p>
-            {action && <p className="text-xs mt-3 opacity-70 border-t pt-3 border-current">✨ AI Recommendation: {action}</p>}
-          </div>
-        </div>
 
-        {/* EMERGENCY & AI INSIGHTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">🛡️ Emergency Fund</h3>
-            <p className="text-sm text-gray-500 mb-3">{emergencyMonths.toFixed(1)} months covered</p>
-            <div className="w-full bg-gray-200 h-2 rounded-full"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} /></div>
-            <div className="bg-blue-50 p-4 rounded-xl text-sm mt-4">💡 3–6 months of savings protects you from unexpected job loss or medical emergencies.</div>
+            {/* FUTURE PROJECTION (WIDE) */}
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] relative overflow-hidden group">
+              <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-muted-foreground">5 Year Projection</h3>
+                  <p className="text-5xl font-black tracking-tight text-foreground">
+                    ₹{calculateFutureNetWorth().toLocaleString('en-IN')}
+                  </p>
+                  <p className="text-green-600 font-medium flex items-center gap-1">
+                    📈 Estimated growth at current pace
+                  </p>
+                </div>
+                <div className="w-32 h-32 rounded-full bg-primary/5 absolute -right-8 -top-8 group-hover:scale-110 transition-transform duration-700" />
+              </div>
+            </div>
+
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">💡 AI Smart Insights</h3>
-            <div className="space-y-3">
-              {insights.slice(0, 3).map((text, i) => (
-                <div key={i} className="bg-blue-50 p-3 rounded-xl text-sm">{text}</div>
-              ))}
+
+          {/* SIDE ASSETS (PROFILE & HEALTH) */}
+          <div className="md:col-span-4 flex flex-col gap-8">
+            
+            {/* PROFILE CARD */}
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] text-center">
+              <div className="w-24 h-24 rounded-full bg-secondary mx-auto mb-4 flex items-center justify-center text-4xl font-bold text-primary">
+                {(userData?.name || "U")[0]}
+              </div>
+              <h2 className="text-2xl font-bold mb-1">{userData?.name || "User"}</h2>
+              <p className="text-muted-foreground mb-6">Monthly Income: ₹{income.toLocaleString('en-IN')}</p>
+              
+              <div className="pt-6 border-t border-border">
+                <p className="text-sm text-muted-foreground mb-2">Primary Goal</p>
+                {isEditingGoal ? (
+                  <div className="flex gap-2 items-center justify-center">
+                    <input
+                      value={goalInput}
+                      onChange={(e) => setGoalInput(e.target.value)}
+                      className="bg-secondary px-4 py-2 rounded-xl text-sm w-full outline-none ring-2 ring-transparent focus:ring-primary/20 transition-all"
+                      placeholder="Enter goal"
+                      autoFocus
+                    />
+                    <button onClick={handleSaveGoal} className="text-primary font-bold">Save</button>
+                  </div>
+                ) : (
+                  <div onClick={() => setIsEditingGoal(true)} className="cursor-pointer group">
+                    <p className="text-xl font-bold text-primary group-hover:underline">{userData?.goal || "Wealth Building"}</p>
+                    <p className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">Edit</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* FINANCIAL HEALTH BEAT */}
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-muted-foreground">Health Score</h3>
+                <span className="text-3xl font-black text-foreground">{score}</span>
+              </div>
+              <div className="w-full bg-secondary h-6 rounded-full overflow-hidden mb-4">
+                <div 
+                  className="h-full rounded-full transition-all duration-1000" 
+                  style={{ 
+                    width: `${score}%`, 
+                    backgroundColor: score > 75 ? "#34c759" : score > 50 ? "#ff9500" : "#ff3b30" 
+                  }} 
+                />
+              </div>
+              <div className={`p-4 rounded-3xl text-sm leading-relaxed ${colorMap[currentInsight.color]} bg-opacity-20 flex gap-3`}>
+                <span className="text-lg">{currentInsight.icon}</span>
+                <p>{currentInsight.message}</p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* KPI TOKENS (SIX PACK) */}
+          <div className="md:col-span-12 grid grid-cols-2 md:grid-cols-5 gap-6">
+            {cards.map((card, i) => (
+              <div 
+                key={i} 
+                className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:scale-[1.02] transition-transform cursor-pointer"
+              >
+                <div className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center text-xl mb-4">
+                  {card.icon}
+                </div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">{card.title}</p>
+                <h2 className="text-2xl font-black truncate">₹{card.value.toLocaleString('en-IN')}</h2>
+              </div>
+            ))}
+          </div>
+
+          {/* CHARTS (CLEANER) */}
+          <div className="md:col-span-7 bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+            <h3 className="text-xl font-bold mb-8">50/30/20 Analysis</h3>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  data={[
+                    { name: "Needs", Target: income * 0.5, Actual: expenses * 0.6 }, 
+                    { name: "Wants", Target: income * 0.3, Actual: expenses * 0.4 }, 
+                    { name: "Savings", Target: income * 0.2, Actual: savings + investments }
+                  ]}
+                  margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                >
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 12 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 10 }} tickFormatter={(val) => `₹${val / 1000}k`} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(0,122,255,0.05)' }}
+                    contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
+                  />
+                  <Bar dataKey="Target" fill="#f2f2f7" radius={[10, 10, 0, 0]} barSize={24} />
+                  <Bar dataKey="Actual" fill="#007aff" radius={[10, 10, 0, 0]} barSize={24} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
+
+          <div className="md:col-span-5 bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+            <h3 className="text-xl font-bold mb-8">Cashflow Snapshot</h3>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  data={[
+                    { name: "In", value: income }, 
+                    { name: "Out", value: expenses }, 
+                    { name: "Bank", value: savings }
+                  ]}
+                  margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                >
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#8e8e93', fontSize: 12 }} dy={10} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(0,122,255,0.05)' }}
+                    contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
+                  />
+                  <Bar dataKey="value" fill="#007aff" radius={[12, 12, 12, 12]} barSize={40} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* INSIGHTS (BENTO BOX STYLE) */}
+          <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] relative">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center text-primary">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold">Top Expense</h3>
+              </div>
+              {topCategory ? (
+                <div>
+                  <p className="text-muted-foreground text-sm uppercase tracking-widest font-bold mb-1">{topCategory.category}</p>
+                  <p className="text-4xl font-black mb-2">₹{Number(topCategory.amount).toLocaleString('en-IN')}</p>
+                  <p className="text-sm font-medium text-muted-foreground">{topPercentage}% of your total spending</p>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">No data available yet</p>
+              )}
+            </div>
+
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] md:col-span-2">
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" /> AI Smart Analysis
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {insights.slice(0, 4).map((text, i) => (
+                  <div key={i} className="bg-secondary p-4 rounded-2xl text-sm font-medium leading-relaxed border border-transparent hover:border-primary/20 transition-colors">
+                    {text}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* EMERGENCY FUND CARD (CLEAN) */}
+          <div className="md:col-span-12 bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] flex flex-col md:flex-row items-center gap-10">
+            <div className="flex-1 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                  🛡️
+                </div>
+                <h3 className="text-2xl font-bold">Emergency Fund</h3>
+              </div>
+              <p className="text-muted-foreground leading-relaxed">
+                You have {emergencyMonths.toFixed(1)} months of coverage. 
+                A solid safety net protects you from unexpected job loss or medical emergencies.
+              </p>
+            </div>
+            <div className="w-full md:w-64 space-y-3">
+              <div className="flex justify-between text-sm font-bold mb-1">
+                <span>Coverage</span>
+                <span className="text-primary">{Math.min((emergencyMonths / 6) * 100, 100).toFixed(0)}%</span>
+              </div>
+              <div className="w-full bg-secondary h-4 rounded-full overflow-hidden">
+                <div 
+                  className="bg-primary h-full rounded-full" 
+                  style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} 
+                />
+              </div>
+              <p className="text-xs text-center text-muted-foreground font-medium">Target: 6 months of expenses</p>
+            </div>
+          </div>
+
         </div>
       </div>
 
+      {/* PDF OVERLAY (PREMIUM BLUR) */}
       {isGeneratingPDF && (
-        <div className="pdf-ignore popup fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="bg-white px-8 py-6 rounded-2xl shadow-2xl flex items-center gap-4 animate-in fade-in zoom-in duration-300">
-            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-2xl animate-pulse">
-              📄
+        <div className="pdf-ignore fixed inset-0 z-[9999] flex items-center justify-center bg-white/40 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white px-10 py-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center gap-4 text-center">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary text-4xl animate-bounce">
+              <Download />
             </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-lg text-gray-900 leading-none mb-1">
-                Generating Report
-              </span>
-              <span className="text-sm font-medium text-gray-500">
-                {pdfStatus || "Please wait..."}
-              </span>
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black text-foreground">Generating High-Res Report</h2>
+              <p className="text-muted-foreground font-medium">{pdfStatus || "Polishing the document..."}</p>
             </div>
           </div>
         </div>
