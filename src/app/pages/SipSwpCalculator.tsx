@@ -469,44 +469,67 @@ export function SipSwpCalculator() {
                 )}
 
                 {/* ABOUT SECTION */}
-                <section className="space-y-8 pb-12 pt-8 border-t border-gray-100">
-                   <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">About</h2>
-                   <div className="grid gap-10">
-                        <div className="space-y-3">
-                            <h4 className="text-base font-bold text-gray-900">
-                                What is {mode === "sip" ? "SIP" : "SWP"}?
-                            </h4>
-                            <p className="text-gray-500 font-medium leading-relaxed max-w-4xl">
-                                {mode === "sip"
-                                    ? "A Systematic Investment Plan (SIP) is a disciplined, automated method for investing fixed sums into the market. It acts like a recurring deposit but leverages market returns, using rupee cost averaging to build significant wealth over time."
-                                    : "A Systematic Withdrawal Plan (SWP) is a way to create a steady income stream from your capital. It structured method to withdraw fixed or variable amounts at regular intervals, often used to bridge income gaps or fund retirement."}
-                            </p>
+                <section className="pt-12 border-t border-gray-100">
+                    <div className="space-y-8">
+                        <div className="space-y-1">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Resources</p>
+                            <h2 className="text-2xl font-black text-gray-900 tracking-tight text-left">
+                                {mode === "sip" ? "About SIP" : "About SWP"}
+                            </h2>
                         </div>
 
-                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default">
-                             <h4 className="text-sm font-bold flex items-center gap-2 mb-4">
-                                <Calculator className="w-4 h-4 text-primary" />
-                                Why use {mode === "sip" ? "SIP" : "SWP"}?
-                            </h4>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                {mode === "sip"
-                                    ? "SIP promotes disciplined investing, reduces market timing risk, and leverages the explosive power of compounding. It's the most effective way for long-term goal reaching with small, regular contributions."
-                                    : "SWP provides a reliable, tax-efficient stream of regular income while keeping your capital invested. It maintains your corpus longer by avoiding the need to time withdrawals."}
-                            </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
+                            {mode === "sip" ? (
+                                <>
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-gray-900">What is SIP?</p>
+                                        <p className="text-sm text-gray-500 leading-relaxed">
+                                            A Systematic Investment Plan (SIP) is a disciplined, automated method for investing fixed sums into the market. 
+                                            It acts like a recurring deposit but leverages market returns, using rupee cost averaging to build significant wealth over time.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-gray-900">Why start an SIP?</p>
+                                        <p className="text-sm text-gray-500 leading-relaxed">
+                                            SIP promoting disciplined investing, reduces market timing risk, and leverages the explosive power of compounding. 
+                                            It's the most effective way for long-term goal reaching with small, regular contributions.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-gray-900">Who should use it?</p>
+                                        <p className="text-sm text-gray-500 leading-relaxed">
+                                            Ideal for disciplined investors, beginners, and anyone looking to build wealth long-term without needing 
+                                            a large lump sum. Perfect for goals like retirement, education, or marriage.
+                                        </p>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-gray-900">What is SWP?</p>
+                                        <p className="text-sm text-gray-500 leading-relaxed">
+                                            A Systematic Withdrawal Plan (SWP) is a way to create a steady income stream from your capital. 
+                                            It is a structured method to withdraw fixed amounts at regular intervals, often used for retirement.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-gray-900">How does it work?</p>
+                                        <p className="text-sm text-gray-500 leading-relaxed">
+                                            SWP provides a reliable, tax-efficient stream of regular income while keeping your capital invested. 
+                                            It maintains your corpus longer by avoiding the need to time large withdrawals.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-gray-900">Who should use it?</p>
+                                        <p className="text-sm text-gray-500 leading-relaxed">
+                                            Ideal for retirees or investors seeking regular, predictable income. Excellent for those wanting 
+                                            a tax-efficient method to withdraw funds while keeping principal invested.
+                                        </p>
+                                    </div>
+                                </>
+                            )}
                         </div>
-
-                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default">
-                             <h4 className="text-sm font-bold flex items-center gap-2 mb-4">
-                                <TrendingUp className="w-4 h-4 text-primary" />
-                                Who should use {mode === "sip" ? "SIP" : "SWP"}?
-                            </h4>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                {mode === "sip"
-                                    ? "Ideal for disciplined investors, beginners, and anyone looking to build wealth long-term without needing a large lump sum. Perfect for goals like retirement, education, or marriage."
-                                    : "Ideal for retirees or investors seeking regular, predictable income. Excellent for those in high tax brackets who want a tax-efficient method to withdraw funds while keeping principal invested."}
-                            </p>
-                        </div>
-                   </div>
+                    </div>
                 </section>
 
             </div>
