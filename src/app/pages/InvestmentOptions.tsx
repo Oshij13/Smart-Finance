@@ -1,19 +1,14 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { TrendingUp, TrendingDown, Info, AlertTriangle } from "lucide-react";
+import { TrendingUp, Info, AlertTriangle, Calendar, IndianRupee } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, Cell } from "recharts";
 
 export function InvestmentOptions() {
   const [investmentAmount, setInvestmentAmount] = useState("");
   const [timeHorizon, setTimeHorizon] = useState("");
   const [historyYear, setHistoryYear] = useState("2010");
   const [showResults, setShowResults] = useState(false);
-  const [customAmount, setCustomAmount] = useState(10000);
-  const [isEditingAmount, setIsEditingAmount] = useState(false);
+  const [simulationAmount, setSimulationAmount] = useState("10000");
 
   const calculateReturns = () => {
     if (investmentAmount && timeHorizon) setShowResults(true);
@@ -23,54 +18,12 @@ export function InvestmentOptions() {
   const years = parseInt(timeHorizon) || 0;
 
   const investmentTypes = [
-    {
-      name: "Fixed Deposits",
-      risk: "Very Low",
-      returns: 6.5,
-      description: "Safe, guaranteed returns from banks",
-      color: "#10b981",
-      suitability: "Conservative investors, emergency fund"
-    },
-    {
-      name: "Liquid Funds",
-      risk: "Low",
-      returns: 7,
-      description: "Mutual funds with high liquidity",
-      color: "#3b82f6",
-      suitability: "Short-term parking, 3-6 months"
-    },
-    {
-      name: "Debt Mutual Funds",
-      risk: "Low-Moderate",
-      returns: 8,
-      description: "Bond-based funds with stable returns",
-      color: "#8b5cf6",
-      suitability: "3-5 year goals, tax efficient"
-    },
-    {
-      name: "Index Funds",
-      risk: "Moderate",
-      returns: 12,
-      description: "Track Nifty/Sensex with low fees",
-      color: "#f59e0b",
-      suitability: "Long-term wealth creation, 7+ years"
-    },
-    {
-      name: "Equity Mutual Funds",
-      risk: "Moderate-High",
-      returns: 14,
-      description: "Actively managed stock portfolios",
-      color: "#ef4444",
-      suitability: "Aggressive growth, 10+ years"
-    },
-    {
-      name: "Direct Stocks",
-      risk: "High",
-      returns: 16,
-      description: "Individual company shares",
-      color: "#ec4899",
-      suitability: "Experienced investors, high involvement"
-    },
+    { name: "Fixed Deposits", risk: "Very Low", returns: 6.5, color: "#10b981", desc: "Safe bank returns", suitability: "Conservative, emergency fund" },
+    { name: "Liquid Funds", risk: "Low", returns: 7, color: "#3b82f6", desc: "High liquidity", suitability: "Short-term parking" },
+    { name: "Debt Funds", risk: "Low-Mod", returns: 8, color: "#8b5cf6", desc: "Stable bond-based", suitability: "3-5 year goals" },
+    { name: "Index Funds", risk: "Moderate", returns: 12, color: "#f59e0b", desc: "Tracks Nifty Index", suitability: "Wealth creation" },
+    { name: "Growth Equity", risk: "Mod-High", returns: 14, color: "#ef4444", desc: "Active stock mix", suitability: "Aggressive growth" },
+    { name: "Direct Stocks", risk: "High", returns: 16, color: "#ec4899", desc: "Individual shares", suitability: "Experienced only" },
   ];
 
   const compareData = investmentTypes.map(inv => ({
@@ -86,321 +39,275 @@ export function InvestmentOptions() {
     aggressive: Math.round(amount * Math.pow(1.15, i)),
   }));
 
+  // Historical Simulation Logic
+  const startYear = parseInt(historyYear);
+  const currentYear = new Date().getFullYear();
+  const yearsCount = currentYear - startYear;
+  const initialSimAmount = parseInt(simulationAmount) || 0;
+  const niftyCagr = 0.125; // Nifty 50 average
+
+  const simData = Array.from({ length: yearsCount + 1 }, (_, i) => ({
+    year: startYear + i,
+    value: Math.round(initialSimAmount * Math.pow(1 + niftyCagr, i)),
+  }));
+
+  const finalSimValue = simData[simData.length - 1]?.value || 0;
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-            <TrendingUp className="w-6 h-6" />
-          </div>
-          <h1 className="text-3xl font-bold">Investment Options</h1>
-        </div>
-        <p className="text-lg text-violet-50">
-          Explore different investment vehicles and find the right mix for your financial goals.
-        </p>
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12">
 
-      {/* HISTORICAL NIFTY SIMULATION */}
-      <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 mt-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">📈 What if you invested earlier?</h2>
-            <p className="text-sm text-gray-600">
-              See how ₹{customAmount.toLocaleString("en-IN")} could have grown over time in Nifty Index
-            </p>
-          </div>
+        {/* HEADER */}
+        <section className="space-y-2">
+          <p className="text-sm text-muted-foreground">Investments</p>
+          <h1 className="text-4xl font-semibold tracking-tight leading-tight">
+            Explore investment options
+          </h1>
+          <p className="text-muted-foreground text-base max-w-xl">
+            See what time and patience can do for your money.
+          </p>
+        </section>
 
-          {!isEditingAmount ? (
-            <button
-              onClick={() => setIsEditingAmount(true)}
-              className="text-xs px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 font-medium whitespace-nowrap"
-            >
-              Change Amount
-            </button>
-          ) : (
-            <input
-              type="number"
-              value={customAmount}
-              onChange={(e) => setCustomAmount(Number(e.target.value))}
-              onBlur={() => setIsEditingAmount(false)}
-              className="w-28 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              autoFocus
-            />
-          )}
-        </div>
+        {/* HISTORICAL SIMULATION */}
+        <section className="space-y-4">
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">
+            WHAT IF YOU INVESTED EARLIER?
+          </h2>
 
-        <div className="space-y-4">
+          <div className="rounded-2xl border hairline bg-card p-8 space-y-8">
+            {/* PARAMETERS */}
+            <div className="grid md:grid-cols-2 gap-6 pb-6 border-b hairline">
+              <div className="space-y-3">
+                <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">
+                  <IndianRupee className="w-3 h-3" /> Initial Amount
+                </label>
+                <input
+                  type="number"
+                  value={simulationAmount}
+                  onChange={(e) => setSimulationAmount(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                  placeholder="e.g. 10,000"
+                />
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">
+                  <Calendar className="w-3 h-3" /> Start Year
+                </label>
+                <div className="flex gap-2">
+                  {["2010", "2016", "2020"].map((year) => (
+                    <button
+                      key={year}
+                      onClick={() => setHistoryYear(year)}
+                      className={`flex-1 px-4 py-2 rounded-xl border hairline text-xs font-semibold transition-all ${
+                        historyYear === year 
+                        ? "bg-primary text-white border-primary" 
+                        : "bg-background text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-          {/* TOGGLE YEARS */}
-          <div className="flex gap-2">
-            {["2010", "2016", "2020"].map((year) => (
-              <Button
-                key={year}
-                variant={historyYear === year ? "default" : "outline"}
-                onClick={() => setHistoryYear(year)}
-                className={historyYear === year ? "bg-emerald-600 hover:bg-emerald-700" : ""}
-              >
-                {year}
-              </Button>
-            ))}
-          </div>
+            {/* BIG RESULT */}
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground font-medium">
+                ₹{initialSimAmount.toLocaleString("en-IN")} invested in {historyYear}
+              </p>
+              <p className="text-5xl font-bold tracking-tight">
+                ₹{finalSimValue.toLocaleString("en-IN")}
+              </p>
+            </div>
 
-          {/* CALCULATION */}
-          {historyYear && (
-            (() => {
-              const startYear = parseInt(historyYear);
-              const currentYear = new Date().getFullYear();
-              const yearsCount = currentYear - startYear;
-
-              const cagr = 0.12; // Nifty approx
-              const initial = customAmount;
-
-              const data = Array.from({ length: yearsCount + 1 }, (_, i) => {
-                const value = Math.round(initial * Math.pow(1 + cagr, i));
-                return {
-                  year: startYear + i,
-                  value,
-                };
-              });
-
-              const finalValue = data[data.length - 1]?.value || 0;
-
-              return (
-                <>
-                  {/* RESULT */}
-                  <div className="p-4 bg-emerald-50 rounded-lg text-center">
-                    <p className="text-sm text-gray-600">
-                      ₹{initial.toLocaleString("en-IN")} invested in {startYear}
-                    </p>
-                    <p className="text-2xl font-bold text-emerald-600">
-                      ₹{finalValue.toLocaleString("en-IN")}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      This is why starting early matters 🚀
-                    </p>
-                  </div>
-
-                  {/* GRAPH */}
-                  <ResponsiveContainer width="100%" height={250}>
-                    <LineChart data={data}>
-                      <XAxis dataKey="year" />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(val: number) => `₹${val.toLocaleString("en-IN")}`}
-                      />
-                      <Line type="monotone" dataKey="value" stroke="#059669" strokeWidth={3} dot={false} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </>
-              );
-            })()
-          )}
-        </div>
-      </div>
-
-      {/* Calculator */}
-      <div className="pt-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Investment Returns Calculator</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Investment Amount (₹)</label>
-            <input
-              type="number"
-              placeholder="e.g. 100000"
-              value={investmentAmount}
-              onChange={(e) => setInvestmentAmount(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Time Horizon (Years)</label>
-            <input
-              type="number"
-              placeholder="e.g. 10"
-              value={timeHorizon}
-              onChange={(e) => setTimeHorizon(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
-            />
-          </div>
-        </div>
-
-        <button
-          onClick={calculateReturns}
-          className="px-6 py-2.5 rounded-lg bg-violet-600 text-white font-medium hover:opacity-90 transition mx-auto block mt-6"
-        >
-          Compare Investment Options
-        </button>
-      </div>
-
-
-
-      {/* Results */}
-      {showResults && amount > 0 && years > 0 && (
-        <>
-          {/* Comparison Chart */}
-          <Card className="border-none shadow-md bg-white mt-4">
-            <CardHeader>
-              <CardTitle>Investment Comparison</CardTitle>
-              <CardDescription>Potential final value after {years} years</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={compareData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis type="number" stroke="#6b7280" />
-                  <YAxis type="category" dataKey="name" stroke="#6b7280" width={150} />
-                  <Tooltip
-                    formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
+            {/* CHART */}
+            <div className="h-[300px] w-full pt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={simData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <XAxis 
+                    dataKey="year" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 500 }}
+                    dy={10}
                   />
-                  <Bar dataKey="finalValue" radius={[0, 8, 8, 0]}>
-                    {compareData.map((entry, index) => (
-                      <rect key={index} fill={investmentTypes[index].color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Growth Projection */}
-          <Card className="border-none shadow-md bg-white mt-4">
-            <CardHeader>
-              <CardTitle>Growth Projection Over Time</CardTitle>
-              <CardDescription>See how your investment could grow year by year</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={growthProjection}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="year" label={{ value: 'Years', position: 'insideBottom', offset: -5 }} stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip
-                    formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 500 }}
+                    tickFormatter={(val) => `₹${(val / 1000).toFixed(0)}k`}
+                    dx={-10}
                   />
-                  <Line type="monotone" dataKey="conservative" stroke="#10b981" strokeWidth={2} name="Conservative (7%)" />
-                  <Line type="monotone" dataKey="moderate" stroke="#3b82f6" strokeWidth={2} name="Moderate (12%)" />
-                  <Line type="monotone" dataKey="aggressive" stroke="#ef4444" strokeWidth={2} name="Aggressive (15%)" />
+                  <Tooltip 
+                    cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))', 
+                      borderRadius: '0.75rem',
+                      fontSize: '11px',
+                      fontWeight: '600'
+                    }}
+                    formatter={(val: number) => [`₹${val.toLocaleString('en-IN')}`, 'Value']}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={3} 
+                    dot={false}
+                    activeDot={{ r: 5, fill: 'hsl(var(--primary))', strokeWidth: 2, stroke: 'white' }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </>
-      )}
+            </div>
+          </div>
+        </section>
 
-      {/* Investment Options Detail */}
-      <Tabs defaultValue="all" className="space-y-4">
-        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-          <TabsTrigger value="all">All Options</TabsTrigger>
-          <TabsTrigger value="low">Low Risk</TabsTrigger>
-          <TabsTrigger value="moderate">Moderate</TabsTrigger>
-          <TabsTrigger value="high">High Risk</TabsTrigger>
-        </TabsList>
+        {/* COMPARISON CALCULATOR */}
+        <section className="space-y-4">
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest px-1">
+            Quick Calculator
+          </h2>
 
-        <TabsContent value="all" className="space-y-4">
-          {investmentTypes.map((inv, index) => (
-            <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-              <div className="flex flex-col md:flex-row items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold flex items-center gap-2 text-gray-900">
-                    {inv.name}
-                    <span className={`text-xs px-2 py-1 rounded-full ${inv.risk.includes('Low') ? 'bg-emerald-100 text-emerald-700' :
-                      inv.risk.includes('Moderate') ? 'bg-blue-100 text-blue-700' :
-                        'bg-rose-100 text-rose-700'
-                      }`}>
-                      {inv.risk}
-                    </span>
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">{inv.description}</p>
+          <div className="rounded-2xl border hairline bg-card p-8 space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-tight">Investment Amount (₹)</label>
+                <input
+                  type="number"
+                  placeholder="e.g. 100,000"
+                  value={investmentAmount}
+                  onChange={(e) => setInvestmentAmount(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-tight">Time Horizon (Years)</label>
+                <input
+                  type="number"
+                  placeholder="e.g. 10"
+                  value={timeHorizon}
+                  onChange={(e) => setTimeHorizon(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={calculateReturns}
+              className="px-6 py-3 rounded-full bg-primary text-white text-sm font-medium hover:opacity-90 transition shadow-sm"
+            >
+              Compare Options
+            </button>
+          </div>
+        </section>
+
+        {/* COMPARISON RESULTS */}
+        {showResults && amount > 0 && years > 0 && (
+          <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-4">
+              <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">Investment Comparison</h2>
+              <div className="rounded-2xl border hairline bg-card p-8">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={compareData} margin={{ left: 40 }}>
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 500 }}
+                      dy={10}
+                    />
+                    <YAxis hide />
+                    <Tooltip 
+                      cursor={{ fill: 'transparent' }}
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '0.75rem', fontSize: '11px' }}
+                      formatter={(val: number) => `₹${val.toLocaleString('en-IN')}`}
+                    />
+                    <Bar dataKey="finalValue" radius={[6, 6, 0, 0]} barSize={40}>
+                      {compareData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill="hsl(var(--primary))" fillOpacity={0.8} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="space-y-4 pb-4">
+              <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">Growth Projection</h2>
+              <div className="rounded-2xl border hairline bg-card p-8">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={growthProjection}>
+                    <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fontSize: 11 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ borderRadius: '0.75rem' }} />
+                    <Line type="monotone" dataKey="conservative" stroke="#10b981" strokeWidth={2} dot={false} name="Conservative (7%)" />
+                    <Line type="monotone" dataKey="moderate" stroke="#3b82f6" strokeWidth={2} dot={false} name="Moderate (12%)" />
+                    <Line type="monotone" dataKey="aggressive" stroke="#ef4444" strokeWidth={2} dot={false} name="Aggressive (15%)" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* TABS & DETAILS */}
+        <section className="space-y-6">
+          <Tabs defaultValue="all" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">Selection Guide</h2>
+              <TabsList className="bg-muted p-1 rounded-xl h-auto">
+                <TabsTrigger value="all" className="px-3 py-1.5 text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">All</TabsTrigger>
+                <TabsTrigger value="low" className="px-3 py-1.5 text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">Low Risk</TabsTrigger>
+                <TabsTrigger value="high" className="px-3 py-1.5 text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">High Risk</TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="all" className="grid gap-4 mt-0">
+              {investmentTypes.map((inv, index) => (
+                <div key={index} className="rounded-2xl border hairline bg-card p-6 group hover:bg-muted/30 transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-semibold">{inv.name}</h3>
+                      <p className="text-sm text-muted-foreground">{inv.desc}</p>
+                    </div>
+                    <div className="text-right space-y-1">
+                      <p className="text-2xl font-bold" style={{ color: inv.color }}>{inv.returns}%</p>
+                      <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{inv.risk}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t hairline flex items-center gap-2 text-xs text-muted-foreground">
+                    <Info className="w-3.5 h-3.5 text-primary" />
+                    <span><span className="font-bold text-foreground">Best for:</span> {inv.suitability}</span>
+                  </div>
                 </div>
-                <div className="text-left md:text-right">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Expected Returns</p>
-                  <p className="text-2xl font-bold mt-1" style={{ color: inv.color }}>{inv.returns}%</p>
-                </div>
-              </div>
-              <div className="mt-4 flex items-start gap-2 text-sm bg-white p-3 rounded-lg border border-gray-100">
-                <Info className="w-4 h-4 text-violet-500 mt-0.5 flex-shrink-0" />
-                <p className="text-gray-600">
-                  <span className="font-semibold text-gray-800">Best for:</span> {inv.suitability}
-                </p>
-              </div>
-            </div>
-          ))}
-        </TabsContent>
+              ))}
+            </TabsContent>
+          </Tabs>
+        </section>
 
-        <TabsContent value="low" className="space-y-4 pt-2">
-          {investmentTypes.filter(inv => inv.risk.includes('Low')).map((inv, index) => (
-            <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">{inv.name}</h3>
-              <p className="text-sm text-gray-600 mt-1">{inv.description}</p>
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <p className="text-2xl font-bold" style={{ color: inv.color }}>Returns: {inv.returns}%</p>
-                <p className="text-sm text-gray-600 mt-1"><span className="font-semibold text-gray-800">Best for:</span> {inv.suitability}</p>
-              </div>
-            </div>
-          ))}
-        </TabsContent>
+        {/* CONSIDERATIONS */}
+        <section className="space-y-5 pb-10">
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5" /> Considerations
+          </h2>
 
-        <TabsContent value="moderate" className="space-y-4 pt-2">
-          {investmentTypes.filter(inv => inv.risk.includes('Moderate')).map((inv, index) => (
-            <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">{inv.name}</h3>
-              <p className="text-sm text-gray-600 mt-1">{inv.description}</p>
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <p className="text-2xl font-bold" style={{ color: inv.color }}>Returns: {inv.returns}%</p>
-                <p className="text-sm text-gray-600 mt-1"><span className="font-semibold text-gray-800">Best for:</span> {inv.suitability}</p>
+          <div className="rounded-2xl border hairline bg-card divide-y hairline overflow-hidden">
+            {[
+              { title: "Past Performance ≠ Future Returns", desc: "Historical returns are indicative. Actual returns vary with market conditions." },
+              { title: "Diversification is Key", desc: "Don't put all your money in one type. Spread across asset classes." },
+              { title: "Match Time Horizon", desc: "Equity for long-term (>7y), Debt for short-term goals." }
+            ].map((item, i) => (
+              <div key={i} className="px-6 py-5 hover:bg-muted/30 transition-colors">
+                <h4 className="text-sm font-semibold text-foreground">{item.title}</h4>
+                <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
               </div>
-            </div>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="high" className="space-y-4 pt-2">
-          {investmentTypes.filter(inv => inv.risk === 'High').map((inv, index) => (
-            <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">{inv.name}</h3>
-              <p className="text-sm text-gray-600 mt-1">{inv.description}</p>
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <p className="text-2xl font-bold" style={{ color: inv.color }}>Returns: {inv.returns}%</p>
-                <p className="text-sm text-gray-600 mt-1"><span className="font-semibold text-gray-800">Best for:</span> {inv.suitability}</p>
-              </div>
-            </div>
-          ))}
-        </TabsContent>
-      </Tabs>
-
-      {/* Important Notes */}
-      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 mt-8">
-        <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900 mb-4">
-          <AlertTriangle className="w-5 h-5 text-amber-600" />
-          Important Considerations
-        </h2>
-        <div className="space-y-3">
-          <div className="p-4 bg-white/80 rounded-lg">
-            <h3 className="font-semibold text-amber-900 mb-1">Past Performance ≠ Future Returns</h3>
-            <p className="text-sm text-gray-600">Historical returns are indicative. Actual returns may vary based on market conditions.</p>
+            ))}
           </div>
-          <div className="p-4 bg-white/80 rounded-lg">
-            <h3 className="font-semibold text-amber-900 mb-1">Diversification is Key</h3>
-            <p className="text-sm text-gray-600">Don't put all your money in one type of investment. Spread across different asset classes.</p>
-          </div>
-          <div className="p-4 bg-white/80 rounded-lg">
-            <h3 className="font-semibold text-amber-900 mb-1">Match Time Horizon</h3>
-            <p className="text-sm text-gray-600">Choose investments that align with when you need the money. Equity for long-term, debt for short-term.</p>
-          </div>
-        </div>
+        </section>
+
       </div>
     </div>
   );
