@@ -479,8 +479,8 @@ export default function DashboardHome() {
   const smartAction = getSmartNextMove();
 
   return (
-    <div id="dashboard-content" className="min-h-screen bg-background">
-      <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12">
+    <div id="dashboard-content" className="min-h-screen bg-background text-foreground">
+      <div className="w-full px-6 lg:px-10 py-12 space-y-12">
 
         {/* HEADER */}
         <section className="space-y-1">

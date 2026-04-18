@@ -81,7 +81,7 @@ export function RetirementPlanning() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="w-full px-6 lg:px-10 py-12 space-y-12">
       {/* Header */}
       <div className="bg-gradient-to-r from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl">
         <div className="flex items-center gap-3 mb-4">
@@ -96,7 +96,7 @@ export function RetirementPlanning() {
       </div>
 
       {/* Input Form */}
-      <div className="space-y-4 max-w-2xl mx-auto py-2 mt-4">
+      <div className="space-y-4 py-2 mt-4">
         <h2 className="text-xl font-bold text-gray-900 mb-2">Retirement Calculator</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">

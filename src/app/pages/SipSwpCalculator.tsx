@@ -215,38 +215,38 @@ export function SipSwpCalculator() {
         return `Ensure your withdrawal is sustainable. Ideally, your withdrawal should be lower than your returns to avoid depletion.`;
     };
 
-    const inputClass = "w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all";
+    const inputClass = "w-full px-5 py-4 rounded-xl border border-gray-100 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-gray-300";
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] text-foreground">
-            <div className="w-full px-6 lg:px-12 py-10 space-y-12">
+        <div className="min-h-screen bg-white text-gray-900">
+            <div className="w-full px-6 lg:px-10 py-12 space-y-12">
 
                 {/* HEADER */}
-                <section className="space-y-2">
-                    <p className="text-sm font-bold text-primary/60 uppercase tracking-widest">Calculators</p>
-                    <h1 className="text-5xl font-bold tracking-tight text-slate-900">
+                <section className="space-y-4">
+                    <p className="text-xs text-gray-400 font-medium">Calculator</p>
+                    <h1 className="text-5xl font-bold tracking-tight text-gray-900">
                         SIP / SWP
                     </h1>
-                    <p className="text-slate-500 text-lg max-w-2xl leading-relaxed">
-                        Plan your wealth journey with precision. Switch between monthly investing (SIP) and systematic withdrawals (SWP).
+                    <p className="text-gray-400 text-lg max-w-2xl font-medium">
+                        Plan your monthly investments and withdrawals.
                     </p>
                 </section>
 
                 {/* MODE TOGGLE */}
-                <section className="max-w-4xl">
-                    <div className="bg-slate-200/50 p-1.5 rounded-2xl flex w-full shadow-inner">
+                <section>
+                    <div className="bg-gray-50 p-1.5 rounded-[1.25rem] flex max-w-[42rem] shadow-inner">
                         <button
                             onClick={() => { setMode("sip"); setResult(null); setChartData([]); }}
-                            className={`flex-1 py-4 px-6 rounded-xl text-sm font-bold transition-all duration-300 ${
-                                mode === "sip" ? "bg-white shadow-md text-primary scale-[1.02]" : "text-slate-500 hover:text-slate-700"
+                            className={`flex-1 py-3 px-6 rounded-[1rem] text-sm font-semibold transition-all ${
+                                mode === "sip" ? "bg-white shadow-md text-gray-900" : "text-gray-400 hover:text-gray-600"
                             }`}
                         >
                             SIP Calculator
                         </button>
                         <button
                             onClick={() => { setMode("swp"); setResult(null); setChartData([]); }}
-                            className={`flex-1 py-4 px-6 rounded-xl text-sm font-bold transition-all duration-300 ${
-                                mode === "swp" ? "bg-white shadow-md text-primary scale-[1.02]" : "text-slate-500 hover:text-slate-700"
+                            className={`flex-1 py-3 px-6 rounded-[1rem] text-sm font-semibold transition-all ${
+                                mode === "swp" ? "bg-white shadow-md text-gray-900" : "text-gray-400 hover:text-gray-600"
                             }`}
                         >
                             SWP Calculator
@@ -256,113 +256,107 @@ export function SipSwpCalculator() {
 
                 {/* CALCULATOR CONTAINER */}
                 <section className="space-y-8">
-                    <div className="rounded-[2.5rem] border hairline bg-white p-10 lg:p-14 shadow-xl shadow-slate-200/50 space-y-10">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b hairline pb-8">
-                            <div>
-                                <h3 className="text-2xl font-bold text-slate-900">
-                                    {mode === "sip" ? "Growth Engine" : "Withdrawal Strategy"}
-                                </h3>
-                                <p className="text-sm text-slate-500 mt-2 font-medium">
-                                    {mode === "sip"
-                                        ? "Visualize how your monthly contributions compound over time."
-                                        : "Analyze how long your corpus can support your lifestyle."}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full border hairline">
-                                <Calculator className="w-4 h-4 text-primary" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Standard Formula Applied</span>
-                            </div>
+                    <div className="rounded-[1.5rem] border border-gray-100 bg-white p-10 lg:p-12 space-y-8 shadow-sm shadow-gray-100">
+                        <div>
+                            <h3 className="text-2xl font-bold text-gray-900">
+                                {mode === "sip" ? "SIP Calculator" : "SWP Calculator"}
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-2 font-medium">
+                                {mode === "sip"
+                                    ? "Calculate your future wealth with monthly investments."
+                                    : "Plan your monthly withdrawals from your corpus."}
+                            </p>
                         </div>
 
                         {/* INPUTS GRID */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {mode === "sip" ? (
                                 <>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Monthly Investment (₹)</label>
+                                    <div className="space-y-4">
+                                        <label className="text-xs font-medium text-gray-400">Monthly Investment (₹)</label>
                                         <input
                                             type="number"
                                             value={monthlyInvestment}
                                             onChange={(e) => setMonthlyInvestment(e.target.value)}
-                                            placeholder="e.g. 5000"
+                                            placeholder="5000"
                                             className={inputClass}
                                         />
                                         {monthlyInvestment && income > 0 && (
-                                            <p className="text-[10px] font-bold text-primary uppercase tracking-tight">
+                                            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-tight">
                                                 {Math.round((parseFloat(monthlyInvestment) / income) * 100)}% of income
                                             </p>
                                         )}
                                     </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Expected Return (%)</label>
+                                    <div className="space-y-4">
+                                        <label className="text-xs font-medium text-gray-400">Expected Return (%)</label>
                                         <input
                                             type="number"
                                             value={expectedReturn}
                                             onChange={(e) => setExpectedReturn(e.target.value)}
-                                            placeholder="e.g. 12"
+                                            placeholder="12"
                                             className={inputClass}
                                         />
                                     </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Time (Years)</label>
+                                    <div className="space-y-4">
+                                        <label className="text-xs font-medium text-gray-400">Time (Years)</label>
                                         <input
                                             type="number"
                                             value={time}
                                             onChange={(e) => setTime(e.target.value)}
-                                            placeholder="e.g. 10"
+                                            placeholder="10"
                                             className={inputClass}
                                         />
                                     </div>
                                 </>
                             ) : (
                                 <>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Initial Corpus (₹)</label>
+                                    <div className="space-y-4">
+                                        <label className="text-xs font-medium text-gray-400">Initial Corpus (₹)</label>
                                         <input
                                             type="number"
                                             value={corpus}
                                             onChange={(e) => setCorpus(e.target.value)}
-                                            placeholder="e.g. 10L"
+                                            placeholder="1000000"
                                             className={inputClass}
                                         />
                                     </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Returns (%)</label>
+                                    <div className="space-y-4">
+                                        <label className="text-xs font-medium text-gray-400">Returns (%)</label>
                                         <input
                                             type="number"
                                             value={withdrawalRate}
                                             onChange={(e) => setWithdrawalRate(e.target.value)}
-                                            placeholder="e.g. 8"
+                                            placeholder="8"
                                             className={inputClass}
                                         />
                                     </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Years</label>
+                                    <div className="space-y-4">
+                                        <label className="text-xs font-medium text-gray-400">Years</label>
                                         <input
                                             type="number"
                                             value={swpTime}
                                             onChange={(e) => setSwpTime(e.target.value)}
-                                            placeholder="e.g. 20"
+                                            placeholder="20"
                                             className={inputClass}
                                         />
                                     </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Inflation (%)</label>
+                                    <div className="space-y-4">
+                                        <label className="text-xs font-medium text-gray-400">Inflation (%)</label>
                                         <input
                                             type="number"
                                             value={inflation}
                                             onChange={(e) => setInflation(e.target.value)}
-                                            placeholder="Standard 6%"
+                                            placeholder="6"
                                             className={inputClass}
                                         />
                                     </div>
-                                    <div className="space-y-3 md:col-span-3">
-                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Monthly Withdrawal (₹)</label>
+                                    <div className="space-y-4 md:col-span-2">
+                                        <label className="text-xs font-medium text-gray-400">Monthly Withdrawal (₹)</label>
                                         <input
                                             type="number"
                                             value={monthlyWithdrawal}
                                             onChange={(e) => setMonthlyWithdrawal(e.target.value)}
-                                            placeholder="Wait for AI Sustainable result or enter your target"
+                                            placeholder="Target Monthly Amount"
                                             className={inputClass}
                                         />
                                     </div>
@@ -370,12 +364,14 @@ export function SipSwpCalculator() {
                             )}
                         </div>
 
-                        <button
-                            onClick={calculate}
-                            className="px-8 py-3 rounded-full bg-primary text-white text-sm font-semibold hover:opacity-90 transition shadow-sm"
-                        >
-                            Calculate
-                        </button>
+                        <div className="pt-4">
+                            <button
+                                onClick={calculate}
+                                className="px-10 py-4 rounded-full bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
+                            >
+                                Calculate
+                            </button>
+                        </div>
 
                         {/* MODE SPECIFIC INFO */}
                         {mode === "swp" && (
@@ -407,69 +403,45 @@ export function SipSwpCalculator() {
 
                 {/* GRAPH SECTION */}
                 {chartData.length > 0 && (
-                    <section className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-sm uppercase text-slate-400 font-bold tracking-[0.2em]">Projection Visualizer</h2>
-                            <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full bg-primary"></div>
-                                    <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-500">Corpus Value</span>
-                                </div>
-                                {mode === "swp" && (
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 rounded-full bg-slate-400"></div>
-                                        <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-500">Monthly Yield</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="rounded-[2.5rem] border hairline bg-white p-10 lg:p-14 shadow-xl shadow-slate-200/50 h-[500px]">
+                    <section className="space-y-4">
+                        <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">Growth Projection</h2>
+                        <div className="rounded-2xl border hairline bg-card p-8 h-[450px]">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 0 }}>
-                                    <defs>
-                                        <linearGradient id="colorCorpus" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
-                                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                                        </linearGradient>
-                                    </defs>
+                                <LineChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 0 }}>
                                     <XAxis 
                                         dataKey="year" 
                                         axisLine={false} 
                                         tickLine={false} 
-                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
-                                        dy={15}
-                                        label={{ value: 'Years', position: 'insideBottom', offset: -10, fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+                                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                                        dy={10}
                                     />
                                     <YAxis 
                                         axisLine={false} 
                                         tickLine={false} 
-                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                                         tickFormatter={(val) => `₹${(val / 100000).toFixed(0)}L`}
-                                        dx={-10}
                                     />
                                     <Tooltip 
-                                        cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
-                                        contentStyle={{ backgroundColor: '#ffffff', border: 'none', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px', padding: '12px' }}
-                                        formatter={(value: any) => [`₹${value.toLocaleString('en-IN')}`, 'Amount']}
+                                        cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                        contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '0.75rem', fontSize: '11px' }}
                                     />
                                     <Line
                                         type="monotone"
                                         dataKey="corpus"
                                         stroke="hsl(var(--primary))"
-                                        strokeWidth={4}
-                                        dot={{ r: 0 }}
-                                        activeDot={{ r: 6, strokeWidth: 0, fill: 'hsl(var(--primary))' }}
-                                        name="Corpus"
-                                        animationDuration={1500}
+                                        strokeWidth={3}
+                                        dot={false}
+                                        name="Projected Corpus"
+                                        activeDot={{ r: 5, fill: 'hsl(var(--primary))' }}
                                     />
                                     {mode === "swp" && (
                                         <Line
                                             type="monotone"
                                             dataKey="withdrawal"
-                                            stroke="#94a3b8"
-                                            strokeWidth={3}
-                                            strokeDasharray="8 8"
-                                            name="Withdrawal"
+                                            stroke="hsl(var(--muted-foreground))"
+                                            strokeWidth={2}
+                                            strokeDasharray="6 6"
+                                            name="Monthly Withdrawal"
                                             dot={false}
                                         />
                                     )}
@@ -484,7 +456,7 @@ export function SipSwpCalculator() {
                     <section className="bg-primary/5 rounded-2xl p-8 border hairline border-primary/20 space-y-3">
                         <div className="flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-primary" />
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-primary">AI Insight</h3>
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-primary">AI Recommendation</h3>
                         </div>
                         <p className="text-base text-foreground font-medium italic leading-relaxed">
                             "{aiRecommendation()}"
@@ -493,24 +465,21 @@ export function SipSwpCalculator() {
                 )}
 
                 {/* ABOUT SECTION */}
-                <section className="space-y-6 pb-12">
-                   <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">About</h2>
-                   <div className="grid gap-6">
-                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default overflow-hidden relative">
-                            <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-150 duration-500"></div>
-                            
-                            <h4 className="text-sm font-bold flex items-center gap-2 mb-4">
-                                <Info className="w-4 h-4 text-primary" />
+                <section className="space-y-8 pb-12 pt-8 border-t border-gray-100">
+                   <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">About</h2>
+                   <div className="grid gap-10">
+                        <div className="space-y-3">
+                            <h4 className="text-base font-bold text-gray-900">
                                 What is {mode === "sip" ? "SIP" : "SWP"}?
                             </h4>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
+                            <p className="text-gray-500 font-medium leading-relaxed max-w-4xl">
                                 {mode === "sip"
                                     ? "A Systematic Investment Plan (SIP) is a disciplined, automated method for investing fixed sums into the market. It acts like a recurring deposit but leverages market returns, using rupee cost averaging to build significant wealth over time."
                                     : "A Systematic Withdrawal Plan (SWP) is a way to create a steady income stream from your capital. It structured method to withdraw fixed or variable amounts at regular intervals, often used to bridge income gaps or fund retirement."}
                             </p>
                         </div>
 
-                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default overflow-hidden relative">
+                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default">
                              <h4 className="text-sm font-bold flex items-center gap-2 mb-4">
                                 <Calculator className="w-4 h-4 text-primary" />
                                 Why use {mode === "sip" ? "SIP" : "SWP"}?

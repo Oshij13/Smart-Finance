@@ -100,7 +100,7 @@ export function SpendingReduction() {
   const totalPotentialSavings = potentialSavings.reduce((sum, item) => sum + item.potential, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="w-full px-6 lg:px-10 py-12 space-y-12">
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-500 to-blue-600 rounded-2xl p-8 text-white shadow-xl">
         <div className="flex items-center gap-3 mb-4">
@@ -115,7 +115,7 @@ export function SpendingReduction() {
       </div>
 
       {/* Input Form */}
-      <div className="space-y-4 max-w-2xl mx-auto py-2 mt-4">
+      <div className="space-y-4 py-2 mt-4">
         <h2 className="text-xl font-bold text-gray-900 mb-2">Track Your Monthly Expenses</h2>
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Monthly Income (₹)</label>
