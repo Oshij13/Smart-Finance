@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { getUserData } from "../store/userStore";
+import { Info, Calculator, TrendingUp } from "lucide-react";
 
 export function SipSwpCalculator() {
     const [mode, setMode] = useState<"sip" | "swp">("sip");
@@ -67,9 +67,6 @@ export function SipSwpCalculator() {
 
             const inflationRate = (parseFloat(inflation) || 6) / 100;
 
-            // -----------------------------
-            // ✅ 1. Sustainable Withdrawal (binary search)
-            // -----------------------------
             let low = 0;
             let high = P;
             let sustainable = 0;
@@ -100,9 +97,6 @@ export function SipSwpCalculator() {
 
             setSustainableWithdrawal(Math.round(sustainable));
 
-            // -----------------------------
-            // ✅ 2. User Withdrawal Simulation (if provided)
-            // -----------------------------
             if (monthlyWithdrawal) {
                 let value = P;
                 let w = parseFloat(monthlyWithdrawal);
@@ -188,348 +182,304 @@ export function SipSwpCalculator() {
             const amt = parseFloat(monthlyInvestment) || 0;
             const ideal = income * 0.2;
             if (amt < ideal) {
-                return `You're investing ₹${amt.toLocaleString('en-IN')}, but based on your income ₹${income.toLocaleString('en-IN')}, you should aim for around ₹${ideal.toLocaleString('en-IN')} monthly for better wealth creation.`;
+                return `You're investing ₹${amt.toLocaleString('en-IN')}, but based on your income, you should aim for around ₹${ideal.toLocaleString('en-IN')} monthly.`;
             }
-            return `Great! You're investing a strong amount. Keep it consistent to build long-term wealth.`;
+            return `Great! You're investing a strong amount. Consistency is key for wealth creation.`;
         }
-        return `Ensure your withdrawal is sustainable. Ideally, your withdrawal should be lower than your returns to avoid running out of money.`;
+        return `Ensure your withdrawal is sustainable. Ideally, your withdrawal should be lower than your returns to avoid depletion.`;
     };
 
-
-
-    const inputClass = "w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500";
+    const inputClass = "w-full px-4 py-3 rounded-xl border hairline bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all";
 
     return (
-        <div className="space-y-8">
+        <div className="min-h-screen bg-background text-foreground">
+            <div className="mx-auto max-w-5xl px-5 lg:px-8 py-10 space-y-12">
 
-            {/* HEADER */}
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white shadow-xl">
-                <h1 className="text-3xl font-bold">SIP / SWP Calculator</h1>
-                <p className="text-lg text-emerald-50">
-                    Plan your investments and withdrawals smartly
-                </p>
-            </div>
-
-            {/* MODE SELECTOR */}
-            <div className="flex gap-4">
-                <button
-                    onClick={() => { setMode("sip"); setResult(null); setChartData([]); }}
-                    className={`flex-1 p-4 rounded-xl border transition cursor-pointer ${
-                        mode === "sip"
-                            ? "border-emerald-500 bg-emerald-50"
-                            : "border-gray-200 bg-white"
-                    }`}
-                >
-                    <h3 className="font-semibold text-left">SIP Calculator</h3>
-                    <p className="text-xs text-gray-500 text-left mt-1">
-                        Invest monthly and grow wealth over time
+                {/* HEADER */}
+                <section className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Calculator</p>
+                    <h1 className="text-4xl font-semibold tracking-tight">
+                        SIP / SWP
+                    </h1>
+                    <p className="text-muted-foreground text-base max-w-xl">
+                        Plan your monthly investments and withdrawals.
                     </p>
-                </button>
+                </section>
 
-                <button
-                    onClick={() => { setMode("swp"); setResult(null); setChartData([]); }}
-                    className={`flex-1 p-4 rounded-xl border transition cursor-pointer ${
-                        mode === "swp"
-                            ? "border-emerald-500 bg-emerald-50"
-                            : "border-gray-200 bg-white"
-                    }`}
-                >
-                    <h3 className="font-semibold text-left">SWP Calculator</h3>
-                    <p className="text-xs text-gray-500 text-left mt-1">
-                        Withdraw fixed income from investments
-                    </p>
-                </button>
-            </div>
+                {/* MODE TOGGLE */}
+                <section>
+                    <div className="bg-muted p-1 rounded-2xl flex max-w-2xl mx-auto">
+                        <button
+                            onClick={() => { setMode("sip"); setResult(null); setChartData([]); }}
+                            className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all ${
+                                mode === "sip" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                        >
+                            SIP Calculator
+                        </button>
+                        <button
+                            onClick={() => { setMode("swp"); setResult(null); setChartData([]); }}
+                            className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all ${
+                                mode === "swp" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                        >
+                            SWP Calculator
+                        </button>
+                    </div>
+                </section>
 
-            {/* CALCULATOR CARD */}
-            <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
-                <div>
-                    <h2 className="text-lg font-semibold">
-                        {mode === "sip" ? "SIP Calculator" : "SWP Calculator"}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                        {mode === "sip"
-                            ? "Calculate your future wealth with monthly investments"
-                            : "Plan your monthly withdrawals from your corpus"}
-                    </p>
-                </div>
+                {/* CALCULATOR CONTAINER */}
+                <section className="space-y-8">
+                    <div className="rounded-2xl border hairline bg-card p-8 space-y-8">
+                        <div>
+                            <h3 className="text-lg font-semibold">
+                                {mode === "sip" ? "SIP Calculator" : "SWP Calculator"}
+                            </h3>
+                            <p className="text-xs text-muted-foreground mt-1 font-medium">
+                                {mode === "sip"
+                                    ? "Calculate your future wealth with monthly investments"
+                                    : "Plan your monthly withdrawals from your corpus"}
+                            </p>
+                        </div>
 
-                {/* INPUTS */}
-                {mode === "sip" ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Monthly Investment (₹)
-                            </label>
-                            <input
-                                type="number"
-                                value={monthlyInvestment}
-                                onChange={(e) => setMonthlyInvestment(e.target.value)}
-                                placeholder="e.g. 5000"
-                                className={inputClass}
-                            />
-                            {monthlyInvestment && income > 0 && (
-                                <p className="text-xs text-gray-500">
-                                    That's{" "}
-                                    <span className="font-semibold text-emerald-600">
-                                        {Math.round((parseFloat(monthlyInvestment) / income) * 100)}%
-                                    </span>{" "}
-                                    of your monthly income
-                                </p>
+                        {/* INPUTS GRID */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {mode === "sip" ? (
+                                <>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Monthly Investment (₹)</label>
+                                        <input
+                                            type="number"
+                                            value={monthlyInvestment}
+                                            onChange={(e) => setMonthlyInvestment(e.target.value)}
+                                            placeholder="e.g. 5000"
+                                            className={inputClass}
+                                        />
+                                        {monthlyInvestment && income > 0 && (
+                                            <p className="text-[10px] font-bold text-primary uppercase tracking-tight">
+                                                {Math.round((parseFloat(monthlyInvestment) / income) * 100)}% of income
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Expected Return (%)</label>
+                                        <input
+                                            type="number"
+                                            value={expectedReturn}
+                                            onChange={(e) => setExpectedReturn(e.target.value)}
+                                            placeholder="e.g. 12"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Time (Years)</label>
+                                        <input
+                                            type="number"
+                                            value={time}
+                                            onChange={(e) => setTime(e.target.value)}
+                                            placeholder="e.g. 10"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Initial Corpus (₹)</label>
+                                        <input
+                                            type="number"
+                                            value={corpus}
+                                            onChange={(e) => setCorpus(e.target.value)}
+                                            placeholder="e.g. 10L"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Returns (%)</label>
+                                        <input
+                                            type="number"
+                                            value={withdrawalRate}
+                                            onChange={(e) => setWithdrawalRate(e.target.value)}
+                                            placeholder="e.g. 8"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Years</label>
+                                        <input
+                                            type="number"
+                                            value={swpTime}
+                                            onChange={(e) => setSwpTime(e.target.value)}
+                                            placeholder="e.g. 20"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Inflation (%)</label>
+                                        <input
+                                            type="number"
+                                            value={inflation}
+                                            onChange={(e) => setInflation(e.target.value)}
+                                            placeholder="Standard 6%"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-3 md:col-span-3">
+                                        <label className="text-[10px] items-center gap-1.5 flex font-bold text-muted-foreground uppercase tracking-widest">Monthly Withdrawal (₹)</label>
+                                        <input
+                                            type="number"
+                                            value={monthlyWithdrawal}
+                                            onChange={(e) => setMonthlyWithdrawal(e.target.value)}
+                                            placeholder="Wait for AI Sustainable result or enter your target"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                </>
                             )}
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Expected Return (%)
-                            </label>
-                            <input
-                                type="number"
-                                value={expectedReturn}
-                                onChange={(e) => setExpectedReturn(e.target.value)}
-                                placeholder="e.g. 12"
-                                className={inputClass}
-                            />
-                        </div>
+                        <button
+                            onClick={calculate}
+                            className="px-8 py-3 rounded-full bg-primary text-white text-sm font-semibold hover:opacity-90 transition shadow-sm"
+                        >
+                            Calculate
+                        </button>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Time (Years)
-                            </label>
-                            <input
-                                type="number"
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                                placeholder="e.g. 10"
-                                className={inputClass}
-                            />
-                        </div>
+                        {/* MODE SPECIFIC INFO */}
+                        {mode === "swp" && (
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest text-center mt-4">
+                                Withdrawal increases annually with inflation (Standard 6%)
+                            </p>
+                        )}
                     </div>
-                ) : (
-                    <>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                            {/* Corpus */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">
-                                    Initial Corpus (₹)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={corpus}
-                                    onChange={(e) => setCorpus(e.target.value)}
-                                    placeholder="e.g. 1000000"
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
-
-                            {/* Return */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">
-                                    Expected Return (%)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={withdrawalRate}
-                                    onChange={(e) => setWithdrawalRate(e.target.value)}
-                                    placeholder="e.g. 8"
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
-
-                            {/* Time */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">
-                                    Time (Years)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={swpTime}
-                                    onChange={(e) => setSwpTime(e.target.value)}
-                                    placeholder="e.g. 20"
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">
-                                    Monthly Withdrawal (₹) (Optional)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={monthlyWithdrawal}
-                                    onChange={(e) => setMonthlyWithdrawal(e.target.value)}
-                                    placeholder="e.g. 50000"
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
+                    {/* RESULTS DISPLAY */}
+                    {(result !== null || swpResult) && (
+                        <div className="grid md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                             {mode === "sip" ? (
+                                <>
+                                    <ResultCard label="Future Value" value={`₹${result?.toLocaleString('en-IN')}`} isPrimary />
+                                    <ResultCard label="Total Invested" value={`₹${totalInvested?.toLocaleString('en-IN')}`} />
+                                    <ResultCard label="Profit Earned" value={`₹${(result! - totalInvested!).toLocaleString('en-IN')}`} />
+                                </>
+                             ) : (
+                                <>
+                                    <ResultCard label="Duration Lasts" value={`${swpResult?.years}y ${swpResult?.months}m`} isPrimary />
+                                    <ResultCard label="Sustainable Monthly" value={`₹${sustainableWithdrawal?.toLocaleString('en-IN')}`} />
+                                    <ResultCard label="Total Withdrawn" value={`₹${swpResult?.totalWithdrawn.toLocaleString('en-IN')}`} />
+                                </>
+                             )}
                         </div>
-                        <p className="text-xs text-gray-500 text-center mt-4">
-                            This withdrawal increases annually with inflation (default 6%)
-                        </p>
-                    </>
-                )}
+                    )}
+                </section>
 
-                {/* CALCULATE BUTTON */}
-                <button
-                    onClick={calculate}
-                    className="px-6 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:opacity-90 transition mx-auto block"
-                >
-                    Calculate
-                </button>
-
-                {/* SIP RESULT */}
-                {mode === "sip" && result !== null && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-
-                        {/* Future Value */}
-                        <div className="bg-green-50 rounded-xl p-4">
-                            <p className="text-sm text-gray-600">Future Value</p>
-                            <h3 className="text-xl font-semibold text-green-700">
-                                ₹ {result.toLocaleString('en-IN')}
-                            </h3>
-                        </div>
-
-                        {/* Total Investment */}
-                        <div className="bg-gray-50 rounded-xl p-4">
-                            <p className="text-sm text-gray-600">Total Invested</p>
-                            <h3 className="text-xl font-semibold">
-                                ₹ {totalInvested?.toLocaleString('en-IN')}
-                            </h3>
-                        </div>
-
-                        <p className="text-sm text-gray-500 pt-2 md:col-span-2">
-                            You earned ₹ {(result! - totalInvested!).toLocaleString('en-IN')} as returns
-                        </p>
-
-                    </div>
-                )}
-
-                {/* SWP RESULT */}
-                {mode === "swp" && (swpResult || sustainableWithdrawal !== null) && (
-                    <div className="bg-green-50 rounded-xl p-4 mt-4">
-                        <div className="grid grid-cols-2 gap-4 text-center">
-                            {/* Duration */}
-                            <div>
-                                <p className="text-xs text-green-800/70 font-medium">Your Withdrawal Lasts</p>
-                                <h3 className="font-semibold text-lg text-green-700">
-                                    {swpResult ? `${swpResult.years}y ${swpResult.months}m` : "-"}
-                                </h3>
-                            </div>
-
-                            {/* Total Withdrawn */}
-                            <div>
-                                <p className="text-xs text-green-800/70 font-medium">Total Withdrawn</p>
-                                <h3 className="font-semibold text-lg text-green-700">
-                                    {swpResult
-                                        ? `₹ ${swpResult.totalWithdrawn.toLocaleString('en-IN')}`
-                                        : "-"}
-                                </h3>
-                            </div>
-
-                            {/* Final Corpus */}
-                            <div>
-                                <p className="text-xs text-green-800/70 font-medium">Final Corpus</p>
-                                <h3 className="font-semibold text-lg text-green-700">
-                                    {swpResult
-                                        ? `₹ ${swpResult.finalCorpus.toLocaleString('en-IN')}`
-                                        : "-"}
-                                </h3>
-                            </div>
-
-                            {/* Sustainable Withdrawal */}
-                            <div>
-                                <p className="text-xs text-green-800/70 font-medium">
-                                    Sustainable Monthly
-                                </p>
-                                <h3 className="font-semibold text-lg text-green-700">
-                                    {sustainableWithdrawal !== null
-                                        ? `₹ ${sustainableWithdrawal.toLocaleString('en-IN')}`
-                                        : "-"}
-                                </h3>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* GRAPH */}
-            {chartData.length > 0 && (
-                <Card className="border-none shadow-md bg-white">
-                    <CardHeader>
-                        <CardTitle>Growth Projection</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={chartData}>
-                                <XAxis dataKey="year" />
-                                <YAxis />
-                                <Tooltip />
-                                <Line
-                                    type="monotone"
-                                    dataKey="corpus"
-                                    strokeWidth={3}
-                                    stroke="#10b981"
-                                    name="Remaining Corpus"
-                                />
-                                {mode === "swp" && (
+                {/* GRAPH SECTION */}
+                {chartData.length > 0 && (
+                    <section className="space-y-4">
+                        <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">Growth Projection</h2>
+                        <div className="rounded-2xl border hairline bg-card p-8 h-[400px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 0 }}>
+                                    <XAxis 
+                                        dataKey="year" 
+                                        axisLine={false} 
+                                        tickLine={false} 
+                                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                                        dy={10}
+                                    />
+                                    <YAxis 
+                                        axisLine={false} 
+                                        tickLine={false} 
+                                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                                        tickFormatter={(val) => `₹${(val / 100000).toFixed(0)}L`}
+                                    />
+                                    <Tooltip 
+                                        cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                        contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '0.75rem', fontSize: '11px' }}
+                                    />
                                     <Line
                                         type="monotone"
-                                        dataKey="withdrawal"
+                                        dataKey="corpus"
+                                        stroke="hsl(var(--primary))"
                                         strokeWidth={3}
-                                        stroke="#0d9488"
-                                        strokeDasharray="5 5"
-                                        name="Withdrawal"
+                                        dot={false}
+                                        name="Projected Corpus"
+                                        activeDot={{ r: 5, fill: 'hsl(var(--primary))' }}
                                     />
-                                )}
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </CardContent>
-                </Card>
-            )}
+                                    {mode === "swp" && (
+                                        <Line
+                                            type="monotone"
+                                            dataKey="withdrawal"
+                                            stroke="hsl(var(--muted-foreground))"
+                                            strokeWidth={2}
+                                            strokeDasharray="6 6"
+                                            name="Monthly Withdrawal"
+                                            dot={false}
+                                        />
+                                    )}
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </section>
+                )}
 
-            {/* AI RECOMMENDATION */}
-            {(result !== null || sustainableWithdrawal !== null) && (
-                <Card className="border-none shadow-md bg-gradient-to-br from-emerald-50 to-teal-50">
-                    <CardHeader>
-                        <CardTitle>AI Recommendation</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-gray-700">{aiRecommendation()}</p>
-                    </CardContent>
-                </Card>
-            )}
+                {/* AI RECOMMENDATION */}
+                {(result !== null || sustainableWithdrawal !== null) && (
+                    <section className="bg-primary/5 rounded-2xl p-8 border hairline border-primary/20 space-y-3">
+                        <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-primary" />
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-primary">AI Insight</h3>
+                        </div>
+                        <p className="text-base text-foreground font-medium italic leading-relaxed">
+                            "{aiRecommendation()}"
+                        </p>
+                    </section>
+                )}
 
-            {/* INFO SECTION */}
-            <div className="space-y-4">
-                <div className="bg-gray-50 rounded-xl p-5 text-sm text-gray-600">
-                    <strong className="text-gray-800">📘 What is {mode === "sip" ? "SIP" : "SWP"}?</strong>
-                    <p className="mt-2">
-                        {mode === "sip"
-                            ? "A Systematic Investment Plan (SIP) is a disciplined, automated method for investing a fixed sum of money into mutual funds at regular intervals. It acts like a recurring deposit but invests in the market, allowing investors to start with small amounts (as low as ₹500) to build wealth over time through rupee cost averaging."
-                            : "A Systematic Withdrawal Plan (SWP) is a mutual fund facility that enables investors to withdraw a fixed or variable amount from their investments at regular intervals. It serves as a structured method to generate a steady income stream, often used for retirement or financial planning."}
-                    </p>
-                </div>
+                {/* ABOUT SECTION */}
+                <section className="space-y-6 pb-12">
+                   <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">About</h2>
+                   <div className="grid gap-6">
+                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default overflow-hidden relative">
+                            <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-150 duration-500"></div>
+                            
+                            <h4 className="text-sm font-bold flex items-center gap-2 mb-4">
+                                <Info className="w-4 h-4 text-primary" />
+                                What is {mode === "sip" ? "SIP" : "SWP"}?
+                            </h4>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                {mode === "sip"
+                                    ? "A Systematic Investment Plan (SIP) is a disciplined, automated method for investing fixed sums into the market. It acts like a recurring deposit but leverages market returns, using rupee cost averaging to build significant wealth over time."
+                                    : "A Systematic Withdrawal Plan (SWP) is a way to create a steady income stream from your capital. It structured method to withdraw fixed or variable amounts at regular intervals, often used to bridge income gaps or fund retirement."}
+                            </p>
+                        </div>
 
-                <div className="bg-gray-50 rounded-xl p-5 text-sm text-gray-600">
-                    <strong className="text-gray-800">💡 Why is {mode === "sip" ? "SIP" : "SWP"} useful?</strong>
-                    <p className="mt-2">
-                        {mode === "sip"
-                            ? "SIP promotes disciplined investing, reduces market timing risk through rupee cost averaging, and leverages the power of compounding to build significant long-term wealth from small regular contributions."
-                            : "SWP provides a reliable, tax-efficient stream of regular income while keeping your capital invested and growing. It avoids the need to time the market and maintains your corpus for longer."}
-                    </p>
-                </div>
+                        <div className="rounded-2xl border hairline bg-card p-8 group hover:bg-muted/30 transition-all cursor-default">
+                             <h4 className="text-sm font-bold flex items-center gap-2 mb-4">
+                                <Calculator className="w-4 h-4 text-primary" />
+                                Why use {mode === "sip" ? "SIP" : "SWP"}?
+                            </h4>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                {mode === "sip"
+                                    ? "SIP promotes disciplined investing, reduces market timing risk, and leverages the explosive power of compounding. It's the most effective way for long-term goal reaching with small, regular contributions."
+                                    : "SWP provides a predictable, tax-efficient stream of regular income while keeping your capital invested. It maintains your corpus longer by avoiding the need to time withdrawals."}
+                            </p>
+                        </div>
+                   </div>
+                </section>
 
-                <div className="bg-gray-50 rounded-xl p-5 text-sm text-gray-600">
-                    <strong className="text-gray-800">🎯 Who should use {mode === "sip" ? "SIP" : "SWP"}?</strong>
-                    <p className="mt-2">
-                        {mode === "sip"
-                            ? "Ideal for disciplined investors, beginners, and anyone looking to build wealth long-term without needing a large lump sum. Great for goals like retirement, education, or marriage."
-                            : "Ideal for retirees, investors seeking regular predictable income, and those in high tax brackets who want a tax-efficient, disciplined method to withdraw funds while keeping the principal invested."}
-                    </p>
-                </div>
             </div>
+        </div>
+    );
+}
 
+function ResultCard({ label, value, isPrimary }: { label: string; value: string; isPrimary?: boolean }) {
+    return (
+        <div className={`rounded-2xl border hairline p-6 flex flex-col justify-between min-h-[140px] ${
+            isPrimary ? "bg-primary border-primary text-primary-foreground" : "bg-card text-foreground"
+        }`}>
+            <p className={`text-sm font-medium ${isPrimary ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{label}</p>
+            <p className="text-3xl font-bold tracking-tight">{value}</p>
         </div>
     );
 }
