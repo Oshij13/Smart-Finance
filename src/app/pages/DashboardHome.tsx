@@ -543,7 +543,7 @@ export default function DashboardHome() {
           {/* CHARTS (50/30/20 & CASHFLOW) */}
           <div className="md:col-span-8 grid grid-cols-1 gap-6">
             <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">50/30/20 Analysis</h3>
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">Financial Health Goal Progress (50, 20, 30 day rule analysis)</h3>
               <div className="h-[250px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
@@ -568,13 +568,13 @@ export default function DashboardHome() {
             </div>
 
             <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">Cashflow Snapshot</h3>
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">Monthly Overview</h3>
               <div className="h-[250px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
                     data={[
-                      { name: "In", value: income }, 
-                      { name: "Out", value: expenses }, 
+                      { name: "Income", value: income }, 
+                      { name: "Expense", value: expenses }, 
                       { name: "Savings", value: savings }
                     ]}
                     margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
@@ -603,10 +603,10 @@ export default function DashboardHome() {
               </div>
             </div>
 
-            {/* EMERGENCY FUND CARD */}
+            {/* EMERGENCY FUNDS CARD */}
             <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Emergency Fund</h3>
+                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Emergency funds</h3>
                 <ShieldCheck className="w-4 h-4 text-muted-foreground" />
               </div>
               <div className="space-y-4">
@@ -630,7 +630,7 @@ export default function DashboardHome() {
             <div className="bg-primary p-8 rounded-2xl text-white shadow-xl flex flex-col justify-between min-h-[160px]">
               <div>
                 <h2 className="text-sm font-bold mb-2 flex items-center gap-2 text-white/90">
-                  <Sparkles className="w-4 h-4" /> Next Recommended Move
+                  <Sparkles className="w-4 h-4" /> What should I do next AI smarts
                 </h2>
                 <p className="text-base font-semibold leading-tight">{smartAction.text}</p>
               </div>
