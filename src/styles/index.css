@@ -1,10 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "./fonts.css";
 @import "./theme.css";
-
-:root {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
 
 @tailwind base;
 @tailwind components;
@@ -22,16 +17,5 @@
 
   .rounded-2xl {
     border-radius: 12px !important;
-  }
-}
-
-@layer utilities {
-  .hairline {
-    border-width: 0.5px;
-    border-color: rgba(0, 0, 0, 0.05);
-  }
-  
-  .dark .hairline {
-    border-color: rgba(255, 255, 255, 0.1);
   }
 }
