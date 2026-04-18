@@ -55,39 +55,36 @@ export function TaxCalculator() {
   return (
     <div className="w-full px-6 lg:px-10 py-12 space-y-12">
       {/* Header */}
-      <div className="bg-gradient-to-r from-rose-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-            <Calculator className="w-6 h-6" />
-          </div>
-          <h1 className="text-3xl font-bold">Tax Calculator</h1>
+      <header className="space-y-2">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Tax</p>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight text-left">Income Tax Calculator</h1>
         </div>
-        <p className="text-lg text-rose-50">
-          Calculate your exact tax liability under the new regime and know your in-hand salary.
+        <p className="text-sm text-gray-500 max-w-xl font-medium text-left">
+          Quick estimate under the new regime (FY 2024-25).
         </p>
-      </div>
+      </header>
 
       {/* Input Form */}
-      <div className="space-y-4 py-2 mt-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Income Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Gross Annual Income (₹)</label>
+            <label className="text-xs font-semibold text-gray-500">Gross Annual Income (₹)</label>
             <input
               type="number"
-              placeholder="e.g. 1200000"
+              placeholder="e.g. 12,00,000"
               value={income}
               onChange={(e) => setIncome(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-gray-300 shadow-sm"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Tax Regime</label>
+            <label className="text-xs font-semibold text-gray-500">Tax Regime</label>
             <select
               value={regime}
               onChange={(e) => setRegime(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white transition"
+              className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer shadow-sm"
             >
               <option value="new">New Regime (2024-25)</option>
               <option value="old" disabled>Old Regime (Coming Soon)</option>
@@ -97,7 +94,7 @@ export function TaxCalculator() {
 
         <button
           onClick={calculateTax}
-          className="px-6 py-2.5 rounded-lg bg-rose-600 text-white font-medium hover:opacity-90 transition mx-auto block mt-6"
+          className="px-8 h-11 rounded-full bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-all active:scale-95 shadow-sm text-center"
         >
           Calculate Tax
         </button>
@@ -107,30 +104,36 @@ export function TaxCalculator() {
       {showResults && annualIncome > 0 && (
         <>
           {/* Key Results */}
-          <div className="bg-rose-50 rounded-xl p-4 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-              <div>
-                <p className="text-sm text-rose-900/70 font-medium">Total Tax + Cess</p>
-                <p className="text-2xl font-bold text-rose-700 mt-1">₹{totalTax.toLocaleString('en-IN')}</p>
-                <p className="text-xs text-rose-800/60 mt-1">Including 4% cess</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+            <div className="p-6 rounded-2xl bg-gray-50/50 border border-gray-100 flex flex-col justify-between h-full">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">total tax + cess</p>
+              <div className="mt-2 text-left">
+                <p className="text-2xl font-bold text-gray-900">₹{totalTax.toLocaleString('en-IN')}</p>
+                <p className="text-[10px] font-bold text-rose-500 mt-0.5 uppercase tracking-tight">inc. 4% cess</p>
               </div>
+            </div>
 
-              <div>
-                <p className="text-sm text-rose-900/70 font-medium">Effective Tax Rate</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{effectiveTaxRate.toFixed(2)}%</p>
-                <p className="text-xs text-rose-800/60 mt-1">Of gross income</p>
+            <div className="p-6 rounded-2xl bg-gray-50/50 border border-gray-100 flex flex-col justify-between h-full">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">effective rate</p>
+              <div className="mt-2 text-left">
+                <p className="text-2xl font-bold text-gray-900">{effectiveTaxRate.toFixed(2)}%</p>
+                <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-tight">of gross income</p>
               </div>
+            </div>
 
-              <div>
-                <p className="text-sm text-rose-900/70 font-medium">Monthly TDS</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">₹{monthlyTDS.toLocaleString('en-IN')}</p>
-                <p className="text-xs text-rose-800/60 mt-1">Deducted monthly</p>
+            <div className="p-6 rounded-2xl bg-gray-50/50 border border-gray-100 flex flex-col justify-between h-full">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">monthly tds</p>
+              <div className="mt-2 text-left">
+                <p className="text-2xl font-bold text-gray-900">₹{Math.round(monthlyTDS).toLocaleString('en-IN')}</p>
+                <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-tight">deducted monthly</p>
               </div>
+            </div>
 
-              <div>
-                <p className="text-sm text-rose-900/70 font-medium">Monthly In-Hand</p>
-                <p className="text-2xl font-bold text-emerald-600 mt-1">₹{monthlyInHand.toLocaleString('en-IN')}</p>
-                <p className="text-xs text-rose-800/60 mt-1">After tax deduction</p>
+            <div className="p-6 rounded-2xl bg-white border border-gray-200 flex flex-col justify-between h-full shadow-sm">
+              <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest text-left">monthly in-hand</p>
+              <div className="mt-2 text-left">
+                <p className="text-2xl font-bold text-emerald-600">₹{Math.round(monthlyInHand).toLocaleString('en-IN')}</p>
+                <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-tight font-medium">after tax</p>
               </div>
             </div>
           </div>
@@ -167,20 +170,23 @@ export function TaxCalculator() {
           </Card>
 
           {/* Tax Slab Breakdown */}
-          <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Tax Slab Breakdown</h2>
-            <div className="space-y-3">
+          <div className="space-y-6 mt-12">
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Analysis</p>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight text-left">Tax Slab Breakdown</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {taxSlabs.map((slab, index) => (
-                <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50/50 border border-gray-100 hover:border-gray-200 transition-colors">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{slab.slab}</h3>
-                    <p className="text-sm text-gray-600 mt-1">Rate: {slab.rate}</p>
+                    <h3 className="text-sm font-bold text-gray-900">{slab.slab}</h3>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight mt-0.5">Rate: {slab.rate}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-bold text-rose-600">
+                    <p className="text-sm font-bold text-gray-900">
                       ₹{slab.tax.toLocaleString('en-IN')}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1 uppercase font-semibold tracking-wider">Tax from slab</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">from slab</p>
                   </div>
                 </div>
               ))}
@@ -188,23 +194,23 @@ export function TaxCalculator() {
           </div>
 
           {/* Tax Saving Tips */}
-          <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl p-6 mt-8">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900 mb-4">
-              <FileText className="w-5 h-5 text-rose-600" />
-              Tax Saving Insights
-            </h2>
-            <div className="space-y-3">
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-rose-900 mb-1">Standard Deduction</h3>
-                <p className="text-sm text-gray-600">₹50,000 standard deduction is available in the new regime (already factored in above slabs).</p>
+          <div className="space-y-6 mt-12">
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest text-left">Insights</p>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight text-left">Tax Saving Tips</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">Standard Deduction</h3>
+                <p className="text-xs text-gray-500 font-medium leading-relaxed">₹50,000 deduction is available automatically in the new regime.</p>
               </div>
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-rose-900 mb-1">NPS Contribution</h3>
-                <p className="text-sm text-gray-600">Contribute to NPS for additional ₹50,000 deduction under Section 80CCD(1B).</p>
+              <div className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">NPS Contribution</h3>
+                <p className="text-xs text-gray-500 font-medium leading-relaxed">Additional ₹50,000 deduction possible under Section 80CCD(1B).</p>
               </div>
-              <div className="p-4 bg-white/80 rounded-lg">
-                <h3 className="font-semibold text-rose-900 mb-1">HRA & LTA</h3>
-                <p className="text-sm text-gray-600">New regime doesn't allow HRA or LTA exemptions. Compare with old regime if you have these.</p>
+              <div className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">HRA & LTA</h3>
+                <p className="text-xs text-gray-500 font-medium leading-relaxed">Exemptions aren't available under the new regime. Compare with old if needed.</p>
               </div>
             </div>
           </div>
