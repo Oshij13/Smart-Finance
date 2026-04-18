@@ -256,33 +256,37 @@ export function InvestmentOptions() {
         {/* TABS & DETAILS */}
         <section className="space-y-6">
           <Tabs defaultValue="all" className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest">Selection Guide</h2>
-              <TabsList className="bg-muted p-1 rounded-xl h-auto">
-                <TabsTrigger value="all" className="px-3 py-1.5 text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">All</TabsTrigger>
-                <TabsTrigger value="low" className="px-3 py-1.5 text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">Low Risk</TabsTrigger>
-                <TabsTrigger value="high" className="px-3 py-1.5 text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">High Risk</TabsTrigger>
+              <TabsList className="bg-muted p-1 rounded-xl h-auto grid grid-cols-4 sm:flex sm:grid-cols-none gap-1">
+                <TabsTrigger value="all" className="px-3 py-1.5 text-[10px] sm:text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">All</TabsTrigger>
+                <TabsTrigger value="low" className="px-3 py-1.5 text-[10px] sm:text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">Low</TabsTrigger>
+                <TabsTrigger value="moderate" className="px-3 py-1.5 text-[10px] sm:text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">Moderate</TabsTrigger>
+                <TabsTrigger value="high" className="px-3 py-1.5 text-[10px] sm:text-xs rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">High</TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value="all" className="grid gap-4 mt-0">
+            <TabsContent value="all" className="grid gap-4 mt-0 animate-in fade-in duration-300">
               {investmentTypes.map((inv, index) => (
-                <div key={index} className="rounded-2xl border hairline bg-card p-6 group hover:bg-muted/30 transition-colors">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-semibold">{inv.name}</h3>
-                      <p className="text-sm text-muted-foreground">{inv.desc}</p>
-                    </div>
-                    <div className="text-right space-y-1">
-                      <p className="text-2xl font-bold" style={{ color: inv.color }}>{inv.returns}%</p>
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{inv.risk}</p>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t hairline flex items-center gap-2 text-xs text-muted-foreground">
-                    <Info className="w-3.5 h-3.5 text-primary" />
-                    <span><span className="font-bold text-foreground">Best for:</span> {inv.suitability}</span>
-                  </div>
-                </div>
+                <InvestmentCard key={index} inv={inv} />
+              ))}
+            </TabsContent>
+
+            <TabsContent value="low" className="grid gap-4 mt-0 animate-in fade-in duration-300">
+              {investmentTypes.filter(i => i.risk.includes('Low') || i.risk.includes('Very Low')).map((inv, index) => (
+                <InvestmentCard key={index} inv={inv} />
+              ))}
+            </TabsContent>
+
+            <TabsContent value="moderate" className="grid gap-4 mt-0 animate-in fade-in duration-300">
+              {investmentTypes.filter(i => i.risk.includes('Moderate')).map((inv, index) => (
+                <InvestmentCard key={index} inv={inv} />
+              ))}
+            </TabsContent>
+
+            <TabsContent value="high" className="grid gap-4 mt-0 animate-in fade-in duration-300">
+              {investmentTypes.filter(i => i.risk === 'High').map((inv, index) => (
+                <InvestmentCard key={index} inv={inv} />
               ))}
             </TabsContent>
           </Tabs>
@@ -308,6 +312,27 @@ export function InvestmentOptions() {
           </div>
         </section>
 
+      </div>
+    </div>
+  );
+}
+
+function InvestmentCard({ inv }: { inv: any }) {
+  return (
+    <div className="rounded-2xl border hairline bg-card p-6 group hover:bg-muted/30 transition-colors">
+      <div className="flex justify-between items-start">
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold">{inv.name}</h3>
+          <p className="text-sm text-muted-foreground">{inv.desc}</p>
+        </div>
+        <div className="text-right space-y-1">
+          <p className="text-2xl font-bold" style={{ color: inv.color }}>{inv.returns}%</p>
+          <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{inv.risk}</p>
+        </div>
+      </div>
+      <div className="mt-4 pt-4 border-t hairline flex items-center gap-2 text-xs text-muted-foreground">
+        <Info className="w-3.5 h-3.5 text-primary" />
+        <span><span className="font-bold text-foreground">Best for:</span> {inv.suitability}</span>
       </div>
     </div>
   );
