@@ -631,8 +631,8 @@ export default function DashboardHome() {
               ]}>
                 <XAxis dataKey="name" fontSize={11} axisLine={false} tickLine={false} />
                 <YAxis hide />
-                <Tooltip cursor={{fill: 'transparent'}} />
-                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4,4,0,0]} />
+                <Tooltip cursor={{ fill: 'transparent' }} />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -647,8 +647,8 @@ export default function DashboardHome() {
               ]}>
                 <XAxis dataKey="name" fontSize={11} axisLine={false} tickLine={false} />
                 <YAxis hide />
-                <Tooltip cursor={{fill: 'transparent'}} />
-                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4,4,0,0]} />
+                <Tooltip cursor={{ fill: 'transparent' }} />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
