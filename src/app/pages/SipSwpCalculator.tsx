@@ -234,19 +234,23 @@ export function SipSwpCalculator() {
 
                 {/* MODE TOGGLE */}
                 <section>
-                    <div className="bg-gray-50 p-1.5 rounded-[1.25rem] flex max-w-[42rem] shadow-inner">
+                    <div className="bg-[#f8f9fa] p-1.5 rounded-[1.75rem] flex w-full max-w-7xl shadow-inner border border-gray-100/50">
                         <button
                             onClick={() => { setMode("sip"); setResult(null); setChartData([]); }}
-                            className={`flex-1 py-3 px-6 rounded-[1rem] text-sm font-semibold transition-all ${
-                                mode === "sip" ? "bg-white shadow-md text-gray-900" : "text-gray-400 hover:text-gray-600"
+                            className={`flex-1 py-4 px-8 rounded-[1.25rem] text-sm font-bold transition-all duration-300 ${
+                                mode === "sip" 
+                                ? "bg-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] text-gray-900 border border-gray-100" 
+                                : "text-gray-400 hover:text-gray-600"
                             }`}
                         >
                             SIP Calculator
                         </button>
                         <button
                             onClick={() => { setMode("swp"); setResult(null); setChartData([]); }}
-                            className={`flex-1 py-3 px-6 rounded-[1rem] text-sm font-semibold transition-all ${
-                                mode === "swp" ? "bg-white shadow-md text-gray-900" : "text-gray-400 hover:text-gray-600"
+                            className={`flex-1 py-4 px-8 rounded-[1.25rem] text-sm font-bold transition-all duration-300 ${
+                                mode === "swp" 
+                                ? "bg-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.12)] text-gray-900 border border-gray-100" 
+                                : "text-gray-400 hover:text-gray-600"
                             }`}
                         >
                             SWP Calculator

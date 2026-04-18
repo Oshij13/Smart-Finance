@@ -183,7 +183,7 @@ export function DashboardLayout() {
       </aside>
 
       {/* MAIN */}
-      <div className="flex-1 p-6 bg-gray-50 lg:ml-64 min-h-screen pt-16 lg:pt-0">
+      <div className="flex-1 bg-white lg:ml-64 min-h-screen pt-16 lg:pt-0">
 
 
 
