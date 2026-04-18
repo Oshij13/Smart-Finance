@@ -483,7 +483,29 @@ export default function DashboardHome() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
             <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground">Hello, {userData?.name || "there"}.</h1>
-            <p className="text-muted-foreground text-lg">A quiet look at your money today.</p>
+            <div className="flex items-center gap-2 text-muted-foreground text-lg">
+              <span>Your Goal:</span>
+              {isEditingGoal ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    value={goalInput}
+                    onChange={(e) => setGoalInput(e.target.value)}
+                    className="bg-secondary px-3 py-1 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary w-40"
+                    placeholder="Enter goal"
+                    autoFocus
+                  />
+                  <button onClick={handleSaveGoal} className="text-primary font-bold text-sm">Save</button>
+                </div>
+              ) : (
+                <span 
+                  onClick={() => setIsEditingGoal(true)} 
+                  className="text-primary font-semibold cursor-pointer hover:underline"
+                >
+                  {userData?.goal || "Financial Freedom"}
+                </span>
+              )}
+            </div>
+            <p className="text-muted-foreground text-sm opacity-80">A quiet look at your metrics today.</p>
           </div>
           <div className="flex items-center gap-3">
             <button 
@@ -496,7 +518,7 @@ export default function DashboardHome() {
               onClick={handleDownloadPDF} 
               className="pdf-ignore px-5 py-2.5 rounded-full text-sm font-semibold border hairline bg-card hover:bg-muted transition-all active:scale-95 flex items-center gap-2"
             >
-              <Download className="w-4 h-4" /> Export
+              <Download className="w-4 h-4" /> Download PDF
             </button>
           </div>
         </div>
@@ -504,7 +526,7 @@ export default function DashboardHome() {
         {/* PRIMARY KPI CARDS (RESTORED INDIVIDUAL CARDS) */}
         <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
           {cards.map((card, i) => (
-            <div key={i} className={`md:col-span-2 bg-card border hairline p-6 rounded-[2rem] shadow-sm hover:scale-[1.02] transition-all cursor-default`}>
+            <div key={i} className={`md:col-span-2 bg-card border hairline p-6 rounded-2xl shadow-sm hover:scale-[1.02] transition-all cursor-default`}>
               <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl mb-4">
                 {card.icon}
               </div>
@@ -520,7 +542,7 @@ export default function DashboardHome() {
           
           {/* CHARTS (50/30/20 & CASHFLOW) */}
           <div className="md:col-span-8 grid grid-cols-1 gap-6">
-            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
+            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">50/30/20 Analysis</h3>
               <div className="h-[250px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -538,14 +560,14 @@ export default function DashboardHome() {
                       cursor={{ fill: 'rgba(0,122,255,0.02)' }}
                       contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }} 
                     />
-                    <Bar dataKey="Target" fill="#f2f2f7" radius={[6, 6, 0, 0]} barSize={24} />
-                    <Bar dataKey="Actual" fill="#007aff" radius={[6, 6, 0, 0]} barSize={24} />
+                    <Bar dataKey="Target" fill="#C7C7CC" radius={[4, 4, 0, 0]} barSize={24} />
+                    <Bar dataKey="Actual" fill="#007aff" radius={[4, 4, 0, 0]} barSize={24} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
+            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">Cashflow Snapshot</h3>
               <div className="h-[250px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -570,7 +592,7 @@ export default function DashboardHome() {
           <div className="md:col-span-4 flex flex-col gap-6">
             
             {/* HEALTH SCORE CARD */}
-            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm text-center">
+            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm text-center">
               <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-4">Financial Health</h3>
               <div className="w-24 h-24 rounded-full border-4 border-secondary mx-auto mb-4 flex items-center justify-center">
                 <span className="text-4xl font-bold text-foreground">{score}</span>
@@ -582,7 +604,7 @@ export default function DashboardHome() {
             </div>
 
             {/* EMERGENCY FUND CARD */}
-            <div className="bg-card border hairline p-8 rounded-[2rem] shadow-sm">
+            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Emergency Fund</h3>
                 <ShieldCheck className="w-4 h-4 text-muted-foreground" />
@@ -605,7 +627,7 @@ export default function DashboardHome() {
             </div>
 
             {/* QUICK ACTION CARD */}
-            <div className="bg-primary p-8 rounded-[2rem] text-white shadow-xl flex flex-col justify-between min-h-[160px]">
+            <div className="bg-primary p-8 rounded-2xl text-white shadow-xl flex flex-col justify-between min-h-[160px]">
               <div>
                 <h2 className="text-sm font-bold mb-2 flex items-center gap-2 text-white/90">
                   <Sparkles className="w-4 h-4" /> Next Recommended Move
@@ -628,7 +650,7 @@ export default function DashboardHome() {
       {/* PDF OVERLAY */}
       {isGeneratingPDF && (
         <div className="pdf-ignore fixed inset-0 z-[9999] flex items-center justify-center bg-white/40 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white px-10 py-8 rounded-[2rem] shadow-2xl flex flex-col items-center gap-4 text-center border hairline">
+          <div className="bg-white px-10 py-8 rounded-2xl shadow-2xl flex flex-col items-center gap-4 text-center border hairline">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl animate-bounce">
               <Download />
             </div>
