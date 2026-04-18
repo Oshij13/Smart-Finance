@@ -439,15 +439,13 @@ export default function DashboardHome() {
 
     const totalMonthly = monthlyInvestment + monthlySavings;
 
-    const rate = 0.12 / 12; // 12% annual return
     const months = 60; // 5 years
+    const rate = 0.12 / 12; // 12% annual return
 
     let value = 0;
-
     for (let i = 1; i <= months; i++) {
       value = (value + totalMonthly) * (1 + rate);
     }
-
     return Math.round(value);
   }
 
@@ -470,7 +468,7 @@ export default function DashboardHome() {
 
         {/* HEADER */}
         <section className="space-y-1">
-          <h1 className="text-4xl font-semibold tracking-tight">
+          <h1 className="text-4xl font-semibold tracking-tight text-foreground">
             Hello, {userData?.name || "there"}.
           </h1>
           <p className="text-muted-foreground text-base">
@@ -480,7 +478,7 @@ export default function DashboardHome() {
           <div className="flex gap-2 pt-3">
             <button
               onClick={() => navigate("/ai-advisor")}
-              className="pdf-ignore px-4 py-2 rounded-full border text-sm hover:bg-muted transition-colors"
+              className="pdf-ignore px-4 py-2 rounded-full border hairline text-sm hover:bg-muted transition-colors text-foreground"
             >
               Ask AI
             </button>
@@ -494,10 +492,31 @@ export default function DashboardHome() {
           </div>
         </section>
 
+        {/* ✅ OVERVIEW MOVED HERE */}
+        <section>
+          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-3">
+            Overview
+          </h2>
+
+          <div className="rounded-2xl border hairline bg-card divide-y hairline">
+            {cards.map((card, i) => (
+              <div key={i} className="flex justify-between items-center px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg opacity-70">{card.icon}</span>
+                  <span className="text-sm text-foreground">{card.title}</span>
+                </div>
+                <span className="font-medium text-primary">
+                  ₹{card.value.toLocaleString('en-IN')}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* ROW 1 */}
         <section className="grid md:grid-cols-2 gap-4">
 
-          {/* FINANCIAL HEALTH (LEFT) */}
+          {/* FINANCIAL HEALTH */}
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
             <h3 className="text-sm text-muted-foreground font-medium">Financial Health</h3>
 
@@ -517,11 +536,11 @@ export default function DashboardHome() {
             </p>
           </div>
 
-          {/* NEXT ACTION (RIGHT) */}
+          {/* NEXT ACTION */}
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
             <h3 className="text-sm text-muted-foreground font-medium">Next Best Action</h3>
 
-            <p className="text-lg font-semibold">{smartAction.text}</p>
+            <p className="text-lg font-semibold text-foreground">{smartAction.text}</p>
 
             <button
               onClick={handleAction}
@@ -535,12 +554,12 @@ export default function DashboardHome() {
         {/* ROW 2 */}
         <section className="grid md:grid-cols-2 gap-4">
 
-          {/* EMERGENCY FUND (LEFT NOW) */}
+          {/* EMERGENCY FUND */}
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
             <h3 className="text-sm text-muted-foreground font-medium">Emergency Fund</h3>
 
             <div className="flex justify-between items-end">
-              <p className="text-2xl font-semibold">
+              <p className="text-2xl font-semibold text-foreground">
                 ₹{savedAmount.toLocaleString('en-IN')}
               </p>
               <p className="text-sm text-muted-foreground">
@@ -560,7 +579,7 @@ export default function DashboardHome() {
             </p>
           </div>
 
-          {/* GOAL */}
+          {/* GOAL Progress with Inline Editing */}
           <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
             <h3 className="text-sm text-muted-foreground font-medium">Goal Progress</h3>
 
@@ -573,7 +592,7 @@ export default function DashboardHome() {
                 <input
                   value={goalInput}
                   onChange={(e) => setGoalInput(e.target.value)}
-                  className="border hairline px-2 py-1 rounded text-sm bg-background w-full"
+                  className="border hairline px-2 py-1 rounded text-sm bg-background w-full text-foreground"
                   placeholder="Enter your goal"
                   autoFocus
                 />
@@ -605,31 +624,10 @@ export default function DashboardHome() {
           </div>
         </section>
 
-        {/* OVERVIEW */}
-        <section>
-          <h2 className="text-xs uppercase text-muted-foreground font-bold tracking-widest mb-3">
-            Overview
-          </h2>
-
-          <div className="rounded-2xl border hairline bg-card divide-y hairline">
-            {cards.map((card, i) => (
-              <div key={i} className="flex justify-between items-center px-5 py-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-lg opacity-70">{card.icon}</span>
-                  <span className="text-sm">{card.title}</span>
-                </div>
-                <span className="font-medium text-primary">
-                  ₹{card.value.toLocaleString('en-IN')}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* CHARTS (SWAPPED) */}
+        {/* CHARTS */}
         <section className="grid md:grid-cols-2 gap-4">
 
-          {/* 50/30/20 LEFT */}
+          {/* 50/30/20 */}
           <div className="rounded-2xl border hairline bg-card p-6">
             <h3 className="text-base font-semibold mb-4 text-foreground">50/30/20 Rule</h3>
             <ResponsiveContainer width="100%" height={220}>
@@ -646,7 +644,7 @@ export default function DashboardHome() {
             </ResponsiveContainer>
           </div>
 
-          {/* MONTHLY RIGHT */}
+          {/* MONTHLY */}
           <div className="rounded-2xl border hairline bg-card p-6">
             <h3 className="text-base font-semibold mb-4 text-foreground">Monthly Overview</h3>
             <ResponsiveContainer width="100%" height={220}>
@@ -679,7 +677,7 @@ export default function DashboardHome() {
                 }
                 className="px-5 py-4 cursor-pointer hover:bg-muted/40 transition-colors"
               >
-                <p className="text-sm font-medium">{item.text}</p>
+                <p className="text-sm font-medium text-foreground">{item.text}</p>
               </div>
             ))}
           </div>
@@ -709,7 +707,7 @@ export default function DashboardHome() {
               📄
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg leading-none mb-1">
+              <span className="font-bold text-lg leading-none mb-1 text-foreground">
                 Exporting Report
               </span>
               <span className="text-sm font-medium text-muted-foreground">
