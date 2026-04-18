@@ -38,9 +38,9 @@ export function TaxCalculator() {
   const monthlyTDS = totalTax / 12;
 
   const breakdownData = [
-    { label: "Gross Income", amount: annualIncome, color: "#3b82f6" },
-    { label: "Tax + Cess", amount: totalTax, color: "#ef4444" },
-    { label: "In-Hand Income", amount: annualIncome - totalTax, color: "#10b981" },
+    { label: "Gross Income", amount: annualIncome, color: "#1e40af" },
+    { label: "Tax + Cess", amount: totalTax, color: "#93c5fd" },
+    { label: "In-Hand Income", amount: annualIncome - totalTax, color: "#3b82f6" },
   ];
 
   const taxSlabs = [
