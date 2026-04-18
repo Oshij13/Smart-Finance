@@ -486,7 +486,7 @@ export default function DashboardHome() {
             <div className="flex items-center gap-2 text-muted-foreground text-lg">
               <span>Your Goal:</span>
               {isEditingGoal ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 animate-in slide-in-from-left-2 duration-300">
                   <input
                     value={goalInput}
                     onChange={(e) => setGoalInput(e.target.value)}
@@ -497,12 +497,13 @@ export default function DashboardHome() {
                   <button onClick={handleSaveGoal} className="text-primary font-bold text-sm">Save</button>
                 </div>
               ) : (
-                <span 
+                <div 
                   onClick={() => setIsEditingGoal(true)} 
-                  className="text-primary font-semibold cursor-pointer hover:underline"
+                  className="flex items-center gap-2 text-primary font-semibold cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   {userData?.goal || "Financial Freedom"}
-                </span>
+                  <Sparkles className="w-3.5 h-3.5 opacity-50" />
+                </div>
               )}
             </div>
             <p className="text-muted-foreground text-sm opacity-80">A quiet look at your metrics today.</p>
@@ -523,18 +524,36 @@ export default function DashboardHome() {
           </div>
         </div>
 
-        {/* PRIMARY KPI CARDS (RESTORED INDIVIDUAL CARDS) */}
         <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
-          {cards.map((card, i) => (
-            <div key={i} className={`md:col-span-2 bg-card border hairline p-6 rounded-2xl shadow-sm hover:scale-[1.02] transition-all cursor-default`}>
-              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl mb-4">
-                {card.icon}
+          {cards.map((card, i) => {
+            const routes: Record<string, string> = {
+              "Income": "/spending",
+              "Expenses": "/spending",
+              "Savings": "/savings",
+              "Investments": "/investments",
+              "Insurance": "/personal-finance"
+            };
+            return (
+              <div 
+                key={i} 
+                onClick={() => navigate(routes[card.title] || "/")}
+                className={`md:col-span-2 bg-card border hairline p-6 rounded-2xl shadow-sm hover:border-primary/30 transition-all cursor-pointer group active:scale-[0.98]`}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl">
+                    {card.icon}
+                  </div>
+                  <TrendingUp className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">{card.title}</p>
+                <h2 className="text-2xl font-bold tabular-nums mb-2 text-foreground">₹{card.value.toLocaleString('en-IN')}</h2>
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{card.insight}</p>
+                  <span className="text-[10px] text-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity">MANAGE</span>
+                </div>
               </div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">{card.title}</p>
-              <h2 className="text-2xl font-bold tabular-nums mb-2 text-foreground">₹{card.value.toLocaleString('en-IN')}</h2>
-              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{card.insight}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* MAIN ANALYSIS SECTION */}
@@ -542,8 +561,16 @@ export default function DashboardHome() {
           
           {/* CHARTS (50/30/20 & CASHFLOW) */}
           <div className="md:col-span-8 grid grid-cols-1 gap-6">
-            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">Financial Health Goal Progress (50, 20, 30 day rule analysis)</h3>
+            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm group">
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Financial Health Goal Progress (50, 20, 30 day rule analysis)</h3>
+                <button 
+                  onClick={() => navigate("/goals")}
+                  className="text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                >
+                  REVISE STRATEGY <TrendingUp className="w-3 h-3" />
+                </button>
+              </div>
               <div className="h-[250px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
@@ -567,8 +594,16 @@ export default function DashboardHome() {
               </div>
             </div>
 
-            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">Monthly Overview</h3>
+            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm group">
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Monthly Overview</h3>
+                <button 
+                  onClick={() => navigate("/spending")}
+                  className="text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                >
+                  REFINE BUDGET <TrendingUp className="w-3 h-3" />
+                </button>
+              </div>
               <div className="h-[250px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
@@ -604,7 +639,7 @@ export default function DashboardHome() {
             </div>
 
             {/* EMERGENCY FUNDS CARD */}
-            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm">
+            <div className="bg-card border hairline p-8 rounded-2xl shadow-sm group">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Emergency funds</h3>
                 <ShieldCheck className="w-4 h-4 text-muted-foreground" />
@@ -620,9 +655,17 @@ export default function DashboardHome() {
                     style={{ width: `${Math.min(progressPercent, 100)}%` }} 
                   />
                 </div>
-                <p className="text-[11px] font-medium text-muted-foreground text-center">
-                  {progressPercent.toFixed(0)}% complete · {emergencyMonths.toFixed(1)} months coverage
-                </p>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-[11px] font-medium text-muted-foreground">
+                    {progressPercent.toFixed(0)}% complete
+                  </p>
+                  <button 
+                    onClick={() => navigate("/savings")}
+                    className="text-[11px] font-bold text-primary group-hover:underline underline-offset-2"
+                  >
+                    MANAGE SAVINGS →
+                  </button>
+                </div>
               </div>
             </div>
 
