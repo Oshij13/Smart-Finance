@@ -554,51 +554,83 @@ export default function DashboardHome() {
         {/* ROW 2 */}
         <section className="grid md:grid-cols-2 gap-4">
 
-          {/* EMERGENCY FUND */}
-          <div className="rounded-2xl border hairline bg-card p-6 space-y-4">
+        {/* EMERGENCY FUND */}
+        <div className="rounded-2xl border hairline bg-card p-6 flex flex-col space-y-4 min-h-[160px]">
+          <div className="flex justify-between items-start">
             <h3 className="text-sm text-muted-foreground font-medium">Emergency Fund</h3>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Safety Net</span>
+          </div>
 
-            <div className="flex justify-between items-end">
-              <p className="text-2xl font-semibold text-foreground">
-                ₹{savedAmount.toLocaleString('en-IN')}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                / ₹{targetAmount.toLocaleString('en-IN')}
-              </p>
-            </div>
+          <div className="flex justify-between items-end">
+            <p className="text-2xl font-semibold text-foreground">
+              ₹{savedAmount.toLocaleString('en-IN')}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              / ₹{targetAmount.toLocaleString('en-IN')}
+            </p>
+          </div>
 
-            <div className="w-full bg-muted h-1.5 rounded-full">
+          <div className="space-y-2">
+            <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
               <div
-                className="bg-primary h-1.5 rounded-full transition-all"
+                className="bg-primary h-1.5 rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(progressPercent, 100)}%` }}
               />
             </div>
-
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[10px] text-muted-foreground">
               {Math.round(progressPercent)}% complete
             </p>
           </div>
+        </div>
 
-          {/* GOAL Progress with Inline Editing */}
-          <div className="rounded-2xl border hairline bg-card p-6 space-y-4 relative">
-            {/* TOP RIGHT GOAL */}
-            <div className="absolute top-4 right-4 text-xs text-muted-foreground">
-              {goal}
-            </div>
+        {/* GOAL Progress */}
+        <div className="rounded-2xl border hairline bg-card p-6 flex flex-col space-y-4 min-h-[160px]">
+          <div className="flex justify-between items-start w-full">
+            <h3 className="text-sm text-muted-foreground font-medium">Goal Progress</h3>
+            
+            {isEditingGoal ? (
+              <div className="flex gap-1 items-center">
+                <input
+                  value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  className="border hairline px-2 py-0.5 rounded text-[10px] bg-background w-24 text-foreground font-medium outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="Set goal..."
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveGoal}
+                  className="bg-primary text-white px-2 py-0.5 rounded-full text-[10px] font-medium"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsEditingGoal(true)}
+                className="text-[10px] text-primary font-medium hover:underline bg-primary/5 px-2 py-0.5 rounded-full transition-colors"
+                title="Click to change goal"
+              >
+                {goal}
+              </button>
+            )}
+          </div>
 
-            <h3 className="text-sm text-muted-foreground">Goal Progress</h3>
+          <p className="text-2xl font-semibold text-foreground">
+            {progress.toFixed(0)}%
+          </p>
 
-            <p className="text-lg font-semibold text-foreground">
-              {progress.toFixed(0)}%
-            </p>
-
-            <div className="w-full bg-muted h-1.5 rounded-full">
+          <div className="space-y-2 mt-auto">
+            <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
               <div
-                className="bg-primary h-1.5 rounded-full transition-all"
+                className="bg-primary h-1.5 rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(progress, 100)}%` }}
               />
             </div>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-tight">
+              Tracking toward your primary goal
+            </p>
           </div>
+        </div>
         </section>
 
         {/* CHARTS */}
